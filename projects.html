@@ -1,0 +1,128 @@
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>YGI SANTOS PORTFOLIO</title>
+        <link rel="stylesheet" href="css/projects.css">
+        <link rel="stylesheet" href="css/style.css">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Sour+Gummy:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+        <link rel="stylesheet" type='text/css' href="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/devicon.min.css" />
+    </head>
+    <body>
+        <!--Navigation-->
+        <nav id="nav">
+            <ul class="nav-links">
+                <li><a href="./#About">About</a></li>
+                <li><a href="./#Projects">Projects</a></li>
+                <li><a href="./#contact">Contact</a></li>
+            </ul>
+            <div class="menu-toggle" onclick="toggleMenu()">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </nav>
+
+        <!--TABS-->
+        <div class="project-tab">
+            <button id="personalBtn" class="project-btn disabled">PERSONAL</button>
+            <button id="commissionBtn" class="project-btn">COMMISSION</button>
+        </div>
+
+        <!--PERSONAL PROJECTS-->
+        <div id="personal" class="project-container">
+            <span class="header">Personal Projects <span class="font-size-small sub-text">(click to learn more)</span></span>
+            <div class="card">
+                <a href="https://gool.com" style="text-decoration: none;">
+                    <img src="projects/bhasa/images/tutorial.png" class="card-img">
+                    <div class="card-body">
+                        <img src="images/logo.png" class="card-icon" alt="Card icon">
+                        <h5 class="card-title">BHasa: Capstone Project</h5>
+                        <p class="card-text">A Cross-Platform Interactive Educational Story-Based Online Game with Teacher and Admin Web Portal Management</p>
+                        <span class="card-btn"><i class="devicon-unity-plain"></i>Unity</span>
+                        <span class="card-btn"><i class="devicon-firebase-plain"></i>Firebase</span>
+                        <span class="card-btn"><i class="devicon-html5-plain"></i>HTML</span>
+                        <span class="card-btn"><i class="devicon-css3-plain"></i>CSS</span>
+                        <span class="card-btn"><i class="devicon-javascript-plain"></i>JavaScript</span>
+                    </div>
+                </a>
+            </div>
+
+            
+            <div class="card">
+                <a href="https://gool.com" style="text-decoration: none;">
+                    <img src="projects/bhasa/images/tutorial.png" class="card-img">
+                    <div class="card-body">
+                        <img src="images/logo.png" class="card-icon" alt="Card icon">
+                        <h5 class="card-title">BHasa: Capstone Project</h5>
+                        <p class="card-text">A Cross-Platform Interactive Educational Story-Based Online Game with Teacher and Admin Web Portal Management</p>
+                        <span class="card-btn"><i class="devicon-unity-plain"></i>Unity</span>
+                        <span class="card-btn"><i class="devicon-firebase-plain"></i>Firebase</span>
+                        <span class="card-btn"><i class="devicon-html5-plain"></i>HTML</span>
+                        <span class="card-btn"><i class="devicon-css3-plain"></i>CSS</span>
+                        <span class="card-btn"><i class="devicon-javascript-plain"></i>JavaScript</span>
+                    </div>
+                </a>
+            </div>
+        </div>
+
+
+
+        
+        <!--COMMISSION PROJECTS-->
+        <div id="commission" class="project-container invisible">
+            <span class="header">Commission Projects <span class="font-size-small sub-text">(click to learn more)</span></span>
+            <div class="card">
+                <a href="https://gool.com" style="text-decoration: none;">
+                    <img src="projects/bhasa/images/tutorial.png" class="card-img">
+                    <div class="card-body">
+                        <img src="images/logo.png" class="card-icon" alt="Card icon">
+                        <h5 class="card-title">BHasa: Capstone Project</h5>
+                        <p class="card-text">A Cross-Platform Interactive Educational Story-Based Online Game with Teacher and Admin Web Portal Management</p>
+                        <span class="card-btn"><i class="devicon-unity-plain"></i>Unity</span>
+                        <span class="card-btn"><i class="devicon-firebase-plain"></i>Firebase</span>
+                        <span class="card-btn"><i class="devicon-html5-plain"></i>HTML</span>
+                        <span class="card-btn"><i class="devicon-css3-plain"></i>CSS</span>
+                        <span class="card-btn"><i class="devicon-javascript-plain"></i>JavaScript</span>
+                    </div>
+                </a>
+            </div>
+
+            
+            <div class="card">
+                <a href="https://gool.com" style="text-decoration: none;">
+                    <img src="projects/bhasa/images/tutorial.png" class="card-img">
+                    <div class="card-body">
+                        <img src="images/logo.png" class="card-icon" alt="Card icon">
+                        <h5 class="card-title">BHasa: Capstone Project</h5>
+                        <p class="card-text">A Cross-Platform Interactive Educational Story-Based Online Game with Teacher and Admin Web Portal Management</p>
+                        <span class="card-btn"><i class="devicon-unity-plain"></i>Unity</span>
+                        <span class="card-btn"><i class="devicon-firebase-plain"></i>Firebase</span>
+                        <span class="card-btn"><i class="devicon-html5-plain"></i>HTML</span>
+                        <span class="card-btn"><i class="devicon-css3-plain"></i>CSS</span>
+                        <span class="card-btn"><i class="devicon-javascript-plain"></i>JavaScript</span>
+                    </div>
+                </a>
+            </div>
+        </div>
+        <a href="#nav">
+            <button class="top-btn">
+                <svg class="svgIcon" viewBox="0 0 384 512">
+                <path
+                    d="M214.6 41.4c-12.5-12.5-32.8-12.5-45.3 0l-160 160c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L160 141.2V448c0 17.7 14.3 32 32 32s32-14.3 32-32V141.2L329.4 246.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3l-160-160z"
+                ></path>
+                </svg>
+            </button>
+        </a>
+          
+    </body>
+    <footer>
+        <span> </span><br>
+        <span> </span><br>
+        <span> </span><br>
+        <span> </span><br>
+        <span> </span>
+    </footer>
+    <script src="javascript/AgeCalculator.js"></script>
+    <script src="javascript/project.js"></script>
+</html>

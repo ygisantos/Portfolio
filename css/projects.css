@@ -1,0 +1,54 @@
+:root {
+    --text-color: #F5F5DC;
+    --dark-grey: rgba(255, 255, 255, 0.1);
+    --light-grey: rgba(255, 255, 255, 0.05);
+    --border-grey: rgba(255, 255, 255, 0.2);
+    --subtext: #ffffff73;
+    --infotext: #ffffffca;
+    --infotextsub: #ffffff89;
+}
+
+.project-tab {
+    display: flex;
+    flex-direction: row;
+    width: 60%;
+    align-self: center;
+    justify-content: center;
+    gap: 5px;
+}
+
+.project-tab .project-btn {
+    flex: 1;
+    height: 50px;
+    padding: 10px;
+    background-color: rgb(111, 100, 171);
+    border: none;
+    font-family: "Sour Gummy", sans-serif;
+    font-style: normal;
+    font-weight: bold;
+    color: var(--text-color);
+    cursor: pointer;
+}
+
+#personalBtn {
+    border-top-left-radius: 15px;
+    border-bottom-left-radius: 15px;
+}
+
+#commissionBtn {
+    border-top-right-radius: 15px;
+    border-bottom-right-radius: 15px;
+    transition: all ease-in 0.1s;
+}
+
+.project-btn:hover {
+    transform: scale(1.1);
+    background-color: rgb(62, 55, 102);
+    border: 1px solid wheat;
+}
+
+.disabled {
+    background-color: rgb(62, 55, 102) !important;
+    pointer-events: none !important;
+}
+

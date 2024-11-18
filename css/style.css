@@ -593,3 +593,6 @@ nav {
     transition-duration: 0.3s;
   }
   
+  .invisible {
+    display: none;
+  }
