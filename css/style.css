@@ -4,12 +4,18 @@
     --light-grey: rgba(255, 255, 255, 0.05);
     --border-grey: rgba(255, 255, 255, 0.2);
     --subtext: #ffffff73;
+    --infotext: #ffffffca;
+    --infotextsub: #ffffff89;
 }
 
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
@@ -46,7 +52,6 @@ a, a:hover, a:focus, a:active, a:link, a:visited {
 *  =============================
 */ 
 nav {
-    /*background-color: #333;*/
     font-size: 1.5rem;
     color: #fff;
     padding: 10px 20px;
@@ -71,6 +76,7 @@ nav {
 
 .nav-links a:hover {
     color: #4caf50;
+    border-bottom: 2px solid #4caf50;
 }
 
 /* =============================
@@ -89,7 +95,7 @@ nav {
     color: var(--text-color);
     align-items: center;
     justify-content: center;
-    padding: 1rem;
+    padding: 2rem;
     border: 2px solid var(--border-grey);
     border-radius: 5px;
 }
@@ -109,8 +115,9 @@ nav {
 
 .profile-container .name {
     font-weight: bold;
-    font-size: 3rem;
+    font-size: clamp(1rem, 10vw, 2rem); 
 }
+
 /* =============================
 *  END OF PROFILE CONTAINER
 *  =============================
@@ -121,13 +128,26 @@ nav {
 *  =============================
 */ 
 .contact-icon {
-    margin-top: 2rem;
+    margin-top: 5% !important;
     display: flex;
     flex-direction: column;
     font-size: 4rem;
     align-items: center;
     flex: 1 0 0;
     gap: 5px;
+    margin: 5px;
+    padding: 5px;
+    border-radius: 6px;
+    border: 1px solid var(--text-color);
+    height: 100%;
+    cursor: pointer;
+    transition: transform ease-in-out 0.2s;
+}
+
+.contact-icon:hover {
+    transform: scale(1.05);
+    background-color: #232323;
+    z-index: 99;
 }
 .contact-icon span {
     text-align: center;
@@ -143,6 +163,200 @@ nav {
 *  END OF CONTACT ME
 *  =============================
 */ 
+
+/* =============================
+*  START OF What I work with
+*  =============================
+*/
+
+.work-with-container {
+    margin-top: 50px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    color: var(--text-color);
+    padding: 1rem;
+}
+@media only screen and (max-width: 550px) { 
+    .work-with-container {
+        grid-template-columns: 1fr;
+    }
+}
+.work-with-container .header {
+    grid-column: 1 / -1;
+    font-size: 2rem;
+    font-weight: bold;
+}
+.work-with-container > div {
+    margin-left: 2%;
+    color: var(--infotext);
+    font-weight: 800;
+    width: 100%;
+}
+.work-with-container div div {
+    color: var(--infotextsub);
+    font-weight: 400;
+}
+.work-with-container div div::before {
+    margin-left: 5%;
+    content: "▹";
+}
+
+.work-with-container div:hover {
+    transform: scale(1.05);
+}
+
+/* =============================
+*  END OF What I work with
+*  =============================
+*/
+
+
+
+/* =============================
+*  START OF Project 
+*  =============================
+*/
+.project-container {
+    margin-top: 50px;
+    padding: 1rem;
+}
+.project-container .header {
+    color: var(--text-color);
+    font-weight: bold;
+    font-size: 2rem;
+}
+.card {
+    position: relative;
+    transform: scale(0.9);
+    padding: 0;
+    border: 1px solid var(--dark-grey);
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+    background-color: var(--light-grey);
+    border-radius: 6px;
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+}
+
+.card:hover {
+    transform: scale(1);
+    box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.card-img {
+    width: 100%;
+    display: block;
+    border-radius: 6px 6px 0 0;
+}
+
+.card-body {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    padding: 15px;
+    background: rgba(43, 43, 43, 0.7); 
+    backdrop-filter: blur(1px); 
+    color: white;
+    border-radius: 6px;
+    text-align: center;
+    transition: background 0.3s ease;
+}
+
+.card:hover .card-body {
+    background: rgba(43, 43, 43, 0.9); 
+}
+.card-icon {
+    margin-bottom: 0px !important;
+}
+.card-body .card-icon {
+    width: 50px;
+    height: 50px;
+    margin-bottom: 10px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.card-body .card-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.card-body .card-text {
+    font-size: 0.9rem;
+    margin-bottom: 15px;
+}
+
+.card-body .btn {
+    padding: 10px 20px;
+    font-size: 1rem;
+    background-color: var(--primary-color);
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+}
+
+.card-body .btn:hover {
+    background-color: var(--dark-primary);
+}
+
+.card-btn {
+    display: inline-block;
+    outline: 0;
+    border: 0;
+    cursor: pointer;
+    background: #232323;
+    color: #FFFFFF;
+    border-radius: 8px;
+    padding: 10px 16px; 
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1;
+    margin: 5px 5px 0 0; 
+    white-space: nowrap; 
+
+    i {
+        margin-right: 8px; 
+        vertical-align: middle;
+        font-size: 16px;
+    }
+}
+@media (max-width: 1000px) {
+    .card-body {
+        padding: 15px;
+    }
+
+    .card-img {
+        width: 100%; 
+        height: auto;
+    }
+
+    .card-btn {
+        font-size: 8px;
+        padding: 4px 6px; 
+        margin-bottom: 4px; 
+    }
+
+    .card-title {
+        font-size: 18px; 
+    }
+
+    .card-text {
+        font-size: 14px; 
+    }
+
+    .card-icon {
+        max-width: 50px; 
+        height: auto;
+    }
+}
+
+/* =============================
+*  END OF project
+*  =============================
+*/
 .icon-border {
     padding: 10px 14px;
     border: 1px solid var(--dark-grey);
@@ -151,13 +365,231 @@ nav {
     border-radius: 6px;
     cursor: pointer;  
     text-decoration: none;
+    transition: all 0.3s ease-in-out;
 }
 
 .icon-border:hover {
-    background-color: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    background-color: rgba(255, 255, 255, 0.2);
 }
 
 .sub-text {
     color: var(--subtext);
 }
+
+.font-size-small {
+    font-size: 1rem;
+}
+.margin-bottom20 {
+    margin-bottom: 20px;
+}
+
+.star-btn {
+    position: relative;
+    padding: 12px 35px;
+    background: #fec195;
+    font-size: 17px;
+    font-weight: 500;
+    color: #181818;
+    border: 3px solid #fec195;
+    border-radius: 8px;
+    box-shadow: 0 0 0 #fec1958c;
+    transition: all 0.3s ease-in-out;
+    cursor: pointer; 
+  }
+  
+  .star-1 {
+    position: absolute;
+    top: 20%;
+    left: 20%;
+    width: 25px;
+    height: auto;
+    filter: drop-shadow(0 0 0 #fffdef);
+    z-index: -5;
+    transition: all 1s cubic-bezier(0.05, 0.83, 0.43, 0.96);
+  }
+  
+  .star-2 {
+    position: absolute;
+    top: 45%;
+    left: 45%;
+    width: 15px;
+    height: auto;
+    filter: drop-shadow(0 0 0 #fffdef);
+    z-index: -5;
+    transition: all 1s cubic-bezier(0, 0.4, 0, 1.01);
+  }
+  
+  .star-3 {
+    position: absolute;
+    top: 40%;
+    left: 40%;
+    width: 5px;
+    height: auto;
+    filter: drop-shadow(0 0 0 #fffdef);
+    z-index: -5;
+    transition: all 1s cubic-bezier(0, 0.4, 0, 1.01);
+  }
+  
+  .star-4 {
+    position: absolute;
+    top: 20%;
+    left: 40%;
+    width: 8px;
+    height: auto;
+    filter: drop-shadow(0 0 0 #fffdef);
+    z-index: -5;
+    transition: all 0.8s cubic-bezier(0, 0.4, 0, 1.01);
+  }
+  
+  .star-5 {
+    position: absolute;
+    top: 25%;
+    left: 45%;
+    width: 15px;
+    height: auto;
+    filter: drop-shadow(0 0 0 #fffdef);
+    z-index: -5;
+    transition: all 0.6s cubic-bezier(0, 0.4, 0, 1.01);
+  }
+  
+  .star-6 {
+    position: absolute;
+    top: 5%;
+    left: 50%;
+    width: 5px;
+    height: auto;
+    filter: drop-shadow(0 0 0 #fffdef);
+    z-index: -5;
+    transition: all 0.8s ease;
+  }
+  
+  .star-btn:hover {
+    background: transparent;
+    color: #fec195;
+    box-shadow: 0 0 25px #fec1958c;
+  }
+  
+  .star-btn:hover .star-1 {
+    position: absolute;
+    top: -80%;
+    left: -30%;
+    width: 25px;
+    height: auto;
+    filter: drop-shadow(0 0 10px #fffdef);
+    z-index: 2;
+  }
+  
+  .star-btn:hover .star-2 {
+    position: absolute;
+    top: -25%;
+    left: 10%;
+    width: 15px;
+    height: auto;
+    filter: drop-shadow(0 0 10px #fffdef);
+    z-index: 2;
+  }
+  
+  .star-btn:hover .star-3 {
+    position: absolute;
+    top: 55%;
+    left: 25%;
+    width: 5px;
+    height: auto;
+    filter: drop-shadow(0 0 10px #fffdef);
+    z-index: 2;
+  }
+  
+  .star-btn:hover .star-4 {
+    position: absolute;
+    top: 30%;
+    left: 80%;
+    width: 8px;
+    height: auto;
+    filter: drop-shadow(0 0 10px #fffdef);
+    z-index: 2;
+  }
+  
+  .star-btn:hover .star-5 {
+    position: absolute;
+    top: 25%;
+    left: 115%;
+    width: 15px;
+    height: auto;
+    filter: drop-shadow(0 0 10px #fffdef);
+    z-index: 2;
+  }
+  
+  .star-btn:hover .star-6 {
+    position: absolute;
+    top: 5%;
+    left: 60%;
+    width: 5px;
+    height: auto;
+    filter: drop-shadow(0 0 10px #fffdef);
+    z-index: 2;
+  }
+  
+  .fil0 {
+    fill: #fffdef;
+  }
+  
+.top-btn {
+    width: 75px;
+    height: 75px;
+    border-radius: 50%;
+    background-color: rgba(20, 20, 20, 0);
+    border: none;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0px 0px 0px 4px rgba(180, 160, 255, 0.253);
+    cursor: pointer;
+    transition-duration: 0.3s;
+    overflow: hidden;
+    position: fixed;
+    bottom: 5%;
+    right: 5%;
+    z-index: 999;
+  }
+  
+  .svgIcon {
+    width: 20px;
+    transition-duration: 0.3s;
+  }
+  
+  .svgIcon path {
+    fill: white;
+  }
+  
+  .top-btn:hover {
+    width: 140px;
+    border-radius: 50px;
+    transition-duration: 0.3s;
+    background-color: rgb(181, 160, 255);
+    align-items: center;
+  }
+  
+  .top-btn:hover .svgIcon {
+    /* width: 20px; */
+    transition-duration: 0.3s;
+    transform: translateY(-200%);
+  }
+  
+  .top-btn::before {
+    position: absolute;
+    bottom: -20px;
+    content: "Back to Top";
+    color: white;
+    /* transition-duration: .3s; */
+    font-size: 0px;
+  }
+  
+  .top-btn:hover::before {
+    font-size: 13px;
+    opacity: 1;
+    bottom: unset;
+    /* transform: translateY(-30px); */
+    transition-duration: 0.3s;
+  }
+  
