@@ -54,7 +54,7 @@ a, a:hover, a:focus, a:active, a:link, a:visited {
 nav {
     font-size: 1.5rem;
     color: #fff;
-    padding: 10px 20px;
+    padding: 20px 50px;
     display: flex;
     justify-content: center;
     align-items: center;
