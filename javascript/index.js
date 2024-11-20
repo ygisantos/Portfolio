@@ -1,11 +1,11 @@
 const awardDictionary = {
     1: {
         name: "ORACLE",
-        imageURL: "../images/certificates/ORACLE.jpg"
+        imageURL: "./images/certificates/ORACLE.jpg"
     },
     2: {
         name: "SYSTEM ADMINISTRATOR",
-        imageURL: "../images/certificates/SYSAD.jpg"
+        imageURL: "./images/certificates/SYSAD.jpg"
     },
     3: {
         name: "CCDT",
@@ -13,30 +13,30 @@ const awardDictionary = {
     },
     4: {
         name: "DATA STRUCTURE AND ALGORITHM",
-        imageURL: "../images/certificates/DASTRAL.jpg"
+        imageURL: "./images/certificates/DASTRAL.jpg"
     },
     5: {
         name: "SAP BUSINESS ONE",
-        imageURL: "../images/certificates/SAP.jpg"
+        imageURL: "./images/certificates/SAP.jpg"
     },
     2.1: {
         name: "JAME GAM CHRISTMAS EDITION",
-        imageURL: "../images/Awards/JAM_GAME.PNG",
+        imageURL: "./images/Awards/JAM_GAME.PNG",
         description: "A 4TH Place Screenshot as a Solo Team for Online Game Jam Competition with over 90 Team Participants"
     },
     2.2: {
         name: "SCORESPACE JAM #17",
-        imageURL: "../images/Awards/SCORE_SPACE17.PNG",
+        imageURL: "./images/Awards/SCORE_SPACE17.PNG",
         description: "A 10TH Place Screenshot as a Solo Team for Online Game Jam Competition with over 140 Team Participants"
     },
     2.3: {
         name: "CODEFEST (MOBILE APP HACKATHON)",
-        imageURL: "../images/Awards/HACKATHON.jpg",
+        imageURL: "./images/Awards/HACKATHON.jpg",
         description: "A First Runner-up Certification for Local Competition held at STI College Balagtas"
     },
     2.4: {
         name: "NATIONAL IT SKILLS COMPETITION (JAVA)",
-        imageURL: "../images/Awards/NATIONAL.jpg",
+        imageURL: "./images/Awards/NATIONAL.jpg",
         description: "A Participation Certificate for National Competition of Java Algorithm"
     }
 }
