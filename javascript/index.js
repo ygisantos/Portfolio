@@ -21,12 +21,12 @@ const awardDictionary = {
     },
     2.1: {
         name: "JAME GAM CHRISTMAS EDITION",
-        imageURL: "/repo-name/images/Awards/JAM_GAME.PNG",
+        imageURL: "/repo-name/images/Awards/JAM_GAME.png",
         description: "A 4TH Place Screenshot as a Solo Team for Online Game Jam Competition with over 90 Team Participants"
     },
     2.2: {
         name: "SCORESPACE JAM #17",
-        imageURL: "/repo-name/images/Awards/SCORE_SPACE17.PNG",
+        imageURL: "/repo-name/images/Awards/SCORE_SPACE17.png",
         description: "A 10TH Place Screenshot as a Solo Team for Online Game Jam Competition with over 140 Team Participants"
     },
     2.3: {
