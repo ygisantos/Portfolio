@@ -1,42 +1,42 @@
 const awardDictionary = {
     1: {
         name: "ORACLE",
-        imageURL: "/Portfolio/images/certificates/ORACLE.jpg"
+        imageURL: "/images/certificates/ORACLE.jpg"
     },
     2: {
         name: "SYSTEM ADMINISTRATOR",
-        imageURL: "/Portfolio/images/certificates/SYSAD.jpg"
+        imageURL: "/images/certificates/SYSAD.jpg"
     },
     3: {
         name: "CCDT",
-        imageURL: "/Portfolio/images/certificates/CCDT.jpg"
+        imageURL: "./images/certificates/CCDT.jpg"
     },
     4: {
         name: "DATA STRUCTURE AND ALGORITHM",
-        imageURL: "/Portfolio/images/certificates/DASTRAL.jpg"
+        imageURL: "/images/certificates/DASTRAL.jpg"
     },
     5: {
         name: "SAP BUSINESS ONE",
-        imageURL: "/Portfolio/images/certificates/SAP.jpg"
+        imageURL: "/images/certificates/SAP.jpg"
     },
     2.1: {
         name: "JAME GAM CHRISTMAS EDITION",
-        imageURL: "/Portfolio/images/Awards/JAM_GAME.png",
+        imageURL: "/images/Awards/JAM_GAME.png",
         description: "A 4TH Place Screenshot as a Solo Team for Online Game Jam Competition with over 90 Team Participants"
     },
     2.2: {
         name: "SCORESPACE JAM #17",
-        imageURL: "/Portfolio/images/Awards/SCORE_SPACE17.png",
+        imageURL: "/images/Awards/SCORE_SPACE17.png",
         description: "A 10TH Place Screenshot as a Solo Team for Online Game Jam Competition with over 140 Team Participants"
     },
     2.3: {
         name: "CODEFEST (MOBILE APP HACKATHON)",
-        imageURL: "/Portfolio/images/Awards/HACKATHON.jpg",
+        imageURL: "/images/Awards/HACKATHON.jpg",
         description: "A First Runner-up Certification for Local Competition held at STI College Balagtas"
     },
     2.4: {
         name: "NATIONAL IT SKILLS COMPETITION (JAVA)",
-        imageURL: "/Portfolio/images/Awards/NATIONAL.jpg",
+        imageURL: "/images/Awards/NATIONAL.jpg",
         description: "A Participation Certificate for National Competition of Java Algorithm"
     }
 }
