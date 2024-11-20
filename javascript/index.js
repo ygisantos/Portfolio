@@ -1,42 +1,42 @@
 const awardDictionary = {
     1: {
         name: "ORACLE",
-        imageURL: "/repo-name/images/certificates/ORACLE.jpg"
+        imageURL: "/Portfolio/images/certificates/ORACLE.jpg"
     },
     2: {
         name: "SYSTEM ADMINISTRATOR",
-        imageURL: "/repo-name/images/certificates/SYSAD.jpg"
+        imageURL: "/Portfolio/images/certificates/SYSAD.jpg"
     },
     3: {
         name: "CCDT",
-        imageURL: "/repo-name/images/certificates/CCDT.jpg"
+        imageURL: "/Portfolio/images/certificates/CCDT.jpg"
     },
     4: {
         name: "DATA STRUCTURE AND ALGORITHM",
-        imageURL: "/repo-name/images/certificates/DASTRAL.jpg"
+        imageURL: "/Portfolio/images/certificates/DASTRAL.jpg"
     },
     5: {
         name: "SAP BUSINESS ONE",
-        imageURL: "/repo-name/images/certificates/SAP.jpg"
+        imageURL: "/Portfolio/images/certificates/SAP.jpg"
     },
     2.1: {
         name: "JAME GAM CHRISTMAS EDITION",
-        imageURL: "/repo-name/images/Awards/JAM_GAME.png",
+        imageURL: "/Portfolio/images/Awards/JAM_GAME.png",
         description: "A 4TH Place Screenshot as a Solo Team for Online Game Jam Competition with over 90 Team Participants"
     },
     2.2: {
         name: "SCORESPACE JAM #17",
-        imageURL: "/repo-name/images/Awards/SCORE_SPACE17.png",
+        imageURL: "/Portfolio/images/Awards/SCORE_SPACE17.png",
         description: "A 10TH Place Screenshot as a Solo Team for Online Game Jam Competition with over 140 Team Participants"
     },
     2.3: {
         name: "CODEFEST (MOBILE APP HACKATHON)",
-        imageURL: "/repo-name/images/Awards/HACKATHON.jpg",
+        imageURL: "/Portfolio/images/Awards/HACKATHON.jpg",
         description: "A First Runner-up Certification for Local Competition held at STI College Balagtas"
     },
     2.4: {
         name: "NATIONAL IT SKILLS COMPETITION (JAVA)",
-        imageURL: "/repo-name/images/Awards/NATIONAL.jpg",
+        imageURL: "/Portfolio/images/Awards/NATIONAL.jpg",
         description: "A Participation Certificate for National Competition of Java Algorithm"
     }
 }
