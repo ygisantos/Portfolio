@@ -1,23 +1,23 @@
 const awardDictionary = {
     1: {
         name: "ORACLE",
-        imageURL: "/images/certificates/ORACLE.jpg"
+        imageURL: "../images/certificates/ORACLE.jpg"
     },
     2: {
         name: "SYSTEM ADMINISTRATOR",
-        imageURL: "/images/certificates/SYSAD.jpg"
+        imageURL: "../images/certificates/SYSAD.jpg"
     },
     3: {
         name: "CCDT",
-        imageURL: "/images/certificates/CCDT.jpg"
+        imageURL: "../images/certificates/CCDT.jpg"
     },
     4: {
         name: "DATA STRUCTURE AND ALGORITHM",
-        imageURL: "/images/certificates/DASTRAL.jpg"
+        imageURL: "../images/certificates/DASTRAL.jpg"
     },
     5: {
         name: "SAP BUSINESS ONE",
-        imageURL: "/images/certificates/SAP.jpg"
+        imageURL: "../images/certificates/SAP.jpg"
     }
 }
 
