@@ -1,13 +1,23 @@
 const awardDictionary = {
     1: {
-        name: "testing name",
-        imageURL: "/projects/bhasa/images/tutorial.png",
-        description: "testing desc"
+        name: "ORACLE",
+        imageURL: "/images/certificates/ORACLE.jpg"
     },
     2: {
-        name: "testing name123",
-        imageURL: "/projects/bhasa/images/tutorial.png123",
-        description: "testi123ng desc"
+        name: "SYSTEM ADMINISTRATOR",
+        imageURL: "/images/certificates/SYSAD.jpg"
+    },
+    3: {
+        name: "CCDT",
+        imageURL: "/images/certificates/CCDT.jpg"
+    },
+    4: {
+        name: "DATA STRUCTURE AND ALGORITHM",
+        imageURL: "/images/certificates/DASTRAL.jpg"
+    },
+    5: {
+        name: "SAP BUSINESS ONE",
+        imageURL: "/images/certificates/SAP.jpg"
     }
 }
 
@@ -20,8 +30,7 @@ document.querySelectorAll('.award-btn').forEach(button => {
 
         const data = awardDictionary[button.value];
         document.getElementById('award-title').innerText = data.name;
-        document.getElementById('award-img').src = window.location.origin + data.imageURL;
-        document.getElementById('award-info').innerText = data.description;
+        document.getElementById('award-img').src = data.imageURL;
     });
 });
 

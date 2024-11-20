@@ -427,7 +427,7 @@ nav {
 
 .award-popup-container img {
     position: relative;
-    width: 50%;
+    width: 40%;
     height: auto;
     object-fit: fill;
 }
@@ -667,7 +667,6 @@ nav {
   }
   
   .top-btn:hover .svgIcon {
-    /* width: 20px; */
     transition-duration: 0.3s;
     transform: translateY(-200%);
   }
@@ -677,7 +676,6 @@ nav {
     bottom: -20px;
     content: "Back to Top";
     color: white;
-    /* transition-duration: .3s; */
     font-size: 0px;
   }
   
@@ -685,19 +683,30 @@ nav {
     font-size: 13px;
     opacity: 1;
     bottom: unset;
-    /* transform: translateY(-30px); */
     transition-duration: 0.3s;
   }
   
   #award-popup {
     opacity: 0;
     visibility: hidden;
-    transition: opacity 0.3s ease, visibility 0s 0.3s; /* Transition for fade-in/fade-out */
+    transition: opacity 0.3s ease, visibility 0s 0.3s; 
 }
 
-/* When the popup is visible, we change its opacity and visibility */
 #award-popup.visible {
     opacity: 1;
     visibility: visible;
     transition: opacity 0.3s ease;
+}
+
+#award-exit {
+    margin: 10px;
+    width: 200px;
+    font-weight: bold;
+    border: none;
+    border-radius: 6px;
+    font-size: 2em;
+}
+
+#award-exit:hover {
+    background-color: wheat;
 }
