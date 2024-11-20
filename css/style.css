@@ -16,8 +16,20 @@
 
 html {
   scroll-behavior: smooth;
+  overflow-x: hidden;
+}
+body::-webkit-scrollbar {
+    width: 0.5em;
 }
 
+body::-webkit-scrollbar-track {
+    box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+}
+
+body::-webkit-scrollbar-thumb {
+    background-color: rgb(153, 137, 137);
+    outline: 1px solid slategrey;
+}
 body {
     margin: 0;
     padding: 0;
@@ -144,6 +156,9 @@ nav {
     transition: transform ease-in-out 0.2s;
 }
 
+.contact-icon i {
+    margin: 10px;
+}
 .contact-icon:hover {
     transform: scale(1.05);
     background-color: #232323;
@@ -151,7 +166,7 @@ nav {
 }
 .contact-icon span {
     text-align: center;
-    font-size: 1.2rem;
+    font-size: 1.5rem;
 }
 
 .contact-info {
@@ -389,13 +404,16 @@ nav {
     transition: all ease 0.2;
     font-weight: bold;
     cursor: pointer;
+    transition: all ease 0.2s;
 }
 
 .award-btn:hover {
     background-color: #fec195;
+    transform: scale(1.1);
 }
 
 .award-popup-container {
+    z-index: 1120;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -411,34 +429,83 @@ nav {
     border: 1px solid white;
     background-color: #151515;
     border-radius: 5px;
+    overflow-y: auto; 
 }
 
 .award-popup-container h2 {
-    font-size: 5vw;
+    font-size: 3rem;
+    margin-bottom: 1rem;
     text-align: center;
     position: relative;
 }
 
 .award-popup-container span {
-    font-size: 2rem;
+    font-size: 1.2rem;
     text-align: center;
     position: relative;
 }
 
 .award-popup-container img {
     position: relative;
-    width: 40%;
+    width: 40vw;
     height: auto;
-    object-fit: fill;
+    object-fit: contain;
+    margin-bottom: 1rem;
+    max-width: 500px;
+}
+#award-popup {
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0s 0.3s; 
+}
+
+#award-popup.visible {
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 0.3s ease;
+}
+
+#award-exit {
+    position: absolute;
+    left: 50%;
+    bottom: 1%;
+    transform: translate(-50%, -50%);
+    margin-top: 50px;
+    width: 200px;
+    font-weight: bold;
+    border: none;
+    border-radius: 6px;
+    font-size: 2em;
+    cursor: pointer;
+    transition: all ease 0.2s;
+}
+
+#award-exit:hover {
+    background-color: wheat;
 }
 
 @media only screen and (max-width: 1000px) { 
+    .award-popup-container {
+        width: 95%;
+        padding: 4%;
+    }
+
     .award-popup-container img {
-        width: 70%;
+        width: 80%;
     }
 }
 
 @media only screen and (max-width: 800px) { 
+    .award-popup-container {
+        width: 100%;
+        padding: 2%;
+    }
+
+
+    .award-popup-container span {
+        font-size: 1rem;
+    }
+
     .award-popup-container img {
         width: 90%;
     }
@@ -686,27 +753,3 @@ nav {
     transition-duration: 0.3s;
   }
   
-  #award-popup {
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 0.3s ease, visibility 0s 0.3s; 
-}
-
-#award-popup.visible {
-    opacity: 1;
-    visibility: visible;
-    transition: opacity 0.3s ease;
-}
-
-#award-exit {
-    margin: 10px;
-    width: 200px;
-    font-weight: bold;
-    border: none;
-    border-radius: 6px;
-    font-size: 2em;
-}
-
-#award-exit:hover {
-    background-color: wheat;
-}
