@@ -1,42 +1,42 @@
 const awardDictionary = {
     1: {
         name: "ORACLE",
-        imageURL: "./images/certificates/ORACLE.jpg"
+        imageURL: "https://raw.githubusercontent.com/ygisantos/Portfolio/main/images/certificates/ORACLE.jpg"
     },
     2: {
         name: "SYSTEM ADMINISTRATOR",
-        imageURL: "./images/certificates/SYSAD.jpg"
+        imageURL: "https://raw.githubusercontent.com/ygisantos/Portfolio/main/images/certificates/SYSAD.jpg"
     },
     3: {
         name: "CCDT",
-        imageURL: "./images/certificates/CCDT.jpg"
+        imageURL: "https://raw.githubusercontent.com/ygisantos/Portfolio/main/images/certificates/CCDT.jpg"
     },
     4: {
         name: "DATA STRUCTURE AND ALGORITHM",
-        imageURL: "./images/certificates/DASTRAL.jpg"
+        imageURL: "https://raw.githubusercontent.com/ygisantos/Portfolio/main/images/certificates/DASTRAL.jpg"
     },
     5: {
         name: "SAP BUSINESS ONE",
-        imageURL: "./images/certificates/SAP.jpg"
+        imageURL: "https://raw.githubusercontent.com/ygisantos/Portfolio/main/images/certificates/SAP.jpg"
     },
     2.1: {
         name: "JAME GAM CHRISTMAS EDITION",
-        imageURL: "./images/Awards/JAM_GAME.png",
+        imageURL: "https://raw.githubusercontent.com/ygisantos/Portfolio/main/images/Awards/JAM_GAME.png",
         description: "A 4TH Place Screenshot as a Solo Team for Online Game Jam Competition with over 90 Team Participants"
     },
     2.2: {
         name: "SCORESPACE JAM #17",
-        imageURL: "./images/Awards/SCORE_SPACE17.png",
+        imageURL: "https://raw.githubusercontent.com/ygisantos/Portfolio/main/images/Awards/SCORE_SPACE17.png",
         description: "A 10TH Place Screenshot as a Solo Team for Online Game Jam Competition with over 140 Team Participants"
     },
     2.3: {
         name: "CODEFEST (MOBILE APP HACKATHON)",
-        imageURL: "./images/Awards/HACKATHON.jpg",
+        imageURL: "https://raw.githubusercontent.com/ygisantos/Portfolio/main/images/Awards/HACKATHON.jpg",
         description: "A First Runner-up Certification for Local Competition held at STI College Balagtas"
     },
     2.4: {
         name: "NATIONAL IT SKILLS COMPETITION (JAVA)",
-        imageURL: "./images/Awards/NATIONAL.jpg",
+        imageURL: "https://raw.githubusercontent.com/ygisantos/Portfolio/main/images/Awards/NATIONAL.jpg",
         description: "A Participation Certificate for National Competition of Java Algorithm"
     }
 }
