@@ -1,7 +1,7 @@
 <html>
     <head>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>YGI SANTOS PORTFOLIO</title>
+        <title>Ygi Santos | Portfolio</title>
         <link rel="stylesheet" href="css/style.css">
         <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
         <link href="https://fonts.googleapis.com/css2?family=Sour+Gummy:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
@@ -10,21 +10,22 @@
     <body>
         <!--Navigation-->
         <nav id="nav">
-            <ul class="nav-links">
-                <li><a href="#About">About</a></li>
-                <li><a href="#Projects">Projects</a></li>
-                <li><a href="#Awards">Awards & Certificates</a></li>
-                <li><a href="#contact">Contact</a></li>
-            </ul>
-            <div class="menu-toggle" onclick="toggleMenu()">
-                <span></span>
-                <span></span>
-                <span></span>
-            </div>
-        </nav>
+          <ul class="nav-links">
+              <li><a href="#About" class="nav-link">About</a></li>
+              <li><a href="#Awards" class="nav-link">Awards & Certificates</a></li>
+              <li><a href="#Projects" class="nav-link">Projects</a></li>
+              <li><a href="#contact" class="nav-link">Contact</a></li>
+          </ul>
+          <div class="menu-toggle" onclick="toggleMenu()">
+              <span></span>
+              <span></span>
+              <span></span>
+          </div>
+      </nav>
         
         <!--About me-->
-        <div id="About" class="profile-container">
+        <section id="About"> </section>
+        <div class="profile-container">
             <div class="row">
                 <span class="name">Ygi Martin Santos</span>
                 <div style="align-content: flex-end;">
@@ -37,13 +38,12 @@
                 <i class="bi bi-geo-alt-fill" style="margin-right: 5px;"></i>
                 <span>Balagtas, Bulacan, Philippines</span>
             </div>
-            <div class="row">
-                <span>I am Ygi Martin Santos, A <span id="age"></span>-year-old developer specializing 
-                in creating 2D and 3D games, desktop applications, mobile applications, and web solutions. 
-                I have been passionate about programming since the age of 16, and I offer my services 
-                on a commission-based model, delivering high-quality software tailored to meet client 
-                needs. My expertise spans various platforms, allowing me to bring diverse projects to 
-                life with a focus on functionality, performance, and user experience.</span>
+            <div class="row font-size-big">
+                <span>I’m Ygi Martin Santos, a <span id="age"></span>-year-old developer 
+                specializing in 2D & 3D games, desktop, mobile, and web applications. 
+                With a passion for programming since 16, I deliver commission-based, 
+                high-quality software tailored to client needs, focusing on functionality, 
+                performance, and user experience.</span>
             </div>
         </div>
 
@@ -133,8 +133,8 @@
         </div>
 
         <!--Awards-->
-        
-        <div id="Awards" class="profile-container" style="margin-top: 50px;">
+        <section id="Awards"></section>
+        <div class="profile-container" style="margin-top: 100px;">
           <div class="row">
               <span class="name">Awards & Certificates</span>
           </div>
@@ -162,14 +162,24 @@
               <button class="award-btn" value="4">SHOW</button>
           </div>
           <div class="row award-row">
-              <span class="award-name">SAP BUSINESS ONE</span>
+              <span class="award-name">SAP BUSINESS ONE (BASIC)</span>
               <span class="award-date">March 21, 2023</span>
               <button class="award-btn" value="5">SHOW</button>
+          </div>
+          <div class="row award-row">
+              <span class="award-name">SAP BUSINESS ONE (ADVANCE)</span>
+              <span class="award-date">Febuary 29, 2024</span>
+              <button class="award-btn" value="6">SHOW</button>
           </div>
 
           <!--AWARDS-->
           <div class="row">
               <span class="sub-text" style="margin-top: 30px;">Awards</span>
+          </div>
+          <div class="row award-row">
+              <span class="award-name">CODEFEST</span>
+              <span class="award-date">June 25, 2020</span>
+              <button class="award-btn" value="2.0">SHOW</button>
           </div>
           <div class="row award-row">
               <span class="award-name">JAME GAM CHRISTMAS EDITION</span>
@@ -194,11 +204,12 @@
         </div>
       
         <!--Projects-->
-        <div id="Projects" class="project-container">
+        <section id="Projects"></section>
+        <div class="project-container">
             <span class="header">My Projects <span class="font-size-small sub-text">(click to learn more)</span></span>
             <div class="card">
-                <a href="https://gool.com" style="text-decoration: none;">
-                    <img src="projects/bhasa/images/tutorial.png" class="card-img">
+                <a href="#" style="text-decoration: none;">
+                    <img src="https://raw.githubusercontent.com/ygisantos/Portfolio/main/projects/bhasa/images/tutorial.png" class="card-img">
                     <div class="card-body">
                         <img src="images/logo.png" class="card-icon" alt="Card icon">
                         <h5 class="card-title">BHasa: Capstone Project</h5>
@@ -214,8 +225,8 @@
 
             
             <div class="card">
-                <a href="https://gool.com" style="text-decoration: none;">
-                    <img src="projects/bhasa/images/tutorial.png" class="card-img">
+                <a href="#" style="text-decoration: none;">
+                    <img src="https://raw.githubusercontent.com/ygisantos/Portfolio/main/projects/bhasa/images/tutorial.png" class="card-img">
                     <div class="card-body">
                         <img src="images/logo.png" class="card-icon" alt="Card icon">
                         <h5 class="card-title">BHasa: Capstone Project</h5>
@@ -355,7 +366,8 @@
         <div style="border-top: 1px solid rgba(255, 255, 255, 0.548); width: 100%; margin-top: 5%; margin-bottom: 5%;">
         </div>
         <!--Contacts-->
-        <div id="contact" class="profile-container" style="margin-top: 50px;">
+        <section id="contact"></section>
+        <div class="profile-container" style="margin-top: 50px;">
             <div class="row">
                 <span class="name">Contact me</span>
             </div>
@@ -406,4 +418,5 @@
     </footer>
     <script src="javascript/AgeCalculator.js"></script>
     <script src="javascript/index.js"></script>
+    <script src="javascript/navigation.js"></script>
 </html>

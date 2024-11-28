@@ -16,8 +16,17 @@ const awardDictionary = {
         imageURL: "https://raw.githubusercontent.com/ygisantos/Portfolio/main/images/certificates/DASTRAL.jpg"
     },
     5: {
-        name: "SAP BUSINESS ONE",
+        name: "SAP BUSINESS ONE (BASIC)",
         imageURL: "https://raw.githubusercontent.com/ygisantos/Portfolio/main/images/certificates/SAP.jpg"
+    },
+    6: {
+        name: "SAP BUSINESS ONE (ADVANCE)",
+        imageURL: "https://raw.githubusercontent.com/ygisantos/Portfolio/main/images/certificates/SAP_ADV.jpg"
+    },
+    2.0: {
+        name: "CODE FEST",
+        imageURL: "https://raw.githubusercontent.com/ygisantos/Portfolio/main/images/Awards/CODE_FEST_2020.jpg",
+        description: "A 2nd Runner-Up Certification for Local Competition held at STI College Balagtas"
     },
     2.1: {
         name: "JAME GAM CHRISTMAS EDITION",
