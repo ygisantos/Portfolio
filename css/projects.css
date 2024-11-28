@@ -9,6 +9,7 @@
 }
 
 .project-tab {
+    margin-top: 100px;
     display: flex;
     flex-direction: row;
     width: 60%;
