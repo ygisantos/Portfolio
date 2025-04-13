@@ -1,0 +1,55 @@
+Admin side pwede wala ng design since ako lang makakakita
+
+Data to turn into dynamic
+- Short Description (intro)
+- Description
+- Location
+- Availability
+- Resume (Direct Download Link) 
+- Certificates
+    - Title
+    - Description
+    - Date
+    - Image base64
+- Awards
+    - Title
+    - Description
+    - Date
+    - Image base64
+- Skills
+    - Icon (idk if preset or image base64)
+    - Title
+    - Proficiency 0 to 100 (percentage)
+- Experiences
+    - Name
+    - From (date)
+    - To (date or "still doing")
+    - Description
+    - What I learned
+    - Job Description/Role
+- Works
+    - Title
+    - Description
+    - Year
+    - How long did it take
+    - Category (Work, Commission, School, Side Project)
+    - Image (base64 and multiple/array)
+Socials
+    - Github
+    - Linkedin
+    - Facebook
+    - Facebook Page
+    - Phone Number
+    - Email Address
+Testimonials
+    - Company Name
+    - Name
+    - Role
+    - Comment
+    - Image (Base 64)
+Comments
+    - Name (Can be anonymous)
+    - Comment
+    - Date
+Information
+    - Number of visits (incremental)
