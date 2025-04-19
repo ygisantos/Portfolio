@@ -177,6 +177,14 @@ export default function PortfolioPage() {
                 onChange={(e) => handleInputChange('resume_url', e.target.value)}
                 className="w-full border border-gray-300 rounded-md p-2"
               />
+              <a
+              href={getData(data.resume_url)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-500 underline"
+            >
+              Download Resume
+            </a>
             </div>
           </section>
         );
