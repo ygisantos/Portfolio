@@ -11,12 +11,17 @@ import {
   deleteDocument,
   updateProfile,
   updateCollection,
+  loginWithPopup,
+  loginWithEmailAndPassword,
+  logout,
 } from '@api/Api';
 
 export default function PortfolioPage() {
   const [data, setData] = useState(null);
   const [editableData, setEditableData] = useState({});
   const [activeTab, setActiveTab] = useState('basic'); // Track the active tab
+  const [loginData, setLoginData] = useState({ email: '', password: '' });
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -80,14 +85,14 @@ export default function PortfolioPage() {
         location: editableData.location || '',
         availability: editableData.availability || '',
         resume_url: editableData.resume_url || '',
-        socials: { 
-          github: editableData.github || '',
-          linkedin: editableData.linkedin || '',
-          facebook: editableData.facebook || '',
-          facebook_page: editableData.facebook_page || '',
-          phone: editableData.phone || '',
-          email: editableData.email || ''
-        }
+        socials: {
+          github: editableData.socials?.github || '',
+          linkedin: editableData.socials?.linkedin || '',
+          facebook: editableData.socials?.facebook || '',
+          facebook_page: editableData.socials?.facebook_page || '',
+          phone: editableData.socials?.phone || '',
+          email: editableData.socials?.email || '',
+        },
       });
 
       // Update collections
@@ -103,6 +108,20 @@ export default function PortfolioPage() {
       console.error('Error updating data:', error.message);
       alert('Failed to update data. Please check your inputs and try again.');
     }
+  };
+
+  // Helper function to sanitize and flatten the languages data
+  const sanitizeLanguages = (languages) => {
+    return languages?.map((lang) => {
+      const extractNameAndIcon = (obj) => {
+        if (obj?.name && typeof obj.name === 'string') {
+          return { name: obj.name, icon: obj.icon || '' };
+        }
+        return extractNameAndIcon(obj?.name || obj);
+      };
+
+      return extractNameAndIcon(lang) || { name: 'Unknown', icon: '' };
+    }) || [];
   };
 
   const renderTabContent = () => {
@@ -286,8 +305,16 @@ export default function PortfolioPage() {
                   <label className="block font-medium capitalize">{field.replace('_', ' ')}:</label>
                   <input
                     type="text"
-                    value={editableData[field] || ''}
-                    onChange={(e) => handleInputChange(field, e.target.value)}
+                    value={editableData.socials?.[field] || ''} // Access nested socials field
+                    onChange={(e) => {
+                      setEditableData((prev) => ({
+                        ...prev,
+                        socials: {
+                          ...prev.socials,
+                          [field]: e.target.value, // Update the specific social field
+                        },
+                      }));
+                    }}
                     className="w-full border border-gray-300 rounded-md p-2"
                   />
                 </div>
@@ -565,14 +592,14 @@ export default function PortfolioPage() {
                 )}
                 <label className="block font-medium mb-1">Languages/Technologies:</label>
                 <div className="flex flex-wrap gap-2 mb-2">
-                  {work.languages?.map((lang, langIndex) => (
+                  {sanitizeLanguages(work.languages).map((lang, langIndex) => (
                     <div key={langIndex} className="flex items-center bg-gray-100 p-2 rounded">
                       <img
-                        src={`https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/${lang}/${lang}-original.svg`}
-                        alt={lang}
+                        src={lang.icon} // Use the sanitized `icon` property
+                        alt={lang.name} // Use the sanitized `name` property
                         className="w-6 h-6 mr-2"
                       />
-                      <span>{lang}</span>
+                      <span>{lang.name}</span> {/* Render the sanitized `name` */}
                       <button
                         onClick={() => {
                           const updated = [...data.works];
@@ -591,8 +618,15 @@ export default function PortfolioPage() {
                     className="w-full border border-gray-300 rounded-md p-2"
                     onChange={(e) => {
                       if (e.target.value) {
+                        const selectedLanguage = e.target.value;
                         const updated = [...data.works];
-                        updated[index].languages = [...(work.languages || []), e.target.value];
+                        updated[index].languages = [
+                          ...(work.languages || []),
+                          {
+                            name: selectedLanguage,
+                            icon: `https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/${selectedLanguage}/${selectedLanguage}-original.svg`
+                          }
+                        ];
                         setData({ ...data, works: updated });
                         e.target.value = ''; // Reset select
                       }
@@ -764,6 +798,25 @@ export default function PortfolioPage() {
     }
   };
 
+  const handleLogin = async () => {
+    const { email, password } = loginData;
+    if (!email || !password) {
+      alert('Please enter both email and password.');
+      return;
+    }
+    const result = await loginWithEmailAndPassword(email, password);
+    if (result.success) {
+      setIsLoggedIn(true);
+    }
+  };
+
+  const handleLogout = async () => {
+    const result = await logout();
+    if (result.success) {
+      setIsLoggedIn(false);
+    }
+  };
+
   if (!data) return <div>Loading...</div>;
 
   const getData = (val) => val ?? 'N/A';
@@ -781,6 +834,45 @@ export default function PortfolioPage() {
   return (
     <div className="p-6 bg-gray-100 min-h-screen">
       <h1 className="text-3xl font-bold mb-4">Portfolio</h1>
+      {!isLoggedIn ? (
+        <div className="mb-4 bg-white shadow-md rounded-lg p-6">
+          <h2 className="text-xl font-semibold mb-4">Login</h2>
+          <div className="mb-4">
+            <label className="block font-medium mb-1">Email:</label>
+            <input
+              type="email"
+              value={loginData.email}
+              onChange={(e) => setLoginData({ ...loginData, email: e.target.value })}
+              className="w-full border border-gray-300 rounded-md p-2"
+            />
+          </div>
+          <div className="mb-4">
+            <label className="block font-medium mb-1">Password:</label>
+            <input
+              type="password"
+              value={loginData.password}
+              onChange={(e) => setLoginData({ ...loginData, password: e.target.value })}
+              className="w-full border border-gray-300 rounded-md p-2"
+            />
+          </div>
+          <button
+            onClick={handleLogin}
+            className="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600"
+          >
+            Login
+          </button>
+        </div>
+      ) : (
+        <div className="mb-4 bg-white shadow-md rounded-lg p-6">
+          <h2 className="text-xl font-semibold mb-4">Welcome!</h2>
+          <button
+            onClick={handleLogout}
+            className="bg-red-500 text-white py-2 px-4 rounded-md hover:bg-red-600"
+          >
+            Logout
+          </button>
+        </div>
+      )}
       <div className="bg-white shadow-md rounded-lg p-6 mb-6">
         <p><strong>Intro:</strong> {getData(data.short_description)}</p>
         <p><strong>Description:</strong> {getData(data.description)}</p>

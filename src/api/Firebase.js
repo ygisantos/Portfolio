@@ -1,7 +1,6 @@
-// Import Firestore from Firebase SDK
-import { getFirestore } from 'firebase/firestore';
 import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
+import { getFirestore } from "firebase/firestore";
+import { getAuth } from "firebase/auth"; // 🔑 Add Auth import
 
 const firebaseConfig = {
   apiKey: "AIzaSyCwJSWXrGuK25Z60TXOm_YCLkd0OvwMr1I",
@@ -14,6 +13,7 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
-const db = getFirestore(app); // Initialize Firestore
+const db = getFirestore(app);
+const auth = getAuth(app); // 🔐 Initialize Auth
 
-export default db;  // Export Firestore instance
+export { db, auth }; // Export both

@@ -1,8 +1,9 @@
-import db from './Firebase';
+import {db, auth} from './Firebase';
 import {
   doc, getDoc, collection, getDocs,
   increment, updateDoc, setDoc, deleteDoc
 } from 'firebase/firestore';
+import { signInWithPopup, GoogleAuthProvider, signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'firebase/auth';
 
 export const fetchProfileData = async () => {
   const docRef = doc(db, 'about_me', 'profile');
@@ -63,6 +64,7 @@ export const getAboutMe = async () => {
   try {
     const docRef = doc(db, 'about_me', 'profile');
     const docSnap = await getDoc(docRef);
+    console.log(JSON.stringify(docSnap.exists() ? docSnap.data() : null, null, 2));
     return JSON.stringify(docSnap.exists() ? docSnap.data() : null, null, 2);
   } catch (error) {
     return {
@@ -323,4 +325,52 @@ export const updateTestimonial = async (testimonial) => {
   } catch (error) {
     return { success: false, error: error.message };
   }
+};
+
+export const loginWithPopup = async () => {
+  try {
+    const provider = new GoogleAuthProvider();
+    const result = await signInWithPopup(auth, provider);
+    const user = result.user;
+    alert(`Welcome, ${user.displayName}!`);
+    return { success: true, user };
+  } catch (error) {
+    alert(`Login failed: ${error.message}`);
+    return { success: false, error: error.message };
+  }
+};
+
+export const loginWithEmailAndPassword = async (email, password) => {
+  try {
+    const result = await signInWithEmailAndPassword(auth, email, password);
+    const user = result.user;
+    alert(`Welcome, ${user.email}!`);
+    return { success: true, user };
+  } catch (error) {
+    alert(`Login failed: ${error.message}`);
+    return { success: false, error: error.message };
+  }
+};
+
+export const logout = async () => {
+  try {
+    await signOut(auth);
+    alert('You have been logged out.');
+    return { success: true };
+  } catch (error) {
+    alert(`Logout failed: ${error.message}`);
+    return { success: false, error: error.message };
+  }
+};
+
+export const requireLogin = async () => {
+  return new Promise((resolve, reject) => {
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        resolve(user);
+      } else {
+        reject(new Error('User is not logged in.'));
+      }
+    });
+  });
 };
