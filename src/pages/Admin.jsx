@@ -1,10 +1,19 @@
 import React, { useEffect, useState } from 'react';
-import db from '@api/Firebase';
-import { ICONS } from '../constants/Icons';
+import {ICONS} from '../constants/Icons';
 import {
-  doc, getDoc, collection, getDocs,
-  increment, updateDoc, setDoc, deleteDoc
-} from 'firebase/firestore';
+  fetchProfileData,
+  fetchCollectionData,
+  fetchAndUpdateStats,
+  deleteDocument,
+  updateProfile,
+  updateCollection,
+
+  // temp testing
+  getAboutMe, getAllCertificates, getCertificateById,
+  getAllExperiences, getExperienceById, getVisits,
+  getAllSkills, getAllTestimonials, getAllWorks,
+  getWorkById
+} from '@api/Api';
 
 export default function PortfolioPage() {
   const [data, setData] = useState(null);
@@ -12,41 +21,46 @@ export default function PortfolioPage() {
   const [activeTab, setActiveTab] = useState('basic'); // Track the active tab
 
   useEffect(() => {
-    const fetchData = async () => {
-      const docRef = doc(db, 'about_me', 'profile');
-      const docSnap = await getDoc(docRef);
+    const test = async () => {
+      const about = await getAboutMe();
+      const cert = await getAllCertificates();
+      const certByID = await getCertificateById("cmiCHH9FVraFxGkze2Ez");
+      const exp = await getAllExperiences();
+      const expByID = await getExperienceById("9V6XkyoTwJ0P7Omt5w8h");
+      const visit = await getVisits();
+      const skills = await getAllSkills();
+      const testimonial = await getAllTestimonials();
+      const works = await getAllWorks();
+      const workByID = await getWorkById("twjgYdU5DrLgWGYNvO79");
 
+      console.log("about me: " + about);
+      console.log("certificates: " + cert);
+      console.log("certificate by id: " + certByID);
+      console.log("experiences: " + exp);
+      console.log("experiences by id: " + expByID);
+      console.log("visits: " + visit);
+      console.log("skills: " + skills);
+      console.log("testimonial: " + testimonial);
+      console.log("works: " + works);
+      console.log("work by id: " + workByID);
+    }
+
+    test();
+    const fetchData = async () => {
+      const profile = await fetchProfileData();
       const collections = [
         'certificates', 'awards', 'skills', 'experiences',
         'works', 'testimonials', 'comments'
       ];
-
-      const collectionData = {};
-      for (const col of collections) {
-        const colSnap = await getDocs(collection(db, col));
-        collectionData[col] = colSnap?.docs.map(doc => ({
-          ...doc.data(),
-          id: doc.id // Ensure ID is included
-        })) || [];
-      }
-
-      // Stats handling
-      const statsRef = doc(db, 'information', 'stats');
-      let statsSnap = await getDoc(statsRef);
-
-      if (!statsSnap.exists()) {
-        await setDoc(statsRef, { visits: 0 });
-        statsSnap = await getDoc(statsRef);
-      }
-
-      await updateDoc(statsRef, { visits: increment(1) });
-      const updatedStatsSnap = await getDoc(statsRef);
+      
+      const collectionData = await fetchCollectionData(collections);
+      const visits = await fetchAndUpdateStats();
 
       const fetchedData = {
-        ...(docSnap?.data() || {}),
+        ...profile,
         ...collectionData,
-        visits: updatedStatsSnap?.data()?.visits || 0,
-        socials: docSnap?.data()?.socials || {}
+        visits,
+        socials: profile.socials || {}
       };
 
       setData(fetchedData);
@@ -66,8 +80,7 @@ export default function PortfolioPage() {
   const deleteItem = async (collectionName, id) => {
     if (!id) return; // Don't delete if no ID exists
     try {
-      const itemRef = doc(db, collectionName, id);
-      await deleteDoc(itemRef);
+      await deleteDocument(collectionName, id);
       setData((prevData) => ({
         ...prevData,
         [collectionName]: prevData[collectionName].filter((item) => item.id !== id)
@@ -81,9 +94,8 @@ export default function PortfolioPage() {
 
   const updateData = async () => {
     try {
-      // Save basic information
-      const profileRef = doc(db, 'about_me', 'profile');
-      await setDoc(profileRef, {
+      // Update profile data
+      await updateProfile({
         short_description: editableData.short_description || '',
         description: editableData.description || '',
         location: editableData.location || '',
@@ -96,18 +108,14 @@ export default function PortfolioPage() {
           facebook_page: editableData.facebook_page || '',
           phone: editableData.phone || '',
           email: editableData.email || ''
-        },
-      }, { merge: true }); // Use merge to avoid overwriting the entire document
+        }
+      });
 
-      // Save collections
+      // Update collections
       const collections = ['certificates', 'skills', 'experiences', 'works', 'testimonials', 'comments'];
       for (const colName of collections) {
-        const colRef = collection(db, colName);
-        for (const item of data[colName] || []) {
-          if (item.title || item.name || item.comment) { // Check for required fields
-            const itemRef = item.id ? doc(colRef, item.id) : doc(colRef);
-            await setDoc(itemRef, { ...item, id: itemRef.id }, { merge: true });
-          }
+        if (data[colName]) {
+          await updateCollection(colName, data[colName]);
         }
       }
 
@@ -556,7 +564,12 @@ export default function PortfolioPage() {
                 <label className="block font-medium mb-1">Languages/Technologies:</label>
                 <div className="flex flex-wrap gap-2 mb-2">
                   {work.languages?.map((lang, langIndex) => (
-                    <div key={langIndex} className="flex items-center bg-gray-100 p-1 rounded">
+                    <div key={langIndex} className="flex items-center bg-gray-100 p-2 rounded">
+                      <img
+                        src={`https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/${lang}/${lang}-original.svg`}
+                        alt={lang}
+                        className="w-6 h-6 mr-2"
+                      />
                       <span>{lang}</span>
                       <button
                         onClick={() => {
@@ -572,19 +585,22 @@ export default function PortfolioPage() {
                   ))}
                 </div>
                 <div className="flex gap-2 mb-2">
-                  <input
-                    type="text"
-                    placeholder="Add language"
-                    className="border border-gray-300 rounded-md p-2"
-                    onKeyPress={(e) => {
-                      if (e.key === 'Enter' && e.target.value) {
+                  <select
+                    className="w-full border border-gray-300 rounded-md p-2"
+                    onChange={(e) => {
+                      if (e.target.value) {
                         const updated = [...data.works];
                         updated[index].languages = [...(work.languages || []), e.target.value];
                         setData({ ...data, works: updated });
-                        e.target.value = '';
+                        e.target.value = ''; // Reset select
                       }
                     }}
-                  />
+                  >
+                    <option value="">Select Technology</option>
+                    {ICONS.map((icon) => (
+                      <option key={icon} value={icon}>{icon}</option>
+                    ))}
+                  </select>
                 </div>
                 <label className="block font-medium mb-1">Images:</label>
                 <input
