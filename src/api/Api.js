@@ -233,3 +233,94 @@ export const getWorkById = async (id) => {
     };
   }
 };
+
+// Update functions for each component
+export const updateBasicInfo = async (data) => {
+  try {
+    const profileRef = doc(db, 'about_me', 'profile');
+    await setDoc(profileRef, {
+      short_description: data.short_description || '',
+      description: data.description || '',
+      location: data.location || '',
+      availability: data.availability || '',
+      resume_url: data.resume_url || '',
+    }, { merge: true });
+    return { success: true };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+};
+
+export const updateContact = async (data) => {
+  try {
+    const profileRef = doc(db, 'about_me', 'profile');
+    await setDoc(profileRef, {
+      socials: {
+        github: data.github || '',
+        linkedin: data.linkedin || '',
+        facebook: data.facebook || '',
+        facebook_page: data.facebook_page || '',
+        phone: data.phone || '',
+        email: data.email || ''
+      }
+    }, { merge: true });
+    return { success: true };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+};
+
+export const updateCertificate = async (certificate) => {
+  try {
+    const colRef = collection(db, 'certificates');
+    const docRef = certificate.id ? doc(colRef, certificate.id) : doc(colRef);
+    await setDoc(docRef, { ...certificate, id: docRef.id }, { merge: true });
+    return { success: true, id: docRef.id };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+};
+
+export const updateSkill = async (skill) => {
+  try {
+    const colRef = collection(db, 'skills');
+    const docRef = skill.id ? doc(colRef, skill.id) : doc(colRef);
+    await setDoc(docRef, { ...skill, id: docRef.id }, { merge: true });
+    return { success: true, id: docRef.id };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+};
+
+export const updateExperience = async (experience) => {
+  try {
+    const colRef = collection(db, 'experiences');
+    const docRef = experience.id ? doc(colRef, experience.id) : doc(colRef);
+    await setDoc(docRef, { ...experience, id: docRef.id }, { merge: true });
+    return { success: true, id: docRef.id };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+};
+
+export const updateWork = async (work) => {
+  try {
+    const colRef = collection(db, 'works');
+    const docRef = work.id ? doc(colRef, work.id) : doc(colRef);
+    await setDoc(docRef, { ...work, id: docRef.id }, { merge: true });
+    return { success: true, id: docRef.id };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+};
+
+export const updateTestimonial = async (testimonial) => {
+  try {
+    const colRef = collection(db, 'testimonials');
+    const docRef = testimonial.id ? doc(colRef, testimonial.id) : doc(colRef);
+    await setDoc(docRef, { ...testimonial, id: docRef.id }, { merge: true });
+    return { success: true, id: docRef.id };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+};
