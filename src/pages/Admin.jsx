@@ -1,18 +1,16 @@
 import React, { useEffect, useState } from 'react';
-import {ICONS} from '../constants/Icons';
+import { ICONS } from '../constants/Icons';
 import {
-  fetchProfileData,
-  fetchCollectionData,
-  fetchAndUpdateStats,
+  getAboutMe,
+  getAllCertificates,
+  getAllExperiences,
+  getAllSkills,
+  getAllTestimonials,
+  getAllWorks,
+  getVisits,
   deleteDocument,
   updateProfile,
   updateCollection,
-
-  // temp testing
-  getAboutMe, getAllCertificates, getCertificateById,
-  getAllExperiences, getExperienceById, getVisits,
-  getAllSkills, getAllTestimonials, getAllWorks,
-  getWorkById
 } from '@api/Api';
 
 export default function PortfolioPage() {
@@ -21,50 +19,31 @@ export default function PortfolioPage() {
   const [activeTab, setActiveTab] = useState('basic'); // Track the active tab
 
   useEffect(() => {
-    const test = async () => {
-      const about = await getAboutMe();
-      const cert = await getAllCertificates();
-      const certByID = await getCertificateById("cmiCHH9FVraFxGkze2Ez");
-      const exp = await getAllExperiences();
-      const expByID = await getExperienceById("9V6XkyoTwJ0P7Omt5w8h");
-      const visit = await getVisits();
-      const skills = await getAllSkills();
-      const testimonial = await getAllTestimonials();
-      const works = await getAllWorks();
-      const workByID = await getWorkById("twjgYdU5DrLgWGYNvO79");
-
-      console.log("about me: " + about);
-      console.log("certificates: " + cert);
-      console.log("certificate by id: " + certByID);
-      console.log("experiences: " + exp);
-      console.log("experiences by id: " + expByID);
-      console.log("visits: " + visit);
-      console.log("skills: " + skills);
-      console.log("testimonial: " + testimonial);
-      console.log("works: " + works);
-      console.log("work by id: " + workByID);
-    }
-
-    test();
     const fetchData = async () => {
-      const profile = await fetchProfileData();
-      const collections = [
-        'certificates', 'awards', 'skills', 'experiences',
-        'works', 'testimonials', 'comments'
-      ];
-      
-      const collectionData = await fetchCollectionData(collections);
-      const visits = await fetchAndUpdateStats();
+      try {
+        const profile = JSON.parse(await getAboutMe());
+        const certificates = JSON.parse(await getAllCertificates());
+        const experiences = JSON.parse(await getAllExperiences());
+        const skills = JSON.parse(await getAllSkills());
+        const testimonials = JSON.parse(await getAllTestimonials());
+        const works = JSON.parse(await getAllWorks());
+        const visits = JSON.parse(await getVisits());
 
-      const fetchedData = {
-        ...profile,
-        ...collectionData,
-        visits,
-        socials: profile.socials || {}
-      };
+        const fetchedData = {
+          ...profile,
+          certificates,
+          experiences,
+          skills,
+          testimonials,
+          works,
+          visits,
+        };
 
-      setData(fetchedData);
-      setEditableData(fetchedData.socials || {});
+        setData(fetchedData);
+        setEditableData(fetchedData); // Set entire profile data to editableData
+      } catch (error) {
+        console.error('Error fetching data:', error.message);
+      }
     };
 
     fetchData();
@@ -135,16 +114,22 @@ export default function PortfolioPage() {
             <div className="mb-4">
               <label className="block font-medium mb-1">Short Description:</label>
               <textarea
-                value={editableData.short_description || ''}
-                onChange={(e) => handleInputChange('short_description', e.target.value)}
+                value={getData(data.short_description)}
+                onChange={(e) => {
+                  setData(prev => ({ ...prev, short_description: e.target.value }));
+                  handleInputChange('short_description', e.target.value);
+                }}
                 className="w-full border border-gray-300 rounded-md p-2"
               />
             </div>
             <div className="mb-4">
               <label className="block font-medium mb-1">Description:</label>
               <textarea
-                value={editableData.description || ''}
-                onChange={(e) => handleInputChange('description', e.target.value)}
+                value={getData(data.description)}
+                onChange={(e) => {
+                  setData(prev => ({ ...prev, description: e.target.value }));
+                  handleInputChange('description', e.target.value);
+                }}
                 className="w-full border border-gray-300 rounded-md p-2"
               />
             </div>
@@ -152,16 +137,22 @@ export default function PortfolioPage() {
               <label className="block font-medium mb-1">Location:</label>
               <input
                 type="text"
-                value={editableData.location || ''}
-                onChange={(e) => handleInputChange('location', e.target.value)}
+                value={getData(data.location)}
+                onChange={(e) => {
+                  setData(prev => ({ ...prev, location: e.target.value }));
+                  handleInputChange('location', e.target.value);
+                }}
                 className="w-full border border-gray-300 rounded-md p-2"
               />
             </div>
             <div className="mb-4">
               <label className="block font-medium mb-1">Availability:</label>
               <select
-                value={editableData.availability || ''}
-                onChange={(e) => handleInputChange('availability', e.target.value)}
+                value={getData(data.availability)}
+                onChange={(e) => {
+                  setData(prev => ({ ...prev, availability: e.target.value }));
+                  handleInputChange('availability', e.target.value);
+                }}
                 className="w-full border border-gray-300 rounded-md p-2"
               >
                 <option value="">Select Availability</option>
@@ -173,18 +164,21 @@ export default function PortfolioPage() {
               <label className="block font-medium mb-1">Resume (Direct Download Link):</label>
               <input
                 type="text"
-                value={editableData.resume_url || ''}
-                onChange={(e) => handleInputChange('resume_url', e.target.value)}
+                value={getData(data.resume_url)}
+                onChange={(e) => {
+                  setData(prev => ({ ...prev, resume_url: e.target.value }));
+                  handleInputChange('resume_url', e.target.value);
+                }}
                 className="w-full border border-gray-300 rounded-md p-2"
               />
               <a
-              href={getData(data.resume_url)}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-blue-500 underline"
-            >
-              Download Resume
-            </a>
+                href={getData(data.resume_url)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-500 underline"
+              >
+                Download Resume
+              </a>
             </div>
           </section>
         );
