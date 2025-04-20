@@ -366,7 +366,7 @@ export const logout = async () => {
 export const requireLogin = async () => {
   return new Promise((resolve, reject) => {
     onAuthStateChanged(auth, (user) => {
-      if (user) {
+      if (user) { 
         resolve(user);
       } else {
         reject(new Error('User is not logged in.'));

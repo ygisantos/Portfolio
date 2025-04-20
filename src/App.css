@@ -1,1 +1,4 @@
 @import "tailwindcss";
+@import 'pixel-retroui/dist/index.css';
+/* For Minecraft font */
+@import 'pixel-retroui/dist/fonts.css';

@@ -1,0 +1,202 @@
+/* Define CSS variables for colors */
+:root {
+    --color-brown-dark: #543310;
+    --color-brown-light: #af8f6f;
+    --color-white: #fff;
+    --color-gray-light: #f0f0f0;
+    --color-black: #000;
+    --color-beige: #ddceb4;
+    --color-gray-dark: #343232;
+}
+
+body {
+    background: var(--color-brown-light);
+  /*  
+    background: radial-gradient(circle, var(--color-brown-dark) 0%, var(--color-brown-light) 0%, var(--color-brown-dark) 100%);
+    */
+}
+
+.navigation {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+}
+
+.sidepanel-toggle {
+    font-size: 1.5rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+    position: fixed;
+    top: 1rem;
+    left: 1rem;
+    z-index: 1100;
+    display: none;
+}
+
+.sidepanel {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 250px;
+    background: var(--color-brown-dark);
+    color: var(--color-beige);
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+    transform: translateX(0);
+    transition: transform 0.3s ease-in-out;
+    z-index: 1000;
+}
+
+.sidepanel.open {
+    transform: translateX(0);
+}
+
+.nav-links {
+    list-style: none;
+    padding: 1rem;
+    margin: 0;
+}
+
+.nav-links li {
+    margin: 1rem 0;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+}
+
+.nav-links li svg {
+    margin-right: 0.5rem;
+}
+
+@media (max-width: 768px) {
+    .sidepanel {
+        padding-top: 24px;
+        transform: translateX(-100%);
+    }
+    .sidepanel.open {
+        transform: translateX(0);
+    }
+    .sidepanel-toggle {
+        display: block;
+    }
+}
+
+.content {
+    padding: 1rem;
+    display: grid;
+    gap: 1.5rem;
+}
+
+.card {
+    padding: 1rem;
+    background: var(--color-gray-light);
+    border: 2px solid var(--color-black);
+    box-shadow: 4px 4px 0 var(--color-black);
+}
+
+@media (min-width: 769px) {
+    .content {
+        margin-left: 250px; /* Adjust content to account for the sidepanel width */
+    }
+}
+
+/* Utility classes for colors */
+.bg-beige {
+    background-color: var(--color-beige);
+}
+
+.bg-black {
+    background-color: var(--color-gray-dark);
+}
+
+.border-beige {
+    border-color: var(--color-beige);
+}
+
+.border-black {
+    border-color: var(--color-gray-dark);
+}
+
+.text-beige {
+    color: var(--color-beige);
+}
+
+.text-black {
+    color: var(--color-gray-dark);
+}
+
+.bg-brown-dark {
+    background-color: var(--color-brown-dark);
+}
+
+.bg-brown-light {
+    background-color: var(--color-brown-light);
+}
+
+.bg-white {
+    background-color: var(--color-white);
+}
+
+.bg-gray-light {
+    background-color: var(--color-gray-light);
+}
+
+.bg-black {
+    background-color: var(--color-black);
+}
+
+.bg-gray-dark {
+    background-color: var(--color-gray-dark);
+}
+
+/* Border color utilities */
+.border-brown-dark {
+    border-color: var(--color-brown-dark);
+}
+
+.border-brown-light {
+    border-color: var(--color-brown-light);
+}
+
+.border-white {
+    border-color: var(--color-white);
+}
+
+.border-gray-light {
+    border-color: var(--color-gray-light);
+}
+
+.border-black {
+    border-color: var(--color-black);
+}
+
+.border-gray-dark {
+    border-color: var(--color-gray-dark);
+}
+
+/* Text color utilities */
+.text-brown-dark {
+    color: var(--color-brown-dark);
+}
+
+.text-brown-light {
+    color: var(--color-brown-light);
+}
+
+.text-white {
+    color: var(--color-white);
+}
+
+.text-gray-light {
+    color: var(--color-gray-light);
+}
+
+.text-black {
+    color: var(--color-black);
+}
+
+.text-gray-dark {
+    color: var(--color-gray-dark);
+}
