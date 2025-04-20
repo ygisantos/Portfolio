@@ -5,7 +5,7 @@ function CustomCard({className, children}) {
             bg="#f8f4e1"
             textColor="#74512d"
             borderColor="#543310"
-            shadowColor="#af8f6f"
+            shadowColor="#543310"
             className={className}
             >
                 {children}
