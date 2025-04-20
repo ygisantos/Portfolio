@@ -938,7 +938,7 @@ export default function PortfolioPage() {
         {renderTabContent()}
         <button
           onClick={updateData}
-          className="mt-4 bg-green-500 text-white py-2 px-4 rounded-md hover:bg-green-600"
+          className="mt-4 bg-green-500 text-gray-500 py-2 px-4 rounded-md hover:bg-green-600"
         >
           Save All Changes
         </button>
