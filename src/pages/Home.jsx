@@ -1,4 +1,5 @@
 import CustomCard from '@components/CustomCard';
+import CustomButton from '@components/CustomButton';
 import Navigation from '@components/Navigation';
 import ButtonIcon from '@components/ButtonIcon';
 import { FaLocationDot } from "react-icons/fa6";
@@ -35,22 +36,23 @@ function Home() {
             <Navigation />
             <div className="content">
                 <div id='profile' className='flex flex-row'>
+                    {/* PROFILE PICTURE AND SOME INFO */}
                     <CustomCard className='flex-1/3'>
                         <img 
                             className='rounded-xs'
                             src='https://static.vecteezy.com/system/resources/thumbnails/036/594/092/small_2x/man-empty-avatar-photo-placeholder-for-social-networks-resumes-forums-and-dating-sites-male-and-female-no-photo-images-for-unfilled-user-profile-free-vector.jpg'/>
-                        <div className='flex flex-col'>
+                        <div className='flex flex-col gap-1 mt-2'>
                             <div className='flex flex-row items-center gap-1'>
-                                <MdOutlineWork />
-                                <span className='capitalize'>{profile?.availability || 'loading...'}</span>
+                                <MdOutlineWork className='flex-1/8'/>
+                                <span className='flex-7/8 text-sm capitalize'>{profile?.availability || 'loading...'}</span>
                             </div>
                             <div className='flex flex-row items-center gap-1'>
-                                <FaLocationDot />
-                                <span className='capitalize'>{profile?.location || 'loading...'}</span>
+                                <FaLocationDot className='flex-1/8'/>
+                                <span className='flex-7/8 text-sm capitalize'>{profile?.location || 'loading...'}</span>
                             </div>
                             <div className='flex flex-row items-center gap-1'>
-                                <IoCalendar  />
-                                <span className='capitalize'>{AgeCalculate()} Years Old</span>
+                                <IoCalendar className='flex-1/8'/>
+                                <span className='flex-7/8 text-sm capitalize'>{AgeCalculate()} Years Old</span>
                             </div>
                             {
                                 /* DI MUNA IPAKITA */
@@ -64,7 +66,8 @@ function Home() {
                     </CustomCard>
 
                     <div className='flex flex-col flex-2/3'>
-                        <CustomCard className={'flex flex-col flex-3/4'}>
+                        {/* DESCRIPTION */}
+                        <CustomCard className={'flex flex-col flex-6/7'}>
                             <div className='flex flex-row justify-between'>
                                 <div className='flex flex-row items-center gap-1'>
                                     <span className='font-black md:!text-4xl text-lg'>YGI MARTIN B. SANTOS</span>
@@ -72,23 +75,52 @@ function Home() {
                                 
                                 <div className='flex flex-row md:items-center items-start md:gap-2 gap-0.5'>
                                     <ButtonIcon 
-                                        icon={<MdEmail className='md:text-2xl text-xs' color='#f8f4e1'/>} 
+                                        icon={<MdEmail className='md:text-2xl text-xs text-beige' />} 
                                         onclick={() => window.open(profile?.socials?.email ? `mailto:${profile.socials.email}` : '#', '_blank')} />
                                     <ButtonIcon 
-                                        icon={<FaLinkedinIn className='md:text-2xl text-xs'color='#f8f4e1'/>} 
+                                        icon={<FaLinkedinIn className='md:text-2xl text-xs text-beige'/>} 
                                         onclick={() => window.open(profile?.socials?.linkedin || '#', '_blank')} />
                                     <ButtonIcon 
-                                        icon={<FaGithub className='md:text-2xl text-xs' color='#f8f4e1'/>} 
+                                        icon={<FaGithub className='md:text-2xl text-xs text-beige' />} 
                                         onclick={() => window.open(profile?.socials?.github || '#', '_blank')} />
                                 </div>
                             </div>
                             <div className='mt-2 text-justify'>
-                                <span>{profile?.description || 'loading...'}</span>
+                                <span className='text-xl font-semibold opacity-60'>{profile?.description || 'loading...'}</span>
                             </div>
                         </CustomCard>
-                        <CustomCard className={'flex flex-col flex-1/4'}>
 
-                        </CustomCard>
+                        <div className='flex md:flex-row flex-col flex-1/7'>
+                            {/* SOCIALS */}
+                            <CustomCard className={'flex md:flex-row flex-col gap-2 items-center justify-around flex-3/4'}>
+                                <span className='font-bold text-4xl'>SOCIALS</span>
+                                <div className='flex md:flex-row flex-col gap-2'>
+                                    <div className='flex flex-row gap-2'>
+                                        <ButtonIcon 
+                                            icon={<FaFacebookF className='text-beige' size={32}/>}
+                                            onclick={null}
+                                        />
+                                        <ButtonIcon 
+                                            icon={<SiFacebookgaming className='text-beige' size={32}/>}
+                                            onclick={null}
+                                        />
+                                    </div>
+                                    <div className='flex flex-row gap-2'>
+                                        <ButtonIcon 
+                                            icon={<FaTiktok className='text-beige' size={32}/>}
+                                            onclick={null}
+                                        />
+                                        <ButtonIcon 
+                                            icon={<FaPhoneAlt className='text-beige' size={32}/>}
+                                            onclick={null}
+                                        />
+                                    </div>
+                                </div>
+                            </CustomCard>
+
+                            {/* DOWNLOAD RESUME */}
+                            <CustomButton text={"DOWNLOAD CV"} onclick={null} className={'flex-1/4'} classText={'font-bold text-xl'}/>
+                        </div>
                     </div>
                 </div>
                 <CustomCard>
