@@ -92,6 +92,7 @@ export default function PortfolioPage() {
           facebook_page: editableData.socials?.facebook_page || '',
           phone: editableData.socials?.phone || '',
           email: editableData.socials?.email || '',
+          tiktok: editableData.socials?.tiktok || '',
         },
       });
 
@@ -277,7 +278,7 @@ export default function PortfolioPage() {
                 {cert.id && (
                   <button
                     onClick={() => deleteItem('certificates', cert.id)}
-                    className="mt-2 bg-red-500 text-white py-1 px-3 rounded-md hover:bg-red-600"
+                    className="mt-2 !bg-red-500 text-gray-500 py-1 px-3 rounded-md hover:bg-red-600"
                   >
                     Delete
                   </button>
@@ -289,7 +290,7 @@ export default function PortfolioPage() {
                 const updated = [...(data.certificates || []), { type: 'Certificate', title: '', description: '', date: '', image: '' }];
                 setData({ ...data, certificates: updated });
               }}
-              className="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600"
+              className="!bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600"
             >
               Add Certificate
             </button>
@@ -300,7 +301,7 @@ export default function PortfolioPage() {
           <section className="bg-white shadow-md rounded-lg p-6 mb-6">
             <h2 className="text-2xl font-semibold mb-4">Contact</h2>
             <div className="space-y-4">
-              {['github', 'linkedin', 'facebook', 'facebook_page', 'phone', 'email'].map((field) => (
+              {['github', 'linkedin', 'facebook', 'facebook_page', 'phone', 'email', 'tiktok'].map((field) => (
                 <div key={field}>
                   <label className="block font-medium capitalize">{field.replace('_', ' ')}:</label>
                   <input
@@ -353,6 +354,24 @@ export default function PortfolioPage() {
                   className="w-full"
                 />
                 <p className="text-sm text-gray-600">Proficiency: {skill.proficiency || 0}%</p>
+                <label className="block font-medium mb-1">Category:</label>
+                <select
+                  value={skill.category || ''}
+                  onChange={(e) => {
+                    const updated = [...data.skills];
+                    updated[index].category = e.target.value;
+                    setData({ ...data, skills: updated });
+                  }}
+                  className="w-full border border-gray-300 rounded-md p-2 mb-2"
+                >
+                  <option value="">Select Category</option>
+                  <option value="Window Application Development">Window Application Development</option>
+                  <option value="Game Development">Game Development</option>
+                  <option value="Mobile Development">Mobile Development</option>
+                  <option value="Web Development">Web Development</option>
+                  <option value="Database & Backend">Database & Backend</option>
+                  <option value="Others">Others</option>
+                </select>
                 <label className="block font-medium mb-1">Icon:</label>
                 <select
                   value={skill.icon || ''}
@@ -378,7 +397,7 @@ export default function PortfolioPage() {
                 {skill.id && (
                   <button
                     onClick={() => deleteItem('skills', skill.id)}
-                    className="mt-2 bg-red-500 text-white py-1 px-3 rounded-md hover:bg-red-600"
+                    className="mt-2 !bg-red-500 text-gray-500 py-1 px-3 rounded-md hover:bg-red-600"
                   >
                     Delete
                   </button>
@@ -387,10 +406,10 @@ export default function PortfolioPage() {
             ))}
             <button
               onClick={() => {
-                const updated = [...(data.skills || []), { title: '', proficiency: 0, icon: '' }];
+                const updated = [...(data.skills || []), { title: '', proficiency: 0, icon: '', category: '' }];
                 setData({ ...data, skills: updated });
               }}
-              className="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600"
+              className="!bg-blue-500 text-gray-500 py-2 px-4 rounded-md hover:bg-blue-600"
             >
               Add Skill
             </button>
@@ -482,7 +501,7 @@ export default function PortfolioPage() {
                 {exp.id && (
                   <button
                     onClick={() => deleteItem('experiences', exp.id)}
-                    className="mt-2 bg-red-500 text-white py-1 px-3 rounded-md hover:bg-red-600"
+                    className="mt-2 !bg-red-500 text-gray-500 py-1 px-3 rounded-md hover:bg-red-600"
                   >
                     Delete
                   </button>
@@ -494,7 +513,7 @@ export default function PortfolioPage() {
                 const updated = [...(data.experiences || []), { name: '', from: '', to: '', description: '', learned: '', role: '', still_doing: false }];
                 setData({ ...data, experiences: updated });
               }}
-              className="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600"
+              className="!bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600"
             >
               Add Experience
             </button>
@@ -664,7 +683,7 @@ export default function PortfolioPage() {
                           updated[index].images = work.images.filter((_, i) => i !== imgIndex);
                           setData({ ...data, works: updated });
                         }}
-                        className="absolute top-0 right-0 bg-red-500 text-white p-1 rounded-full"
+                        className="absolute top-0 right-0 !bg-red-500 text-white p-1 rounded-full"
                       >
                         ×
                       </button>
@@ -674,7 +693,7 @@ export default function PortfolioPage() {
                 {work.id && (
                   <button
                     onClick={() => deleteItem('works', work.id)}
-                    className="mt-2 bg-red-500 text-white py-1 px-3 rounded-md hover:bg-red-600"
+                    className="mt-2 !bg-red-500 text-gray-500 py-1 px-3 rounded-md hover:bg-red-600"
                   >
                     Delete
                   </button>
@@ -695,7 +714,7 @@ export default function PortfolioPage() {
                 }];
                 setData({ ...data, works: updated });
               }}
-              className="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600"
+              className="!bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600"
             >
               Add Work
             </button>
@@ -775,7 +794,7 @@ export default function PortfolioPage() {
                 {testimonial.id && (
                   <button
                     onClick={() => deleteItem('testimonials', testimonial.id)}
-                    className="mt-2 bg-red-500 text-white py-1 px-3 rounded-md hover:bg-red-600"
+                    className="mt-2 !bg-red-500 text-gray-500 py-1 px-3 rounded-md hover:bg-red-600"
                   >
                     Delete
                   </button>
@@ -787,7 +806,7 @@ export default function PortfolioPage() {
                 const updated = [...(data.testimonials || []), { company: '', name: '', role: '', comment: '', image: '' }];
                 setData({ ...data, testimonials: updated });
               }}
-              className="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600"
+              className="!bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600"
             >
               Add Testimonial
             </button>
@@ -832,7 +851,7 @@ export default function PortfolioPage() {
   };
 
   return (
-    <div className="p-6 bg-gray-100 min-h-screen">
+    <div className="p-6 bg-gray-400 text-gray-700 min-h-screen">
       <h1 className="text-3xl font-bold mb-4">Portfolio</h1>
       {!isLoggedIn ? (
         <div className="mb-4 bg-white shadow-md rounded-lg p-6">
@@ -857,7 +876,7 @@ export default function PortfolioPage() {
           </div>
           <button
             onClick={handleLogin}
-            className="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600"
+            className="!bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600"
           >
             Login
           </button>
@@ -867,7 +886,7 @@ export default function PortfolioPage() {
           <h2 className="text-xl font-semibold mb-4">Welcome!</h2>
           <button
             onClick={handleLogout}
-            className="bg-red-500 text-white py-2 px-4 rounded-md hover:bg-red-600"
+            className="!bg-red-500 text-white py-2 px-4 rounded-md hover:bg-red-600"
           >
             Logout
           </button>
@@ -894,43 +913,43 @@ export default function PortfolioPage() {
         <div className="mb-6">
           <button
             onClick={() => setActiveTab('basic')}
-            className={`mr-2 px-4 py-2 rounded-md ${activeTab === 'basic' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
+            className={`mr-2 px-4 py-2 rounded-md ${activeTab === 'basic' ? '!bg-blue-500 text-white' : 'bg-gray-200'}`}
           >
             Basic Info
           </button>
           <button
             onClick={() => setActiveTab('certificates')}
-            className={`mr-2 px-4 py-2 rounded-md ${activeTab === 'certificates' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
+            className={`mr-2 px-4 py-2 rounded-md ${activeTab === 'certificates' ? '!bg-blue-500 text-white' : 'bg-gray-200'}`}
           >
             Certificates
           </button>
           <button
             onClick={() => setActiveTab('contact')}
-            className={`mr-2 px-4 py-2 rounded-md ${activeTab === 'contact' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
+            className={`mr-2 px-4 py-2 rounded-md ${activeTab === 'contact' ? '!bg-blue-500 text-white' : 'bg-gray-200'}`}
           >
             Contact
           </button>
           <button
             onClick={() => setActiveTab('skills')}
-            className={`mr-2 px-4 py-2 rounded-md ${activeTab === 'skills' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
+            className={`mr-2 px-4 py-2 rounded-md ${activeTab === 'skills' ? '!bg-blue-500 text-white' : 'bg-gray-200'}`}
           >
             Skills
           </button>
           <button
             onClick={() => setActiveTab('experiences')}
-            className={`mr-2 px-4 py-2 rounded-md ${activeTab === 'experiences' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
+            className={`mr-2 px-4 py-2 rounded-md ${activeTab === 'experiences' ? '!bg-blue-500 text-white' : 'bg-gray-200'}`}
           >
             Experiences
           </button>
           <button
             onClick={() => setActiveTab('works')}
-            className={`mr-2 px-4 py-2 rounded-md ${activeTab === 'works' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
+            className={`mr-2 px-4 py-2 rounded-md ${activeTab === 'works' ? '!bg-blue-500 text-white' : 'bg-gray-200'}`}
           >
             Works
           </button>
           <button
             onClick={() => setActiveTab('testimonials')}
-            className={`mr-2 px-4 py-2 rounded-md ${activeTab === 'testimonials' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
+            className={`mr-2 px-4 py-2 rounded-md ${activeTab === 'testimonials' ? '!bg-blue-500 text-white' : 'bg-gray-200'}`}
           >
             Testimonials
           </button>
@@ -938,7 +957,7 @@ export default function PortfolioPage() {
         {renderTabContent()}
         <button
           onClick={updateData}
-          className="mt-4 bg-green-500 text-gray-500 py-2 px-4 rounded-md hover:bg-green-600"
+          className="mt-4 !bg-green-500 text-gray-500 py-2 px-4 rounded-md hover:bg-green-600"
         >
           Save All Changes
         </button>
