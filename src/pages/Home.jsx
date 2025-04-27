@@ -19,7 +19,7 @@ import { useEffect } from 'react';
 import { useState } from 'react';
 import { RxDividerHorizontal } from "react-icons/rx";
 import { IoCalendar } from "react-icons/io5";
-
+import Menu from '@/components/Menu';
 function Home() {
     const [profile,setProfile] = useState();
 
@@ -33,8 +33,9 @@ function Home() {
     }, []);
     return (
         <div>
-            <Navigation />
-            <div className="content">
+            {/* <Navigation /> */}
+            <Menu />
+            <div className="flex flex-col gap-2 p-2">
                 <div id='profile' className='flex flex-row'>
                     {/* PROFILE PICTURE AND SOME INFO */}
                     <CustomCard className='flex-1/3'>
@@ -75,13 +76,16 @@ function Home() {
                                 
                                 <div className='flex flex-row md:items-center items-start md:gap-2 gap-0.5'>
                                     <ButtonIcon 
-                                        icon={<MdEmail className='md:text-2xl text-xs text-beige' />} 
+                                        className='md:text-2xl text-xs'
+                                        icon={<MdEmail/>} 
                                         onclick={() => window.open(profile?.socials?.email ? `mailto:${profile.socials.email}` : '#', '_blank')} />
                                     <ButtonIcon 
-                                        icon={<FaLinkedinIn className='md:text-2xl text-xs text-beige'/>} 
+                                        className='md:text-2xl text-xs'
+                                        icon={<FaLinkedinIn/>} 
                                         onclick={() => window.open(profile?.socials?.linkedin || '#', '_blank')} />
                                     <ButtonIcon 
-                                        icon={<FaGithub className='md:text-2xl text-xs text-beige' />} 
+                                        className='md:text-2xl text-xs'
+                                        icon={<FaGithub/>} 
                                         onclick={() => window.open(profile?.socials?.github || '#', '_blank')} />
                                 </div>
                             </div>
@@ -97,21 +101,21 @@ function Home() {
                                 <div className='flex md:flex-row flex-col gap-2'>
                                     <div className='flex flex-row gap-2'>
                                         <ButtonIcon 
-                                            icon={<FaFacebookF className='text-beige' size={32}/>}
+                                            icon={<FaFacebookF size={32}/>}
                                             onclick={null}
                                         />
                                         <ButtonIcon 
-                                            icon={<SiFacebookgaming className='text-beige' size={32}/>}
+                                            icon={<SiFacebookgaming size={32}/>}
                                             onclick={null}
                                         />
                                     </div>
                                     <div className='flex flex-row gap-2'>
                                         <ButtonIcon 
-                                            icon={<FaTiktok className='text-beige' size={32}/>}
+                                            icon={<FaTiktok size={32}/>}
                                             onclick={null}
                                         />
                                         <ButtonIcon 
-                                            icon={<FaPhoneAlt className='text-beige' size={32}/>}
+                                            icon={<FaPhoneAlt size={32}/>}
                                             onclick={null}
                                         />
                                     </div>
@@ -127,30 +131,60 @@ function Home() {
                     <section id="skills">
                         <h2>Skills</h2>
                         {/* Skills content */}
+                        <h1 className='h-[74px]'>TEST CONTENT</h1>
+                        <h1 className='h-[74px]'>TEST CONTENT</h1>
+                        <h1 className='h-[74px]'>TEST CONTENT</h1>
+                        <h1 className='h-[74px]'>TEST CONTENT</h1>
+                        <h1 className='h-[74px]'>TEST CONTENT</h1>
+                        <h1 className='h-[74px]'>TEST CONTENT</h1>
                     </section>
                 </CustomCard>
                 <CustomCard>
                     <section id="awards">
                         <h2>Awards & Certificates</h2>
                         {/* Awards & Certificates content */}
+                        <h1 className='h-[74px]'>TEST CONTENT</h1>
+                        <h1 className='h-[74px]'>TEST CONTENT</h1>
+                        <h1 className='h-[74px]'>TEST CONTENT</h1>
+                        <h1 className='h-[74px]'>TEST CONTENT</h1>
+                        <h1 className='h-[74px]'>TEST CONTENT</h1>
+                        <h1 className='h-[74px]'>TEST CONTENT</h1>
                     </section>
                 </CustomCard>
                 <CustomCard>
                     <section id="projects">
                         <h2>Projects</h2>
                         {/* Projects content */}
+                        <h1 className='h-[74px]'>TEST CONTENT</h1>
+                        <h1 className='h-[74px]'>TEST CONTENT</h1>
+                        <h1 className='h-[74px]'>TEST CONTENT</h1>
+                        <h1 className='h-[74px]'>TEST CONTENT</h1>
+                        <h1 className='h-[74px]'>TEST CONTENT</h1>
+                        <h1 className='h-[74px]'>TEST CONTENT</h1>
                     </section>
                 </CustomCard>
                 <CustomCard>
                     <section id="experiences">
                         <h2>Experiences</h2>
                         {/* Experiences content */}
+                        <h1 className='h-[74px]'>TEST CONTENT</h1>
+                        <h1 className='h-[74px]'>TEST CONTENT</h1>
+                        <h1 className='h-[74px]'>TEST CONTENT</h1>
+                        <h1 className='h-[74px]'>TEST CONTENT</h1>
+                        <h1 className='h-[74px]'>TEST CONTENT</h1>
+                        <h1 className='h-[74px]'>TEST CONTENT</h1>
                     </section>
                 </CustomCard>
                 <CustomCard>
                     <section id="testimonials">
                         <h2>Testimonials</h2>
                         {/* Testimonials content */}
+                        <h1 className='h-[74px]'>TEST CONTENT</h1>
+                        <h1 className='h-[74px]'>TEST CONTENT</h1>
+                        <h1 className='h-[74px]'>TEST CONTENT</h1>
+                        <h1 className='h-[74px]'>TEST CONTENT</h1>
+                        <h1 className='h-[74px]'>TEST CONTENT</h1>
+                        <h1 className='h-[74px]'>TEST CONTENT</h1>
                     </section>
                 </CustomCard>
             </div>

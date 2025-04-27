@@ -1,4 +1,5 @@
-/* Define CSS variables for colors */
+@import "tailwindcss"; 
+
 :root {
     --color-brown-dark: #543310;
     --color-brown-light: #af8f6f;
@@ -96,18 +97,7 @@ body {
     }
 }
 
-.content {
-    padding: 1rem;
-    display: grid;
-    gap: 1.5rem;
-}
 
-.card {
-    padding: 1rem;
-    background: var(--color-gray-light);
-    border: 2px solid var(--color-black);
-    box-shadow: 4px 4px 0 var(--color-black);
-}
 
 @media (min-width: 769px) {
     .content {
@@ -212,4 +202,8 @@ body {
 
 .text-gray-dark {
     color: var(--color-gray-dark);
+}
+
+.border-radius-1 {
+    border-radius: 68% 32% 10% 10% / 65% 62% 10% 10% ;
 }
