@@ -6,7 +6,7 @@ function CustomCard({className, children}) {
             textColor="#74512d"
             borderColor="#543310"
             shadowColor="#543310"
-            className={className}
+            className={`${className} p-2`}
             >
                 {children}
         </Card>

@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { FaUser, FaTools, FaAward, FaProjectDiagram, FaBriefcase, FaCommentDots } from 'react-icons/fa';
 import ButtonIcon from "@components/ButtonIcon";
+import "./Menu.css"; // Import custom CSS for gooey effect
 
 function Menu() {
     const [activeSection, setActiveSection] = useState("profile");
@@ -11,12 +12,10 @@ function Menu() {
         const observer = new IntersectionObserver(
             (entries) => {
                 entries.forEach((entry) => {
-                    if (entry.isIntersecting) {
-                        setActiveSection(entry.target.id);
-                    }
+                    if (entry.isIntersecting) setActiveSection(entry.target.id);
                 });
             },
-            { threshold: 0.6 } // Adjust threshold to determine when a section is considered "in view"
+            { threshold: 0.6 }
         );
 
         sections.forEach((section) => observer.observe(section));
@@ -33,8 +32,14 @@ function Menu() {
     const handleMouseLeave = () => setHoveredButton(null);
 
     return (
-        <div className="flex items-center justify-center bottom-1 fixed w-full">
-            <div className="flex flex-row gap-4 p-4 bg-[#a07850c6] rounded-lg !backdrop-blur">
+        <div className="!z-5 flex  flex-col items-center justify-center bottom-1 fixed w-full">
+            {/* LABEL */}
+            <span className="gooey-label bg-brown-light">{activeSection}</span>
+            <div className="flex flex-row gap-4 p-5 bg-brown-light rounded-lg !backdrop-blur relative">
+                {/* Decorative border-radius-1 blob at the bottom */}
+                <div className="absolute h-[40%] bg-beige left-0 bottom-0 w-full border-radius-1 pointer-events-none"></div>
+                
+                {/* Menu buttons */}
                 { [
                     { id: "profile", icon: <FaUser size={32} />, label: "Profile" },
                     { id: "skills", icon: <FaTools size={32} />, label: "Skills" },
@@ -44,19 +49,13 @@ function Menu() {
                     { id: "testimonials", icon: <FaCommentDots size={32} />, label: "Testimonials" },
                 ].map(({ id, icon, label }) => (
                     <div key={id} className="relative flex flex-col items-center">
-                        {(hoveredButton === id || activeSection === id) && (
-                            <span className="absolute -top-10 text-xs text-white bg-brown-light p-3 border-radius-1">{label}</span>
-                        )}
-                        <div
-                            onMouseEnter={() => handleMouseEnter(id)}
-                            onMouseLeave={handleMouseLeave}
-                        >
+                        <div onMouseEnter={() => handleMouseEnter(id)} onMouseLeave={handleMouseLeave} >
                             <ButtonIcon
                                 icon={icon}
                                 onclick={() => handleScrollTo(id)}
-                                className={`transition-transform ${
+                                className={`transition-all ${
                                     activeSection === id || hoveredButton === id
-                                        ? "text-white !scale-125"
+                                        ? "transition-all bg-beige text-brown-dark !scale-125 !-translate-y-1.5"
                                         : "text-beige"
                                 }`}
                             />

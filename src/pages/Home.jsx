@@ -20,6 +20,9 @@ import { useState } from 'react';
 import { RxDividerHorizontal } from "react-icons/rx";
 import { IoCalendar } from "react-icons/io5";
 import Menu from '@/components/Menu';
+// Add import for the animated background
+import AnimatedCodeBackground from '@/components/AnimatedCodeBackground';
+
 function Home() {
     const [profile,setProfile] = useState();
 
@@ -32,10 +35,12 @@ function Home() {
         fetchData();
     }, []);
     return (
-        <div>
+        <div className='flex justify-center min-h-screen overflow'>
+            {/* Animated programming background */}
+            <AnimatedCodeBackground />
             {/* <Navigation /> */}
             <Menu />
-            <div className="flex flex-col gap-2 p-2">
+            <div className="relative flex flex-col gap-2 p-2 md:w-[80vw] w-[90vw]">
                 <div id='profile' className='flex flex-row'>
                     {/* PROFILE PICTURE AND SOME INFO */}
                     <CustomCard className='flex-1/3'>
@@ -43,6 +48,14 @@ function Home() {
                             className='rounded-xs'
                             src='https://static.vecteezy.com/system/resources/thumbnails/036/594/092/small_2x/man-empty-avatar-photo-placeholder-for-social-networks-resumes-forums-and-dating-sites-male-and-female-no-photo-images-for-unfilled-user-profile-free-vector.jpg'/>
                         <div className='flex flex-col gap-1 mt-2'>
+                            <div className='flex flex-row items-center gap-1'>
+                                <MdEmail className='flex-1/8'/>
+                                <span className='flex-7/8 text-sm capitalize uppercase'>{profile?.socials?.email || 'loading...'}</span>
+                            </div>
+                            <div className='flex flex-row items-center gap-1'>
+                                <FaPhoneAlt className='flex-1/8'/>
+                                <span className='flex-7/8 text-sm capitalize'>{profile?.socials?.phone || 'loading...'}</span>
+                            </div>
                             <div className='flex flex-row items-center gap-1'>
                                 <MdOutlineWork className='flex-1/8'/>
                                 <span className='flex-7/8 text-sm capitalize'>{profile?.availability || 'loading...'}</span>

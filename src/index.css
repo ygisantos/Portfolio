@@ -2,6 +2,7 @@
 
 :root {
     --color-brown-dark: #543310;
+    --color-brown-medium: #633f18;
     --color-brown-light: #af8f6f;
     --color-white: #fff;
     --color-gray-light: #f0f0f0;
@@ -107,7 +108,7 @@ body {
 
 /* Utility classes for colors */
 .bg-beige {
-    background-color: var(--color-beige);
+    background-color: var(--color-beige) !important ;
 }
 
 .bg-black {
@@ -133,7 +134,9 @@ body {
 .bg-brown-dark {
     background-color: var(--color-brown-dark);
 }
-
+.bg-brown-medium {
+    background-color: var(--color-brown-medium);
+}
 .bg-brown-light {
     background-color: var(--color-brown-light);
 }
@@ -205,5 +208,33 @@ body {
 }
 
 .border-radius-1 {
-    border-radius: 68% 32% 10% 10% / 65% 62% 10% 10% ;
+    border-radius: 45% 45% 0% 0% / 49% 49% 10% 10% ;
+}
+
+.blob {
+    width: 300px;
+    height: 300px;
+    background: var(--color-beige);
+    clip-path: path('M0,100 C20,0 80,0 100,100 S180,200 200,100 S280,0 300,100 L300,300 L0,300 Z');
+}
+@layer utilities {
+    *::-webkit-scrollbar {
+        width: 10px;
+        height: 10px;
+    }
+
+    *::-webkit-scrollbar-track {
+        border-radius: 100vh;
+        background: var(--color-brown-medium);
+    }
+
+    *::-webkit-scrollbar-thumb {
+        background: var(--color-brown-light);
+        border-radius: 100vh;
+        border: 3px solid var(--color-brown-dark);
+    }
+
+    *::-webkit-scrollbar-thumb:hover {
+        background: #80797f;
+    }
 }
