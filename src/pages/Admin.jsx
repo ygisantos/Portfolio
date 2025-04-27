@@ -15,6 +15,7 @@ import {
   loginWithEmailAndPassword,
   logout,
 } from '@api/Api';
+import LanguageIcon from '@components/LanguageIcon';
 
 export default function PortfolioPage() {
   const [data, setData] = useState(null);
@@ -613,12 +614,8 @@ export default function PortfolioPage() {
                 <div className="flex flex-wrap gap-2 mb-2">
                   {sanitizeLanguages(work.languages).map((lang, langIndex) => (
                     <div key={langIndex} className="flex items-center bg-gray-100 p-2 rounded">
-                      <img
-                        src={lang.icon} // Use the sanitized `icon` property
-                        alt={lang.name} // Use the sanitized `name` property
-                        className="w-6 h-6 mr-2"
-                      />
-                      <span>{lang.name}</span> {/* Render the sanitized `name` */}
+                      <LanguageIcon icon={lang.icon} name={lang.name} />
+                      <span>{lang.name}</span>
                       <button
                         onClick={() => {
                           const updated = [...data.works];

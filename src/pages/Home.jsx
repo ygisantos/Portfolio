@@ -14,144 +14,112 @@ import { FaPhoneAlt } from "react-icons/fa";
 import { FaLinkedinIn } from "react-icons/fa6";
 import { FaGithub } from "react-icons/fa";
 import { AgeCalculate } from '@/utils/Calculator';
-import {getAboutMe} from '@api/Api';
-import { useEffect } from 'react';
-import { useState } from 'react';
+import {getAboutMe, getAllSkills} from '@api/Api';
+import { useEffect, useState } from 'react';
 import { RxDividerHorizontal } from "react-icons/rx";
 import { IoCalendar } from "react-icons/io5";
 import Menu from '@/components/Menu';
+import LanguageIcon from '@components/LanguageIcon';
 // Add import for the animated background
 import AnimatedCodeBackground from '@/components/AnimatedCodeBackground';
+import SkillsCarousel from './Skills';
+import ProfileSection from './Profile';
 
 function Home() {
-    const [profile,setProfile] = useState();
+    const [profile, setProfile] = useState();
+    const [skills, setSkills] = useState([]);
+    const [offset, setOffset] = useState(0);
+    const skillsPerPage = 5;
+    const slideInterval = 20; // ms, lower is smoother
+    const slideStep = 1; // px per interval
 
     useEffect(() => {
         const fetchData = async () => {
             const about_me = JSON.parse(await getAboutMe());
             setProfile(about_me);
-        }
+            const skillsData = JSON.parse(await getAllSkills());
+            setSkills(skillsData);
+        };
 
         fetchData();
     }, []);
+
+    // Smooth auto-slide effect
+    useEffect(() => {
+        if (!skills.length) return;
+        let animationFrame;
+        let currentOffset = offset;
+
+        const slide = () => {
+            // Each skill item is 96px wide (w-12 h-12 + margin), adjust as needed
+            const itemWidth = 96; // px
+            const totalWidth = itemWidth * skills.length;
+            currentOffset += slideStep;
+            if (currentOffset >= totalWidth) {
+                currentOffset = 0;
+            }
+            setOffset(currentOffset);
+            animationFrame = setTimeout(slide, slideInterval);
+        };
+
+        animationFrame = setTimeout(slide, slideInterval);
+        return () => clearTimeout(animationFrame);
+        // eslint-disable-next-line
+    }, [skills]);
+
+    const handlePrev = () => {
+        setSkillIndex((prev) => Math.max(prev - skillsPerPage, 0));
+    };
+
+    const handleNext = () => {
+        setSkillIndex((prev) =>
+            Math.min(prev + skillsPerPage, Math.max(skills.length - skillsPerPage, 0))
+        );
+    };
+
     return (
-        <div className='flex justify-center min-h-screen overflow'>
+        <div className='flex flex-row justify-center min-h-screen overflow'>
             {/* Animated programming background */}
             <AnimatedCodeBackground />
+
             {/* <Navigation /> */}
             <Menu />
             <div className="relative flex flex-col gap-2 p-2 md:w-[80vw] w-[90vw]">
-                <div id='profile' className='flex flex-row'>
-                    {/* PROFILE PICTURE AND SOME INFO */}
-                    <CustomCard className='flex-1/3'>
-                        <img 
-                            className='rounded-xs'
-                            src='https://static.vecteezy.com/system/resources/thumbnails/036/594/092/small_2x/man-empty-avatar-photo-placeholder-for-social-networks-resumes-forums-and-dating-sites-male-and-female-no-photo-images-for-unfilled-user-profile-free-vector.jpg'/>
-                        <div className='flex flex-col gap-1 mt-2'>
-                            <div className='flex flex-row items-center gap-1'>
-                                <MdEmail className='flex-1/8'/>
-                                <span className='flex-7/8 text-sm capitalize uppercase'>{profile?.socials?.email || 'loading...'}</span>
-                            </div>
-                            <div className='flex flex-row items-center gap-1'>
-                                <FaPhoneAlt className='flex-1/8'/>
-                                <span className='flex-7/8 text-sm capitalize'>{profile?.socials?.phone || 'loading...'}</span>
-                            </div>
-                            <div className='flex flex-row items-center gap-1'>
-                                <MdOutlineWork className='flex-1/8'/>
-                                <span className='flex-7/8 text-sm capitalize'>{profile?.availability || 'loading...'}</span>
-                            </div>
-                            <div className='flex flex-row items-center gap-1'>
-                                <FaLocationDot className='flex-1/8'/>
-                                <span className='flex-7/8 text-sm capitalize'>{profile?.location || 'loading...'}</span>
-                            </div>
-                            <div className='flex flex-row items-center gap-1'>
-                                <IoCalendar className='flex-1/8'/>
-                                <span className='flex-7/8 text-sm capitalize'>{AgeCalculate()} Years Old</span>
-                            </div>
-                            {
-                                /* DI MUNA IPAKITA */
-                                false && 
-                                <div className='flex flex-row items-center gap-1'>
-                                <MdDescription />
-                                <span className='capitalize'>{profile?.short_description || 'loading...'}</span>
-                            </div>
-                            }
-                        </div>
-                    </CustomCard>
-
-                    <div className='flex flex-col flex-2/3'>
-                        {/* DESCRIPTION */}
-                        <CustomCard className={'flex flex-col flex-6/7'}>
-                            <div className='flex flex-row justify-between'>
-                                <div className='flex flex-row items-center gap-1'>
-                                    <span className='font-black md:!text-4xl text-lg'>YGI MARTIN B. SANTOS</span>
+                {/* PROFILE */}
+                <section id="profile">
+                    <ProfileSection />
+                    {/* SOCIALS and DOWNLOAD CV remain here */}
+                    <div className='flex md:flex-row flex-col flex-1/7'>
+                        {/* SOCIALS */}
+                        <CustomCard className={'flex md:flex-row flex-col gap-2 items-center justify-around flex-3/4'}>
+                            <span className='font-black text-4xl'>SOCIALS</span>
+                            <div className='flex md:flex-row flex-col gap-2'>
+                                <div className='flex flex-row gap-2'>
+                                    <ButtonIcon icon={<FaFacebookF size={32}/>} onclick={null}/>
+                                    <ButtonIcon icon={<SiFacebookgaming size={32}/>} onclick={null}/>
                                 </div>
-                                
-                                <div className='flex flex-row md:items-center items-start md:gap-2 gap-0.5'>
-                                    <ButtonIcon 
-                                        className='md:text-2xl text-xs'
-                                        icon={<MdEmail/>} 
-                                        onclick={() => window.open(profile?.socials?.email ? `mailto:${profile.socials.email}` : '#', '_blank')} />
-                                    <ButtonIcon 
-                                        className='md:text-2xl text-xs'
-                                        icon={<FaLinkedinIn/>} 
-                                        onclick={() => window.open(profile?.socials?.linkedin || '#', '_blank')} />
-                                    <ButtonIcon 
-                                        className='md:text-2xl text-xs'
-                                        icon={<FaGithub/>} 
-                                        onclick={() => window.open(profile?.socials?.github || '#', '_blank')} />
+                                <div className='flex flex-row gap-2'>
+                                    <ButtonIcon  icon={<FaTiktok size={32}/>} onclick={null} />
+                                    <ButtonIcon  icon={<FaPhoneAlt size={32}/>} onclick={null} />
                                 </div>
-                            </div>
-                            <div className='mt-2 text-justify'>
-                                <span className='text-xl font-semibold opacity-60'>{profile?.description || 'loading...'}</span>
                             </div>
                         </CustomCard>
-
-                        <div className='flex md:flex-row flex-col flex-1/7'>
-                            {/* SOCIALS */}
-                            <CustomCard className={'flex md:flex-row flex-col gap-2 items-center justify-around flex-3/4'}>
-                                <span className='font-bold text-4xl'>SOCIALS</span>
-                                <div className='flex md:flex-row flex-col gap-2'>
-                                    <div className='flex flex-row gap-2'>
-                                        <ButtonIcon 
-                                            icon={<FaFacebookF size={32}/>}
-                                            onclick={null}
-                                        />
-                                        <ButtonIcon 
-                                            icon={<SiFacebookgaming size={32}/>}
-                                            onclick={null}
-                                        />
-                                    </div>
-                                    <div className='flex flex-row gap-2'>
-                                        <ButtonIcon 
-                                            icon={<FaTiktok size={32}/>}
-                                            onclick={null}
-                                        />
-                                        <ButtonIcon 
-                                            icon={<FaPhoneAlt size={32}/>}
-                                            onclick={null}
-                                        />
-                                    </div>
-                                </div>
-                            </CustomCard>
-
-                            {/* DOWNLOAD RESUME */}
-                            <CustomButton text={"DOWNLOAD CV"} onclick={null} className={'flex-1/4'} classText={'font-bold text-xl'}/>
-                        </div>
+                        {/* DOWNLOAD RESUME */}
+                        <CustomButton text={"DOWNLOAD CV"} onclick={null} className={'flex-1/4'} classText={'font-bold text-xl'}/>
                     </div>
-                </div>
-                <CustomCard>
-                    <section id="skills">
-                        <h2>Skills</h2>
-                        {/* Skills content */}
-                        <h1 className='h-[74px]'>TEST CONTENT</h1>
-                        <h1 className='h-[74px]'>TEST CONTENT</h1>
-                        <h1 className='h-[74px]'>TEST CONTENT</h1>
-                        <h1 className='h-[74px]'>TEST CONTENT</h1>
-                        <h1 className='h-[74px]'>TEST CONTENT</h1>
-                        <h1 className='h-[74px]'>TEST CONTENT</h1>
-                    </section>
-                </CustomCard>
+                </section>
+
+                {/* SKILLS */}
+                <section id="skills" className='mt-16'>
+                    <div className={'w-fit z-1 -mb-1 ml-6 gooey-label bg-brown-dark !pt-6'} >
+                        <span className='text-center solid-shadow-title text-beige text-xl font-black'>WHAT I WORK WITH</span>
+                    </div>
+                    <CustomCard className={``}>
+                        <SkillsCarousel />
+                    </CustomCard>
+                </section>
+
+                {/* AWARDS & CERTIFICATES */}
                 <CustomCard>
                     <section id="awards">
                         <h2>Awards & Certificates</h2>

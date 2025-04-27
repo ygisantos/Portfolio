@@ -12,10 +12,12 @@ function Menu() {
         const observer = new IntersectionObserver(
             (entries) => {
                 entries.forEach((entry) => {
-                    if (entry.isIntersecting) setActiveSection(entry.target.id);
+                    if (entry.isIntersecting) {
+                        setActiveSection(entry.target.id);
+                    }
                 });
             },
-            { threshold: 0.6 }
+            { threshold: 0.6 } 
         );
 
         sections.forEach((section) => observer.observe(section));
