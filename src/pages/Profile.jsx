@@ -11,16 +11,7 @@ import { AgeCalculate } from '@/utils/Calculator';
 import { getAboutMe } from '@api/Api';
 import { useEffect, useState } from 'react';
 
-export default function ProfileSection() {
-    const [profile, setProfile] = useState();
-
-    useEffect(() => {
-        const fetchData = async () => {
-            const about_me = JSON.parse(await getAboutMe());
-            setProfile(about_me);
-        };
-        fetchData();
-    }, []);
+export default function ProfileSection({profile}) {
 
     return (
         <div className='flex md:flex-row flex-col'>

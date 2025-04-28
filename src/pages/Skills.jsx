@@ -1,28 +1,14 @@
 import { useEffect, useRef, useState } from 'react';
-import { getAllSkills } from '@api/Api';
 import LanguageIcon from '@components/LanguageIcon';
 
 const ITEM_WIDTH = 96; // px
 const SLIDE_INTERVAL = 20; // ms
 const SLIDE_STEP = 2; // px
 
-export default function SkillsCarousel() {
-    const [skills, setSkills] = useState([]);
+export default function SkillsCarousel({skills}) {
     const [offset, setOffset] = useState(0);
     const offsetRef = useRef(0);
     const animationRef = useRef(null);
-
-    useEffect(() => {
-        const fetchSkills = async () => {
-            try {
-                const skillsData = JSON.parse(await getAllSkills());
-                setSkills(skillsData);
-            } catch (error) {
-                console.error('Failed to fetch skills:', error);
-            }
-        };
-        fetchSkills();
-    }, []);
 
     useEffect(() => {
         if (!skills.length) return;

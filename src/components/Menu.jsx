@@ -34,14 +34,14 @@ function Menu() {
     const handleMouseLeave = () => setHoveredButton(null);
 
     return (
-        <div className="!z-5 flex flex-col items-center justify-center bottom-1 fixed w-full">
+        <div className="!z-5 flex flex-col items-center justify-center bottom-5 fixed w-full">
             {/* LABEL */}
-            <span className="gooey-label bg-brown-light">{activeSection}</span>
-            <div className="flex flex-row ! gap-4 p-5 bg-brown-light rounded-xl relative">
-                {/* Decorative border-radius-1 blob at the bottom */}
-                <div className="absolute h-[40%] bg-beige left-0 bottom-0 w-full border-radius-1 pointer-events-none"></div>
-                
-                {/* Menu buttons */}
+                <span className="gooey-label bg-brown-light opacity-95 shadow-2xl">{activeSection}</span>
+                <div className="flex flex-row gap-6 p-5 px-16 bg-brown-light opacity-95 rounded-4xl relative overflow-hidden">
+                    {/* Decorative border-radius-1 blob at the bottom */}
+                    <div className="absolute h-[40%] bg-beige left-0 bottom-0 w-full border-radius-1 pointer-events-none mask"></div>
+                    
+                    {/* Menu buttons */}
                 { [
                     { id: "profile", icon: <FaUser size={32} />, label: "Profile" },
                     { id: "skills", icon: <FaTools size={32} />, label: "Skills" },

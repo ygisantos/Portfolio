@@ -20,62 +20,30 @@ import { RxDividerHorizontal } from "react-icons/rx";
 import { IoCalendar } from "react-icons/io5";
 import Menu from '@/components/Menu';
 import LanguageIcon from '@components/LanguageIcon';
+import SkillSlider from '@/components/SkillSlider'; // Import a new component for the slider
 // Add import for the animated background
 import AnimatedCodeBackground from '@/components/AnimatedCodeBackground';
 import SkillsCarousel from './Skills';
 import ProfileSection from './Profile';
+import PixelatedSlider from '@/components/PixelatedSlider'; // Import custom pixelated slider component
 
 function Home() {
     const [profile, setProfile] = useState();
     const [skills, setSkills] = useState([]);
-    const [offset, setOffset] = useState(0);
-    const skillsPerPage = 5;
-    const slideInterval = 20; // ms, lower is smoother
-    const slideStep = 1; // px per interval
 
     useEffect(() => {
         const fetchData = async () => {
             const about_me = JSON.parse(await getAboutMe());
             setProfile(about_me);
+
             const skillsData = JSON.parse(await getAllSkills());
+            console.log(skillsData);
             setSkills(skillsData);
         };
 
         fetchData();
     }, []);
 
-    // Smooth auto-slide effect
-    useEffect(() => {
-        if (!skills.length) return;
-        let animationFrame;
-        let currentOffset = offset;
-
-        const slide = () => {
-            // Each skill item is 96px wide (w-12 h-12 + margin), adjust as needed
-            const itemWidth = 96; // px
-            const totalWidth = itemWidth * skills.length;
-            currentOffset += slideStep;
-            if (currentOffset >= totalWidth) {
-                currentOffset = 0;
-            }
-            setOffset(currentOffset);
-            animationFrame = setTimeout(slide, slideInterval);
-        };
-
-        animationFrame = setTimeout(slide, slideInterval);
-        return () => clearTimeout(animationFrame);
-        // eslint-disable-next-line
-    }, [skills]);
-
-    const handlePrev = () => {
-        setSkillIndex((prev) => Math.max(prev - skillsPerPage, 0));
-    };
-
-    const handleNext = () => {
-        setSkillIndex((prev) =>
-            Math.min(prev + skillsPerPage, Math.max(skills.length - skillsPerPage, 0))
-        );
-    };
 
     return (
         <div className='flex flex-row justify-center min-h-screen overflow'>
@@ -87,7 +55,7 @@ function Home() {
             <div className="relative flex flex-col gap-2 p-2 md:w-[80vw] w-[90vw]">
                 {/* PROFILE */}
                 <section id="profile">
-                    <ProfileSection />
+                    <ProfileSection profile={profile}/>
                     {/* SOCIALS and DOWNLOAD CV remain here */}
                     <div className='flex md:flex-row flex-col flex-1/7'>
                         {/* SOCIALS */}
@@ -115,8 +83,47 @@ function Home() {
                         <span className='text-center solid-shadow-title text-beige text-xl font-black'>WHAT I WORK WITH</span>
                     </div>
                     <CustomCard className={``}>
-                        <SkillsCarousel />
+                        <SkillsCarousel skills={skills}/>
                     </CustomCard>
+
+                    {/* Grouped Skills */}
+                    <div className='grid md:grid-cols-3 grid-cols-1 md:grid-rows-2 grid-rows-6 gap-2 mt-6'>
+                        {Object.entries(
+                            skills.reduce((acc, skill) => {
+                                acc[skill.category] = acc[skill.category] || [];
+                                acc[skill.category].push(skill);
+                                return acc;
+                            }, {})
+                        )
+                        .sort(([categoryA, skillsA], [categoryB, skillsB]) => {
+                            if (categoryA === "Others") return 1;
+                            if (categoryB === "Others") return -1;
+
+                            const maxProficiencyA = Math.max(...skillsA.map(skill => skill.proficiency));
+                            const maxProficiencyB = Math.max(...skillsB.map(skill => skill.proficiency));
+
+                            return maxProficiencyB - maxProficiencyA;
+                        })
+                        .map(([category, categorySkills]) => (
+                            <CustomCard key={category}>
+                                <span className='font-bold md:text-xl text-lg'>{category.toUpperCase()}</span>
+                                <div className='flex flex-col gap-4 mt-2'>
+                                    {categorySkills.map(skill => (
+                                        <div key={skill.id} className='flex flex-row items-center gap-4'>
+                                            <img
+                                                src={`https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/${skill.icon}/${skill.icon}-original.svg`}
+                                                alt={skill.title}
+                                                className="h-6 flex-1/10"
+                                            />
+                                            <span className='flex-5/10 font-medium'>{skill.title}</span>
+                                            <span className='flex-1/10 font-medium'>{skill.proficiency}%</span>
+                                            <PixelatedSlider value={skill.proficiency} className={`flex-4/10 w-full`}/>
+                                        </div>
+                                    ))}
+                                </div>
+                            </CustomCard>
+                        ))}
+                    </div>
                 </section>
 
                 {/* AWARDS & CERTIFICATES */}
