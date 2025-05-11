@@ -11,22 +11,90 @@ import {
   deleteDocument,
   updateProfile,
   updateCollection,
-  loginWithPopup,
   loginWithEmailAndPassword,
   logout,
 } from '@api/Api';
 import LanguageIcon from '@components/LanguageIcon';
 
-export default function PortfolioPage() {
+// Helper components
+const LoadingSpinner = () => (
+  <div className="flex justify-center items-center py-8">
+    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+  </div>
+);
+
+const SuccessAlert = ({ message, onClose }) => (
+  <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4" role="alert">
+    <span className="block sm:inline">{message}</span>
+    <span className="absolute top-0 bottom-0 right-0 px-4 py-3" onClick={onClose}>
+      <svg className="fill-current h-6 w-6 text-green-500" role="button" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+        <title>Close</title>
+        <path d="M14.348 14.849a1.2 1.2 0 0 1-1.697 0L10 11.819l-2.651 3.029a1.2 1.2 0 1 1-1.697-1.697l2.758-3.15-2.759-3.152a1.2 1.2 0 1 1 1.697-1.697L10 8.183l2.651-3.031a1.2 1.2 0 1 1 1.697 1.697l-2.758 3.152 2.758 3.15a1.2 1.2 0 0 1 0 1.698z"/>
+      </svg>
+    </span>
+  </div>
+);
+
+const ErrorAlert = ({ message, onClose }) => (
+  <div className="!bg-red-100 border !border-red-400 !text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
+    <span className="block sm:inline">{message}</span>
+    <span className="absolute top-0 bottom-0 right-0 px-4 py-3" onClick={onClose}>
+      <svg className="fill-current h-6 w-6 !text-red-500" role="button" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+        <title>Close</title>
+        <path d="M14.348 14.849a1.2 1.2 0 0 1-1.697 0L10 11.819l-2.651 3.029a1.2 1.2 0 1 1-1.697-1.697l2.758-3.15-2.759-3.152a1.2 1.2 0 1 1 1.697-1.697L10 8.183l2.651-3.031a1.2 1.2 0 1 1 1.697 1.697l-2.758 3.152 2.758 3.15a1.2 1.2 0 0 1 0 1.698z"/>
+      </svg>
+    </span>
+  </div>
+);
+
+const TabButton = ({ active, onClick, children }) => (
+  <button
+    onClick={onClick}
+    className={`mr-2 px-4 py-2 rounded-md transition-colors ${
+      active ? '!bg-blue-500 !text-white' : '!bg-gray-200 hover:!bg-gray-300'
+    }`}
+  >
+    {children}
+  </button>
+);
+
+const PrimaryButton = ({ onClick, children, className = '', disabled = false }) => (
+  <button
+    onClick={onClick}
+    disabled={disabled}
+    className={`!bg-blue-500 !text-white py-2 px-4 rounded-md hover:!bg-blue-600 transition-colors ${
+      disabled ? 'opacity-50 cursor-not-allowed' : ''
+    } ${className}`}
+  >
+    {children}
+  </button>
+);
+
+const DangerButton = ({ onClick, children, className = '' }) => (
+  <button
+    onClick={onClick}
+    className={`!bg-red-500 !text-white py-2 px-4 rounded-md hover:!bg-red-600 transition-colors ${className}`}
+  >
+    {children}
+  </button>
+);
+
+// Main component
+export default function PortfolioAdmin() {
   const [data, setData] = useState(null);
   const [editableData, setEditableData] = useState({});
-  const [activeTab, setActiveTab] = useState('basic'); // Track the active tab
+  const [activeTab, setActiveTab] = useState('basic');
   const [loginData, setLoginData] = useState({ email: '', password: '' });
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(null);
+  const [isUpdating, setIsUpdating] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
+        setIsLoading(true);
         const profile = JSON.parse(await getAboutMe());
         const certificates = JSON.parse(await getAllCertificates());
         const experiences = JSON.parse(await getAllExperiences());
@@ -46,14 +114,20 @@ export default function PortfolioPage() {
         };
 
         setData(fetchedData);
-        setEditableData(fetchedData); // Set entire profile data to editableData
+        setEditableData(fetchedData);
+        setError(null);
       } catch (error) {
-        console.error('Error fetching data:', error.message);
+        console.error('Error fetching data:', error);
+        setError('Failed to load data. Please try again later.');
+      } finally {
+        setIsLoading(false);
       }
     };
 
-    fetchData();
-  }, []);
+    if (isLoggedIn) {
+      fetchData();
+    }
+  }, [isLoggedIn]);
 
   const handleInputChange = (field, value) => {
     setEditableData((prev) => ({
@@ -62,23 +136,40 @@ export default function PortfolioPage() {
     }));
   };
 
+  const handleNestedInputChange = (parentField, field, value) => {
+    setEditableData((prev) => ({
+      ...prev,
+      [parentField]: {
+        ...prev[parentField],
+        [field]: value,
+      },
+    }));
+  };
+
   const deleteItem = async (collectionName, id) => {
-    if (!id) return; // Don't delete if no ID exists
+    if (!id) return;
+    
     try {
+      setIsLoading(true);
       await deleteDocument(collectionName, id);
       setData((prevData) => ({
         ...prevData,
-        [collectionName]: prevData[collectionName].filter((item) => item.id !== id)
+        [collectionName]: prevData[collectionName].filter((item) => item.id !== id),
       }));
-      alert(`${collectionName} item deleted successfully!`);
+      setSuccess(`${collectionName} item deleted successfully!`);
     } catch (error) {
-      console.error(`Error deleting ${collectionName}:`, error.message);
-      alert(`Failed to delete ${collectionName}. Please try again.`);
+      console.error(`Error deleting ${collectionName}:`, error);
+      setError(`Failed to delete ${collectionName}. Please try again.`);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const updateData = async () => {
     try {
+      setIsUpdating(true);
+      setError(null);
+      
       // Update profile data
       await updateProfile({
         short_description: editableData.short_description || '',
@@ -98,746 +189,42 @@ export default function PortfolioPage() {
       });
 
       // Update collections
-      const collections = ['certificates', 'skills', 'experiences', 'works', 'testimonials', 'comments'];
+      const collections = ['certificates', 'skills', 'experiences', 'works', 'testimonials'];
       for (const colName of collections) {
         if (data[colName]) {
           await updateCollection(colName, data[colName]);
         }
       }
 
-      alert('All data updated successfully!');
+      setSuccess('All data updated successfully!');
     } catch (error) {
-      console.error('Error updating data:', error.message);
-      alert('Failed to update data. Please check your inputs and try again.');
+      console.error('Error updating data:', error);
+      setError('Failed to update data. Please check your inputs and try again.');
+    } finally {
+      setIsUpdating(false);
     }
   };
 
-  // Helper function to sanitize and flatten the languages data
   const sanitizeLanguages = (languages) => {
-    return languages?.map((lang) => {
-      const extractNameAndIcon = (obj) => {
-        if (obj?.name && typeof obj.name === 'string') {
-          return { name: obj.name, icon: obj.icon || '' };
-        }
-        return extractNameAndIcon(obj?.name || obj);
+    if (!languages) return [];
+    
+    // Convert all language entries to a consistent format
+    return languages.map(lang => {
+      // If it's already in the correct format
+      if (lang?.name && lang?.icon) return lang;
+      
+      // If it's a string or has a name property
+      const langName = typeof lang === 'string' ? lang : lang?.name;
+      if (!langName) return null;
+      
+      // Create a properly formatted language object
+      return {
+        name: langName,
+        icon: `https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/${langName}/${langName}-original.svg`
       };
-
-      return extractNameAndIcon(lang) || { name: 'Unknown', icon: '' };
-    }) || [];
+    }).filter(Boolean);
   };
 
-  const renderTabContent = () => {
-    switch (activeTab) {
-      case 'basic':
-        return (
-          <section className="bg-white shadow-md rounded-lg p-6 mb-6">
-            <h2 className="text-2xl font-semibold mb-4">Basic Information</h2>
-            <div className="mb-4">
-              <label className="block font-medium mb-1">Short Description:</label>
-              <textarea
-                value={getData(data.short_description)}
-                onChange={(e) => {
-                  setData(prev => ({ ...prev, short_description: e.target.value }));
-                  handleInputChange('short_description', e.target.value);
-                }}
-                className="w-full border border-gray-300 rounded-md p-2"
-              />
-            </div>
-            <div className="mb-4">
-              <label className="block font-medium mb-1">Description:</label>
-              <textarea
-                value={getData(data.description)}
-                onChange={(e) => {
-                  setData(prev => ({ ...prev, description: e.target.value }));
-                  handleInputChange('description', e.target.value);
-                }}
-                className="w-full border border-gray-300 rounded-md p-2"
-              />
-            </div>
-            <div className="mb-4">
-              <label className="block font-medium mb-1">Location:</label>
-              <input
-                type="text"
-                value={getData(data.location)}
-                onChange={(e) => {
-                  setData(prev => ({ ...prev, location: e.target.value }));
-                  handleInputChange('location', e.target.value);
-                }}
-                className="w-full border border-gray-300 rounded-md p-2"
-              />
-            </div>
-            <div className="mb-4">
-              <label className="block font-medium mb-1">Availability:</label>
-              <select
-                value={getData(data.availability)}
-                onChange={(e) => {
-                  setData(prev => ({ ...prev, availability: e.target.value }));
-                  handleInputChange('availability', e.target.value);
-                }}
-                className="w-full border border-gray-300 rounded-md p-2"
-              >
-                <option value="">Select Availability</option>
-                <option value="Open for job">Open for job</option>
-                <option value="Hired">Hired</option>
-              </select>
-            </div>
-            <div className="mb-4">
-              <label className="block font-medium mb-1">Resume (Direct Download Link):</label>
-              <input
-                type="text"
-                value={getData(data.resume_url)}
-                onChange={(e) => {
-                  setData(prev => ({ ...prev, resume_url: e.target.value }));
-                  handleInputChange('resume_url', e.target.value);
-                }}
-                className="w-full border border-gray-300 rounded-md p-2"
-              />
-              <a
-                href={getData(data.resume_url)}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-blue-500 underline"
-              >
-                Download Resume
-              </a>
-            </div>
-          </section>
-        );
-      case 'certificates':
-        return (
-          <section className="bg-white shadow-md rounded-lg p-6 mb-6">
-            <h2 className="text-2xl font-semibold mb-4">Certificates</h2>
-            {data.certificates?.map((cert, index) => (
-              <div key={index} className="mb-4 border-b border-gray-200 pb-4">
-                <label className="block font-medium mb-1">Type:</label>
-                <select
-                  value={cert.type || 'Certificate'}
-                  onChange={(e) => {
-                    const updated = [...data.certificates];
-                    updated[index].type = e.target.value;
-                    setData({ ...data, certificates: updated });
-                  }}
-                  className="w-full border border-gray-300 rounded-md p-2 mb-2"
-                >
-                  <option value="Certificate">Certificate</option>
-                  <option value="Award">Award</option>
-                </select>
-                <label className="block font-medium mb-1">Title:</label>
-                <input
-                  type="text"
-                  value={cert.title || ''}
-                  onChange={(e) => {
-                    const updated = [...data.certificates];
-                    updated[index].title = e.target.value;
-                    setData({ ...data, certificates: updated });
-                  }}
-                  className="w-full border border-gray-300 rounded-md p-2 mb-2"
-                />
-                <label className="block font-medium mb-1">Description:</label>
-                <textarea
-                  value={cert.description || ''}
-                  onChange={(e) => {
-                    const updated = [...data.certificates];
-                    updated[index].description = e.target.value;
-                    setData({ ...data, certificates: updated });
-                  }}
-                  className="w-full border border-gray-300 rounded-md p-2 mb-2"
-                />
-                <label className="block font-medium mb-1">Date:</label>
-                <input
-                  type="date"
-                  value={cert.date || ''}
-                  onChange={(e) => {
-                    const updated = [...data.certificates];
-                    updated[index].date = e.target.value;
-                    setData({ ...data, certificates: updated });
-                  }}
-                  className="w-full border border-gray-300 rounded-md p-2 mb-2"
-                />
-                <label className="block font-medium mb-1">Image:</label>
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={async (e) => {
-                    const file = e.target.files[0];
-                    if (file) {
-                      const base64 = await convertToBase64(file);
-                      const updated = [...data.certificates];
-                      updated[index].image = base64;
-                      setData({ ...data, certificates: updated });
-                    }
-                  }}
-                  className="w-full border border-gray-300 rounded-md p-2"
-                />
-                {cert.image && (
-                  <img
-                    src={cert.image}
-                    alt="Certificate Preview"
-                    className="mt-2 w-32 h-32 object-cover border"
-                  />
-                )}
-                {cert.id && (
-                  <button
-                    onClick={() => deleteItem('certificates', cert.id)}
-                    className="mt-2 !bg-red-500 text-gray-500 py-1 px-3 rounded-md hover:bg-red-600"
-                  >
-                    Delete
-                  </button>
-                )}
-              </div>
-            ))}
-            <button
-              onClick={() => {
-                const updated = [...(data.certificates || []), { type: 'Certificate', title: '', description: '', date: '', image: '' }];
-                setData({ ...data, certificates: updated });
-              }}
-              className="!bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600"
-            >
-              Add Certificate
-            </button>
-          </section>
-        );
-      case 'contact':
-        return (
-          <section className="bg-white shadow-md rounded-lg p-6 mb-6">
-            <h2 className="text-2xl font-semibold mb-4">Contact</h2>
-            <div className="space-y-4">
-              {['github', 'linkedin', 'facebook', 'facebook_page', 'phone', 'email', 'tiktok'].map((field) => (
-                <div key={field}>
-                  <label className="block font-medium capitalize">{field.replace('_', ' ')}:</label>
-                  <input
-                    type="text"
-                    value={editableData.socials?.[field] || ''} // Access nested socials field
-                    onChange={(e) => {
-                      setEditableData((prev) => ({
-                        ...prev,
-                        socials: {
-                          ...prev.socials,
-                          [field]: e.target.value, // Update the specific social field
-                        },
-                      }));
-                    }}
-                    className="w-full border border-gray-300 rounded-md p-2"
-                  />
-                </div>
-              ))}
-            </div>
-          </section>
-        );
-      case 'skills':
-        return (
-          <section className="bg-white shadow-md rounded-lg p-6 mb-6">
-            <h2 className="text-2xl font-semibold mb-4">Skills</h2>
-            {data.skills?.map((skill, index) => (
-              <div key={index} className="mb-4 border-b border-gray-200 pb-4">
-                <label className="block font-medium mb-1">Title:</label>
-                <input
-                  type="text"
-                  value={skill.title || ''}
-                  onChange={(e) => {
-                    const updated = [...data.skills];
-                    updated[index].title = e.target.value;
-                    setData({ ...data, skills: updated });
-                  }}
-                  className="w-full border border-gray-300 rounded-md p-2 mb-2"
-                />
-                <label className="block font-medium mb-1">Proficiency:</label>
-                <input
-                  type="range"
-                  min="0"
-                  max="100"
-                  value={skill.proficiency || 0}
-                  onChange={(e) => {
-                    const updated = [...data.skills];
-                    updated[index].proficiency = e.target.value;
-                    setData({ ...data, skills: updated });
-                  }}
-                  className="w-full"
-                />
-                <p className="text-sm text-gray-600">Proficiency: {skill.proficiency || 0}%</p>
-                <label className="block font-medium mb-1">Category:</label>
-                <select
-                  value={skill.category || ''}
-                  onChange={(e) => {
-                    const updated = [...data.skills];
-                    updated[index].category = e.target.value;
-                    setData({ ...data, skills: updated });
-                  }}
-                  className="w-full border border-gray-300 rounded-md p-2 mb-2"
-                >
-                  <option value="">Select Category</option>
-                  <option value="Window Application Development">Window Application Development</option>
-                  <option value="Game Development">Game Development</option>
-                  <option value="Mobile Development">Mobile Development</option>
-                  <option value="Web Development">Web Development</option>
-                  <option value="Database & Backend">Database & Backend</option>
-                  <option value="Others">Others</option>
-                </select>
-                <label className="block font-medium mb-1">Icon:</label>
-                <select
-                  value={skill.icon || ''}
-                  onChange={(e) => {
-                    const updated = [...data.skills];
-                    updated[index].icon = e.target.value;
-                    setData({ ...data, skills: updated });
-                  }}
-                  className="w-full border border-gray-300 rounded-md p-2"
-                >
-                  <option value="">Select an Icon</option>
-                  {ICONS.map((icon) => (
-                    <option key={icon} value={icon}>{icon}</option>
-                  ))}
-                </select>
-                {skill.icon && (
-                  <img
-                    src={`https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/${skill.icon}/${skill.icon}-original.svg`}
-                    alt={`${skill.icon} icon`}
-                    className="mt-2 w-16 h-16 object-cover border"
-                  />
-                )}
-                {skill.id && (
-                  <button
-                    onClick={() => deleteItem('skills', skill.id)}
-                    className="mt-2 !bg-red-500 text-gray-500 py-1 px-3 rounded-md hover:bg-red-600"
-                  >
-                    Delete
-                  </button>
-                )}
-              </div>
-            ))}
-            <button
-              onClick={() => {
-                const updated = [...(data.skills || []), { title: '', proficiency: 0, icon: '', category: '' }];
-                setData({ ...data, skills: updated });
-              }}
-              className="!bg-blue-500 text-gray-500 py-2 px-4 rounded-md hover:bg-blue-600"
-            >
-              Add Skill
-            </button>
-          </section>
-        );
-      case 'experiences':
-        return (
-          <section className="bg-white shadow-md rounded-lg p-6 mb-6">
-            <h2 className="text-2xl font-semibold mb-4">Experiences</h2>
-            {data.experiences?.map((exp, index) => (
-              <div key={index} className="mb-4 border-b border-gray-200 pb-4">
-                <label className="block font-medium mb-1">Name:</label>
-                <input
-                  type="text"
-                  value={exp.name || ''}
-                  onChange={(e) => {
-                    const updated = [...data.experiences];
-                    updated[index].name = e.target.value;
-                    setData({ ...data, experiences: updated });
-                  }}
-                  className="w-full border border-gray-300 rounded-md p-2 mb-2"
-                />
-                <label className="block font-medium mb-1">From:</label>
-                <input
-                  type="date"
-                  value={exp.from || ''}
-                  onChange={(e) => {
-                    const updated = [...data.experiences];
-                    updated[index].from = e.target.value;
-                    setData({ ...data, experiences: updated });
-                  }}
-                  className="w-full border border-gray-300 rounded-md p-2 mb-2"
-                />
-                <label className="block font-medium mb-1">To:</label>
-                <div className="flex items-center gap-2">
-                  <input 
-                    type="date" 
-                    value={exp.to || ''} 
-                    disabled={exp.still_doing}
-                    onChange={(e) => {
-                      const updated = [...data.experiences];
-                      updated[index].to = e.target.value;
-                      setData({ ...data, experiences: updated });
-                    }}
-                    className="w-full border border-gray-300 rounded-md p-2 mb-2"
-                  />
-                  <label>
-                    <input
-                      type="checkbox"
-                      checked={exp.still_doing || false}
-                      onChange={(e) => {
-                        const updated = [...data.experiences];
-                        updated[index].still_doing = e.target.checked;
-                        setData({ ...data, experiences: updated });
-                      }}
-                    /> Still doing
-                  </label>
-                </div>
-                <label className="block font-medium mb-1">Description:</label>
-                <textarea
-                  value={exp.description || ''}
-                  onChange={(e) => {
-                    const updated = [...data.experiences];
-                    updated[index].description = e.target.value;
-                    setData({ ...data, experiences: updated });
-                  }}
-                  className="w-full border border-gray-300 rounded-md p-2 mb-2"
-                />
-                <label className="block font-medium mb-1">What I Learned:</label>
-                <textarea
-                  value={exp.learned || ''}
-                  onChange={(e) => {
-                    const updated = [...data.experiences];
-                    updated[index].learned = e.target.value;
-                    setData({ ...data, experiences: updated });
-                  }}
-                  className="w-full border border-gray-300 rounded-md p-2 mb-2"
-                />
-                <label className="block font-medium mb-1">Job Description/Role:</label>
-                <textarea
-                  value={exp.role || ''}
-                  onChange={(e) => {
-                    const updated = [...data.experiences];
-                    updated[index].role = e.target.value;
-                    setData({ ...data, experiences: updated });
-                  }}
-                  className="w-full border border-gray-300 rounded-md p-2 mb-2"
-                />
-                {exp.id && (
-                  <button
-                    onClick={() => deleteItem('experiences', exp.id)}
-                    className="mt-2 !bg-red-500 text-gray-500 py-1 px-3 rounded-md hover:bg-red-600"
-                  >
-                    Delete
-                  </button>
-                )}
-              </div>
-            ))}
-            <button
-              onClick={() => {
-                const updated = [...(data.experiences || []), { name: '', from: '', to: '', description: '', learned: '', role: '', still_doing: false }];
-                setData({ ...data, experiences: updated });
-              }}
-              className="!bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600"
-            >
-              Add Experience
-            </button>
-          </section>
-        );
-      case 'works':
-        return (
-          <section className="bg-white shadow-md rounded-lg p-6 mb-6">
-            <h2 className="text-2xl font-semibold mb-4">Works</h2>
-            {data.works?.map((work, index) => (
-              <div key={index} className="mb-4 border-b border-gray-200 pb-4">
-                <label className="block font-medium mb-1">Title:</label>
-                <input
-                  type="text"
-                  value={work.title || ''}
-                  onChange={(e) => {
-                    const updated = [...data.works];
-                    updated[index].title = e.target.value;
-                    setData({ ...data, works: updated });
-                  }}
-                  className="w-full border border-gray-300 rounded-md p-2 mb-2"
-                />
-                <label className="block font-medium mb-1">Description:</label>
-                <textarea
-                  value={work.description || ''}
-                  onChange={(e) => {
-                    const updated = [...data.works];
-                    updated[index].description = e.target.value;
-                    setData({ ...data, works: updated });
-                  }}
-                  className="w-full border border-gray-300 rounded-md p-2 mb-2"
-                />
-                <label className="block font-medium mb-1">Year:</label>
-                <input
-                  type="number"
-                  value={work.year || ''}
-                  onChange={(e) => {
-                    const updated = [...data.works];
-                    updated[index].year = e.target.value;
-                    setData({ ...data, works: updated });
-                  }}
-                  className="w-full border border-gray-300 rounded-md p-2 mb-2"
-                />
-                <label className="block font-medium mb-1">Duration:</label>
-                <input
-                  type="text"
-                  value={work.duration || ''}
-                  onChange={(e) => {
-                    const updated = [...data.works];
-                    updated[index].duration = e.target.value;
-                    setData({ ...data, works: updated });
-                  }}
-                  className="w-full border border-gray-300 rounded-md p-2 mb-2"
-                />
-                <label className="block font-medium mb-1">Category:</label>
-                <select
-                  value={work.category || ''}
-                  onChange={(e) => {
-                    const updated = [...data.works];
-                    updated[index].category = e.target.value;
-                    setData({ ...data, works: updated });
-                  }}
-                  className="w-full border border-gray-300 rounded-md p-2 mb-2"
-                >
-                  <option value="">Select Category</option>
-                  <option value="Work">Work</option>
-                  <option value="Commission">Commission</option>
-                  <option value="School">School</option>
-                  <option value="Side Project">Side Project</option>
-                </select>
-                <label className="block font-medium mb-1">Video Link (YouTube/Vimeo Embed URL):</label>
-                <input
-                  type="text"
-                  placeholder="e.g., https://www.youtube.com/embed/VIDEO_ID"
-                  value={work.video_link || ''}
-                  onChange={(e) => {
-                    const updated = [...data.works];
-                    updated[index].video_link = e.target.value;
-                    setData({ ...data, works: updated });
-                  }}
-                  className="w-full border border-gray-300 rounded-md p-2 mb-2"
-                />
-                {work.video_link && (
-                  <div className="mb-2">
-                    <iframe
-                      width="100%"
-                      height="315"
-                      src={work.video_link}
-                      frameBorder="0"
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                      allowFullScreen
-                      className="mb-2"
-                    ></iframe>
-                  </div>
-                )}
-                <label className="block font-medium mb-1">Languages/Technologies:</label>
-                <div className="flex flex-wrap gap-2 mb-2">
-                  {sanitizeLanguages(work.languages).map((lang, langIndex) => (
-                    <div key={langIndex} className="flex items-center bg-gray-100 p-2 rounded">
-                      <LanguageIcon icon={lang.icon} name={lang.name} />
-                      <span>{lang.name}</span>
-                      <button
-                        onClick={() => {
-                          const updated = [...data.works];
-                          updated[index].languages = work.languages.filter((_, i) => i !== langIndex);
-                          setData({ ...data, works: updated });
-                        }}
-                        className="ml-2 text-red-500"
-                      >
-                        ×
-                      </button>
-                    </div>
-                  ))}
-                </div>
-                <div className="flex gap-2 mb-2">
-                  <select
-                    className="w-full border border-gray-300 rounded-md p-2"
-                    onChange={(e) => {
-                      if (e.target.value) {
-                        const selectedLanguage = e.target.value;
-                        const updated = [...data.works];
-                        updated[index].languages = [
-                          ...(work.languages || []),
-                          {
-                            name: selectedLanguage,
-                            icon: `https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/${selectedLanguage}/${selectedLanguage}-original.svg`
-                          }
-                        ];
-                        setData({ ...data, works: updated });
-                        e.target.value = ''; // Reset select
-                      }
-                    }}
-                  >
-                    <option value="">Select Technology</option>
-                    {ICONS.map((icon) => (
-                      <option key={icon} value={icon}>{icon}</option>
-                    ))}
-                  </select>
-                </div>
-                <label className="block font-medium mb-1">Images:</label>
-                <input
-                  type="file"
-                  multiple
-                  accept="image/*"
-                  onChange={async (e) => {
-                    const files = Array.from(e.target.files);
-                    const base64Images = await Promise.all(
-                      files.map(file => convertToBase64(file))
-                    );
-                    const updated = [...data.works];
-                    updated[index].images = [...(updated[index].images || []), ...base64Images];
-                    setData({ ...data, works: updated });
-                  }}
-                  className="w-full border border-gray-300 rounded-md p-2 mb-2"
-                />
-                <div className="grid grid-cols-3 gap-2 mt-2">
-                  {work.images?.map((img, imgIndex) => (
-                    <div key={imgIndex} className="relative">
-                      <img src={img} alt={`Work ${imgIndex + 1}`} className="w-full h-32 object-cover" />
-                      <button
-                        onClick={() => {
-                          const updated = [...data.works];
-                          updated[index].images = work.images.filter((_, i) => i !== imgIndex);
-                          setData({ ...data, works: updated });
-                        }}
-                        className="absolute top-0 right-0 !bg-red-500 text-white p-1 rounded-full"
-                      >
-                        ×
-                      </button>
-                    </div>
-                  ))}
-                </div>
-                {work.id && (
-                  <button
-                    onClick={() => deleteItem('works', work.id)}
-                    className="mt-2 !bg-red-500 text-gray-500 py-1 px-3 rounded-md hover:bg-red-600"
-                  >
-                    Delete
-                  </button>
-                )}
-              </div>
-            ))}
-            <button
-              onClick={() => {
-                const updated = [...(data.works || []), {
-                  title: '',
-                  description: '',
-                  year: '',
-                  duration: '',
-                  category: '',
-                  video_link: '',
-                  languages: [],
-                  images: []
-                }];
-                setData({ ...data, works: updated });
-              }}
-              className="!bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600"
-            >
-              Add Work
-            </button>
-          </section>
-        );
-      case 'testimonials':
-        return (
-          <section className="bg-white shadow-md rounded-lg p-6 mb-6">
-            <h2 className="text-2xl font-semibold mb-4">Testimonials</h2>
-            {data.testimonials?.map((testimonial, index) => (
-              <div key={index} className="mb-4 border-b border-gray-200 pb-4">
-                <label className="block font-medium mb-1">Company Name:</label>
-                <input
-                  type="text"
-                  value={testimonial.company || ''}
-                  onChange={(e) => {
-                    const updated = [...data.testimonials];
-                    updated[index].company = e.target.value;
-                    setData({ ...data, testimonials: updated });
-                  }}
-                  className="w-full border border-gray-300 rounded-md p-2 mb-2"
-                />
-                <label className="block font-medium mb-1">Name:</label>
-                <input
-                  type="text"
-                  value={testimonial.name || ''}
-                  onChange={(e) => {
-                    const updated = [...data.testimonials];
-                    updated[index].name = e.target.value;
-                    setData({ ...data, testimonials: updated });
-                  }}
-                  className="w-full border border-gray-300 rounded-md p-2 mb-2"
-                />
-                <label className="block font-medium mb-1">Role:</label>
-                <input
-                  type="text"
-                  value={testimonial.role || ''}
-                  onChange={(e) => {
-                    const updated = [...data.testimonials];
-                    updated[index].role = e.target.value;
-                    setData({ ...data, testimonials: updated });
-                  }}
-                  className="w-full border border-gray-300 rounded-md p-2 mb-2"
-                />
-                <label className="block font-medium mb-1">Comment:</label>
-                <textarea
-                  value={testimonial.comment || ''}
-                  onChange={(e) => {
-                    const updated = [...data.testimonials];
-                    updated[index].comment = e.target.value;
-                    setData({ ...data, testimonials: updated });
-                  }}
-                  className="w-full border border-gray-300 rounded-md p-2 mb-2"
-                />
-                <label className="block font-medium mb-1">Image:</label>
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={async (e) => {
-                    const file = e.target.files[0];
-                    if (file) {
-                      const base64 = await convertToBase64(file);
-                      const updated = [...data.testimonials];
-                      updated[index].image = base64;
-                      setData({ ...data, testimonials: updated });
-                    }
-                  }}
-                  className="w-full border border-gray-300 rounded-md p-2 mb-2"
-                />
-                {testimonial.image && (
-                  <img
-                    src={testimonial.image}
-                    alt="Profile"
-                    className="mt-2 w-32 h-32 object-cover"
-                  />
-                )}
-                {testimonial.id && (
-                  <button
-                    onClick={() => deleteItem('testimonials', testimonial.id)}
-                    className="mt-2 !bg-red-500 text-gray-500 py-1 px-3 rounded-md hover:bg-red-600"
-                  >
-                    Delete
-                  </button>
-                )}
-              </div>
-            ))}
-            <button
-              onClick={() => {
-                const updated = [...(data.testimonials || []), { company: '', name: '', role: '', comment: '', image: '' }];
-                setData({ ...data, testimonials: updated });
-              }}
-              className="!bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600"
-            >
-              Add Testimonial
-            </button>
-          </section>
-        );
-      default:
-        return null;
-    }
-  };
-
-  const handleLogin = async () => {
-    const { email, password } = loginData;
-    if (!email || !password) {
-      alert('Please enter both email and password.');
-      return;
-    }
-    const result = await loginWithEmailAndPassword(email, password);
-    if (result.success) {
-      setIsLoggedIn(true);
-    }
-  };
-
-  const handleLogout = async () => {
-    const result = await logout();
-    if (result.success) {
-      setIsLoggedIn(false);
-    }
-  };
-
-  if (!data) return <div>Loading...</div>;
-
-  const getData = (val) => val ?? 'N/A';
-
-  // Helper function to convert image file to Base64
   const convertToBase64 = (file) => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -847,118 +234,1323 @@ export default function PortfolioPage() {
     });
   };
 
-  return (
-    <div className="p-6 bg-gray-400 text-gray-700 min-h-screen">
-      <h1 className="text-3xl font-bold mb-4">Portfolio</h1>
-      {!isLoggedIn ? (
-        <div className="mb-4 bg-white shadow-md rounded-lg p-6">
-          <h2 className="text-xl font-semibold mb-4">Login</h2>
-          <div className="mb-4">
-            <label className="block font-medium mb-1">Email:</label>
-            <input
-              type="email"
-              value={loginData.email}
-              onChange={(e) => setLoginData({ ...loginData, email: e.target.value })}
-              className="w-full border border-gray-300 rounded-md p-2"
-            />
+  const handleLogin = async () => {
+    const { email, password } = loginData;
+    if (!email || !password) {
+      setError('Please enter both email and password.');
+      return;
+    }
+    
+    try {
+      setIsLoading(true);
+      const result = await loginWithEmailAndPassword(email, password);
+      if (result.success) {
+        setIsLoggedIn(true);
+        setSuccess('Login successful!');
+      }
+    } catch (error) {
+      setError(error.message || 'Login failed. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      setIsLoading(true);
+      const result = await logout();
+      if (result.success) {
+        setIsLoggedIn(false);
+        setSuccess('Logged out successfully!');
+      }
+    } catch (error) {
+      setError(error.message || 'Logout failed. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const renderTabContent = () => {
+    if (isLoading) return <LoadingSpinner />;
+    
+    switch (activeTab) {
+      case 'basic':
+        return (
+          <BasicInfoTab 
+            data={data} 
+            editableData={editableData} 
+            setData={setData} 
+            handleInputChange={handleInputChange} 
+          />
+        );
+      case 'certificates':
+        return (
+          <CertificatesTab 
+            data={data} 
+            setData={setData} 
+            deleteItem={deleteItem} 
+            convertToBase64={convertToBase64} 
+          />
+        );
+      case 'contact':
+        return (
+          <ContactTab 
+            editableData={editableData} 
+            handleNestedInputChange={handleNestedInputChange} 
+          />
+        );
+      case 'skills':
+        return (
+          <SkillsTab 
+            data={data} 
+            setData={setData} 
+            deleteItem={deleteItem} 
+          />
+        );
+      case 'experiences':
+        return (
+          <ExperiencesTab 
+            data={data} 
+            setData={setData} 
+            deleteItem={deleteItem} 
+          />
+        );
+      case 'works':
+        return (
+          <WorksTab 
+            data={data} 
+            setData={setData} 
+            deleteItem={deleteItem} 
+            convertToBase64={convertToBase64} 
+            sanitizeLanguages={sanitizeLanguages} 
+          />
+        );
+      case 'testimonials':
+        return (
+          <TestimonialsTab 
+            data={data} 
+            setData={setData} 
+            deleteItem={deleteItem} 
+            convertToBase64={convertToBase64} 
+          />
+        );
+      default:
+        return null;
+    }
+  };
+
+  const getData = (val) => val ?? 'N/A';
+
+  if (!isLoggedIn) {
+    return (
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
+        <div className="bg-white shadow-lg rounded-lg p-8 w-full max-w-md">
+          <h1 className="text-2xl font-bold text-center mb-6">Portfolio Admin Login</h1>
+          
+          {error && <ErrorAlert message={error} onClose={() => setError(null)} />}
+          {success && <SuccessAlert message={success} onClose={() => setSuccess(null)} />}
+          
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+              <input
+                type="email"
+                value={loginData.email}
+                onChange={(e) => setLoginData({ ...loginData, email: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="admin@example.com"
+              />
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
+              <input
+                type="password"
+                value={loginData.password}
+                onChange={(e) => setLoginData({ ...loginData, password: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="••••••••"
+              />
+            </div>
+            
+            <PrimaryButton 
+              onClick={handleLogin} 
+              disabled={isLoading}
+              className="w-full flex justify-center text-black"
+            >
+              {isLoading ? 'Logging in...' : 'Login'}
+            </PrimaryButton>
           </div>
-          <div className="mb-4">
-            <label className="block font-medium mb-1">Password:</label>
-            <input
-              type="password"
-              value={loginData.password}
-              onChange={(e) => setLoginData({ ...loginData, password: e.target.value })}
-              className="w-full border border-gray-300 rounded-md p-2"
-            />
-          </div>
-          <button
-            onClick={handleLogin}
-            className="!bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600"
-          >
-            Login
-          </button>
         </div>
-      ) : (
-        <div className="mb-4 bg-white shadow-md rounded-lg p-6">
-          <h2 className="text-xl font-semibold mb-4">Welcome!</h2>
-          <button
-            onClick={handleLogout}
-            className="!bg-red-500 text-white py-2 px-4 rounded-md hover:bg-red-600"
-          >
-            Logout
-          </button>
-        </div>
-      )}
-      <div className="bg-white shadow-md rounded-lg p-6 mb-6">
-        <p><strong>Intro:</strong> {getData(data.short_description)}</p>
-        <p><strong>Description:</strong> {getData(data.description)}</p>
-        <p><strong>Location:</strong> {getData(data.location)}</p>
-        <p><strong>Availability:</strong> {getData(data.availability)}</p>
-        <a
-          href={getData(data.resume_url)}
-          download
-          className="text-blue-500 underline"
-        >
-          Download Resume
-        </a>
       </div>
+    );
+  }
 
-      <p className="mt-6 text-gray-600">Total Visits: {getData(data.visits)}</p>
-
-      <div className="p-6 bg-gray-100 min-h-screen">
-        <h1 className="text-3xl font-bold mb-4">Admin Panel</h1>
-        <div className="mb-6">
-          <button
-            onClick={() => setActiveTab('basic')}
-            className={`mr-2 px-4 py-2 rounded-md ${activeTab === 'basic' ? '!bg-blue-500 text-white' : 'bg-gray-200'}`}
-          >
-            Basic Info
-          </button>
-          <button
-            onClick={() => setActiveTab('certificates')}
-            className={`mr-2 px-4 py-2 rounded-md ${activeTab === 'certificates' ? '!bg-blue-500 text-white' : 'bg-gray-200'}`}
-          >
-            Certificates
-          </button>
-          <button
-            onClick={() => setActiveTab('contact')}
-            className={`mr-2 px-4 py-2 rounded-md ${activeTab === 'contact' ? '!bg-blue-500 text-white' : 'bg-gray-200'}`}
-          >
-            Contact
-          </button>
-          <button
-            onClick={() => setActiveTab('skills')}
-            className={`mr-2 px-4 py-2 rounded-md ${activeTab === 'skills' ? '!bg-blue-500 text-white' : 'bg-gray-200'}`}
-          >
-            Skills
-          </button>
-          <button
-            onClick={() => setActiveTab('experiences')}
-            className={`mr-2 px-4 py-2 rounded-md ${activeTab === 'experiences' ? '!bg-blue-500 text-white' : 'bg-gray-200'}`}
-          >
-            Experiences
-          </button>
-          <button
-            onClick={() => setActiveTab('works')}
-            className={`mr-2 px-4 py-2 rounded-md ${activeTab === 'works' ? '!bg-blue-500 text-white' : 'bg-gray-200'}`}
-          >
-            Works
-          </button>
-          <button
-            onClick={() => setActiveTab('testimonials')}
-            className={`mr-2 px-4 py-2 rounded-md ${activeTab === 'testimonials' ? '!bg-blue-500 text-white' : 'bg-gray-200'}`}
-          >
-            Testimonials
-          </button>
+  return (
+    <div className="min-h-screen bg-gray-100 p-4 md:p-8 !text-black">
+      <div className="max-w-7xl mx-auto">
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-3xl font-bold text-gray-800">Portfolio Admin Dashboard</h1>
+          <DangerButton onClick={handleLogout} disabled={isLoading}>
+            {isLoading ? 'Logging out...' : 'Logout'}
+          </DangerButton>
         </div>
-        {renderTabContent()}
-        <button
-          onClick={updateData}
-          className="mt-4 !bg-green-500 text-gray-500 py-2 px-4 rounded-md hover:bg-green-600"
-        >
-          Save All Changes
-        </button>
+
+        {error && <ErrorAlert message={error} onClose={() => setError(null)} />}
+        {success && <SuccessAlert message={success} onClose={() => setSuccess(null)} />}
+
+        <div className="bg-white shadow-md rounded-lg p-6 mb-6">
+          <h2 className="text-xl font-semibold mb-4">Quick Overview</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="bg-blue-50 p-4 rounded-lg">
+              <h3 className="text-sm font-medium text-blue-800">Total Visits</h3>
+              <p className="text-2xl font-bold">{getData(data?.visits)}</p>
+            </div>
+            <div className="bg-green-50 p-4 rounded-lg">
+              <h3 className="text-sm font-medium text-green-800">Certificates</h3>
+              <p className="text-2xl font-bold">{data?.certificates?.length || 0}</p>
+            </div>
+            <div className="bg-purple-50 p-4 rounded-lg">
+              <h3 className="text-sm font-medium text-purple-800">Projects</h3>
+              <p className="text-2xl font-bold">{data?.works?.length || 0}</p>
+            </div>
+            <div className="bg-yellow-50 p-4 rounded-lg">
+              <h3 className="text-sm font-medium text-yellow-800">Testimonials</h3>
+              <p className="text-2xl font-bold">{data?.testimonials?.length || 0}</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white shadow-md rounded-lg p-6 mb-6">
+          <div className="flex flex-wrap gap-2 mb-6">
+            <TabButton active={activeTab === 'basic'} onClick={() => setActiveTab('basic')}>
+              Basic Info
+            </TabButton>
+            <TabButton active={activeTab === 'contact'} onClick={() => setActiveTab('contact')}>
+              Contact
+            </TabButton>
+            <TabButton active={activeTab === 'skills'} onClick={() => setActiveTab('skills')}>
+              Skills
+            </TabButton>
+            <TabButton active={activeTab === 'experiences'} onClick={() => setActiveTab('experiences')}>
+              Experiences
+            </TabButton>
+            <TabButton active={activeTab === 'works'} onClick={() => setActiveTab('works')}>
+              Projects
+            </TabButton>
+            <TabButton active={activeTab === 'certificates'} onClick={() => setActiveTab('certificates')}>
+              Certificates
+            </TabButton>
+            <TabButton active={activeTab === 'testimonials'} onClick={() => setActiveTab('testimonials')}>
+              Testimonials
+            </TabButton>
+          </div>
+
+          {renderTabContent()}
+
+          <div className="mt-6 flex justify-end">
+            <PrimaryButton 
+              onClick={updateData} 
+              disabled={isUpdating || isLoading}
+              className="w-full md:w-auto"
+            >
+              {isUpdating ? 'Saving...' : 'Save All Changes'}
+            </PrimaryButton>
+          </div>
+        </div>
       </div>
     </div>
   );
 }
+
+// Tab Components
+const BasicInfoTab = ({ data, editableData, setData, handleInputChange }) => (
+  <section className="space-y-6">
+    <h2 className="text-2xl font-semibold">Basic Information</h2>
+    
+    <div>
+      <label className="block font-medium mb-1">Short Description:</label>
+      <textarea
+        value={editableData.short_description || ''}
+        onChange={(e) => handleInputChange('short_description', e.target.value)}
+        className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+        rows={3}
+      />
+    </div>
+    
+    <div>
+      <label className="block font-medium mb-1">Description:</label>
+      <textarea
+        value={editableData.description || ''}
+        onChange={(e) => handleInputChange('description', e.target.value)}
+        className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+        rows={5}
+      />
+    </div>
+    
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div>
+        <label className="block font-medium mb-1">Location:</label>
+        <input
+          type="text"
+          value={editableData.location || ''}
+          onChange={(e) => handleInputChange('location', e.target.value)}
+          className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+        />
+      </div>
+      
+      <div>
+        <label className="block font-medium mb-1">Availability:</label>
+        <select
+          value={editableData.availability || ''}
+          onChange={(e) => handleInputChange('availability', e.target.value)}
+          className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+        >
+          <option value="">Select Availability</option>
+          <option value="Open for job">Open for job</option>
+          <option value="Hired">Hired</option>
+        </select>
+      </div>
+    </div>
+    
+    <div>
+      <label className="block font-medium mb-1">Resume (Direct Download Link):</label>
+      <input
+        type="text"
+        value={editableData.resume_url || ''}
+        onChange={(e) => handleInputChange('resume_url', e.target.value)}
+        className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 mb-2"
+      />
+      {editableData.resume_url && (
+        <a
+          href={editableData.resume_url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-blue-600 hover:text-blue-800 hover:underline"
+        >
+          View Resume
+        </a>
+      )}
+    </div>
+  </section>
+);
+
+const ContactTab = ({ editableData, handleNestedInputChange }) => (
+  <section className="space-y-6">
+    <h2 className="text-2xl font-semibold">Contact Information</h2>
+    
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      {['email', 'phone'].map((field) => (
+        <div key={field}>
+          <label className="block font-medium capitalize mb-1">{field}:</label>
+          <input
+            type={field === 'email' ? 'email' : 'tel'}
+            value={editableData.socials?.[field] || ''}
+            onChange={(e) => handleNestedInputChange('socials', field, e.target.value)}
+            className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          />
+        </div>
+      ))}
+    </div>
+    
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      {['github', 'linkedin', 'facebook', 'facebook_page', 'tiktok'].map((field) => (
+        <div key={field}>
+          <label className="block font-medium capitalize mb-1">
+            {field.replace('_', ' ')}:
+          </label>
+          <input
+            type="url"
+            value={editableData.socials?.[field] || ''}
+            onChange={(e) => handleNestedInputChange('socials', field, e.target.value)}
+            className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            placeholder={`https://${field}.com/username`}
+          />
+        </div>
+      ))}
+    </div>
+  </section>
+);
+
+const CertificatesTab = ({ data, setData, deleteItem, convertToBase64 }) => {
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  const goToNext = () => {
+    if (currentIndex < (data.certificates?.length || 0) - 1) {
+      setCurrentIndex(currentIndex + 1);
+    }
+  };
+
+  const goToPrevious = () => {
+    if (currentIndex > 0) {
+      setCurrentIndex(currentIndex - 1);
+    }
+  };
+
+  return (
+    <section className="space-y-6">
+      <div className="flex justify-between items-center">
+        <h2 className="text-2xl font-semibold">Certificates</h2>
+        <PrimaryButton
+          onClick={() => {
+            const updated = [...(data.certificates || []), {
+              type: 'Certificate',
+              title: '',
+              description: '',
+              date: '',
+              image: ''
+            }];
+            setData(prev => ({ ...prev, certificates: updated }));
+            setCurrentIndex(updated.length - 1);
+          }}
+        >
+          Add Certificate
+        </PrimaryButton>
+      </div>
+
+      {data.certificates?.length > 0 ? (
+        <>
+          <div className="flex justify-between items-center mb-4">
+            <button
+              onClick={goToPrevious}
+              disabled={currentIndex === 0}
+              className={`px-4 py-2 rounded ${currentIndex === 0 ? '!bg-gray-300' : '!bg-blue-500 hover:!bg-blue-600'} !text-white`}
+            >
+              Previous
+            </button>
+            <span className="text-sm">
+              {currentIndex + 1} of {data.certificates.length}
+            </span>
+            <button
+              onClick={goToNext}
+              disabled={currentIndex === data.certificates.length - 1}
+              className={`px-4 py-2 rounded ${currentIndex === data.certificates.length - 1 ? '!bg-gray-300' : '!bg-blue-500 hover:!bg-blue-600'} !text-white`}
+            >
+              Next
+            </button>
+          </div>
+
+          <div className="border border-gray-200 rounded-lg p-4">
+            {data.certificates[currentIndex] && (
+              <>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                  <div>
+                    <label className="block font-medium mb-1">Type:</label>
+                    <select
+                      value={data.certificates[currentIndex].type || 'Certificate'}
+                      onChange={(e) => {
+                        const updated = [...data.certificates];
+                        updated[currentIndex].type = e.target.value;
+                        setData(prev => ({ ...prev, certificates: updated }));
+                      }}
+                      className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    >
+                      <option value="Certificate">Certificate</option>
+                      <option value="Award">Award</option>
+                    </select>
+                  </div>
+                  
+                  <div>
+                    <label className="block font-medium mb-1">Title:</label>
+                    <input
+                      type="text"
+                      value={data.certificates[currentIndex].title || ''}
+                      onChange={(e) => {
+                        const updated = [...data.certificates];
+                        updated[currentIndex].title = e.target.value;
+                        setData(prev => ({ ...prev, certificates: updated }));
+                      }}
+                      className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    />
+                  </div>
+                </div>
+                
+                <div className="mb-4">
+                  <label className="block font-medium mb-1">Description:</label>
+                  <textarea
+                    value={data.certificates[currentIndex].description || ''}
+                    onChange={(e) => {
+                      const updated = [...data.certificates];
+                      updated[currentIndex].description = e.target.value;
+                      setData(prev => ({ ...prev, certificates: updated }));
+                    }}
+                    className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    rows={3}
+                  />
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                  <div>
+                    <label className="block font-medium mb-1">Date:</label>
+                    <input
+                      type="date"
+                      value={data.certificates[currentIndex].date || ''}
+                      onChange={(e) => {
+                        const updated = [...data.certificates];
+                        updated[currentIndex].date = e.target.value;
+                        setData(prev => ({ ...prev, certificates: updated }));
+                      }}
+                      className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block font-medium mb-1">Image:</label>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={async (e) => {
+                        const file = e.target.files[0];
+                        if (file) {
+                          const base64 = await convertToBase64(file);
+                          const updated = [...data.certificates];
+                          updated[currentIndex].image = base64;
+                          setData(prev => ({ ...prev, certificates: updated }));
+                        }
+                      }}
+                      className="w-full border border-gray-300 rounded-md p-1 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    />
+                  </div>
+                </div>
+                
+                {data.certificates[currentIndex].image && (
+                  <div className="mb-4">
+                    <img
+                      src={data.certificates[currentIndex].image}
+                      alt="Certificate Preview"
+                      className="max-w-full h-auto max-h-64 object-contain border rounded"
+                    />
+                  </div>
+                )}
+                
+                <div className="flex justify-end">
+                  <DangerButton
+                    onClick={() => {
+                      deleteItem('certificates', data.certificates[currentIndex].id);
+                      if (currentIndex === data.certificates.length - 1) {
+                        setCurrentIndex(Math.max(0, currentIndex - 1));
+                      }
+                    }}
+                    className="ml-2"
+                  >
+                    Delete
+                  </DangerButton>
+                </div>
+              </>
+            )}
+          </div>
+        </>
+      ) : (
+        <p className="text-center text-gray-500">No certificates added yet.</p>
+      )}
+    </section>
+  );
+};
+
+const SkillsTab = ({ data, setData, deleteItem }) => {
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  const goToNext = () => {
+    if (currentIndex < (data.skills?.length || 0) - 1) {
+      setCurrentIndex(currentIndex + 1);
+    }
+  };
+
+  const goToPrevious = () => {
+    if (currentIndex > 0) {
+      setCurrentIndex(currentIndex - 1);
+    }
+  };
+
+  return (
+    <section className="space-y-6">
+      <div className="flex justify-between items-center">
+        <h2 className="text-2xl font-semibold">Skills</h2>
+        <PrimaryButton
+          onClick={() => {
+            const updated = [...(data.skills || []), {
+              title: '',
+              proficiency: 0,
+              icon: '',
+              category: ''
+            }];
+            setData(prev => ({ ...prev, skills: updated }));
+            setCurrentIndex(updated.length - 1);
+          }}
+        >
+          Add Skill
+        </PrimaryButton>
+      </div>
+
+      {data.skills?.length > 0 ? (
+        <>
+          <div className="flex justify-between items-center mb-4">
+            <button
+              onClick={goToPrevious}
+              disabled={currentIndex === 0}
+              className={`px-4 py-2 rounded ${currentIndex === 0 ? '!bg-gray-300' : '!bg-blue-500 hover:!bg-blue-600'} !text-white`}
+            >
+              Previous
+            </button>
+            <span className="text-sm">
+              {currentIndex + 1} of {data.skills.length}
+            </span>
+            <button
+              onClick={goToNext}
+              disabled={currentIndex === data.skills.length - 1}
+              className={`px-4 py-2 rounded ${currentIndex === data.skills.length - 1 ? '!bg-gray-300' : '!bg-blue-500 hover:!bg-blue-600'} !text-white`}
+            >
+              Next
+            </button>
+          </div>
+
+          <div className="border border-gray-200 rounded-lg p-4">
+            {data.skills[currentIndex] && (
+              <>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                  <div>
+                    <label className="block font-medium mb-1">Title:</label>
+                    <input
+                      type="text"
+                      value={data.skills[currentIndex].title || ''}
+                      onChange={(e) => {
+                        const updated = [...data.skills];
+                        updated[currentIndex].title = e.target.value;
+                        setData(prev => ({ ...prev, skills: updated }));
+                      }}
+                      className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block font-medium mb-1">Category:</label>
+                    <select
+                      value={data.skills[currentIndex].category || ''}
+                      onChange={(e) => {
+                        const updated = [...data.skills];
+                        updated[currentIndex].category = e.target.value;
+                        setData(prev => ({ ...prev, skills: updated }));
+                      }}
+                      className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    >
+                      <option value="">Select Category</option>
+                      <option value="Window Application Development">Window Application Development</option>
+                      <option value="Game Development">Game Development</option>
+                      <option value="Mobile Development">Mobile Development</option>
+                      <option value="Web Development">Web Development</option>
+                      <option value="Database & Backend">Database & Backend</option>
+                      <option value="Others">Others</option>
+                    </select>
+                  </div>
+                </div>
+                
+                <div className="mb-4">
+                  <label className="block font-medium mb-1">Proficiency: {data.skills[currentIndex].proficiency || 0}%</label>
+                  <input
+                    type="range"
+                    min="0"
+                    max="100"
+                    value={data.skills[currentIndex].proficiency || 0}
+                    onChange={(e) => {
+                      const updated = [...data.skills];
+                      updated[currentIndex].proficiency = e.target.value;
+                      setData(prev => ({ ...prev, skills: updated }));
+                    }}
+                    className="w-full"
+                  />
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                  <div>
+                    <label className="block font-medium mb-1">Icon:</label>
+                    <select
+                      value={data.skills[currentIndex].icon || ''}
+                      onChange={(e) => {
+                        const updated = [...data.skills];
+                        updated[currentIndex].icon = e.target.value;
+                        setData(prev => ({ ...prev, skills: updated }));
+                      }}
+                      className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    >
+                      <option value="">Select an Icon</option>
+                      {ICONS.map((icon) => (
+                        <option key={icon} value={icon}>{icon}</option>
+                      ))}
+                    </select>
+                  </div>
+                  
+                  <div className="flex items-center justify-center">
+                    {data.skills[currentIndex].icon && (
+                      <img
+                        src={`https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/${data.skills[currentIndex].icon}/${data.skills[currentIndex].icon}-original.svg`}
+                        alt={`${data.skills[currentIndex].icon} icon`}
+                        className="w-16 h-16 object-contain"
+                      />
+                    )}
+                  </div>
+                </div>
+                
+                <div className="flex justify-end">
+                  <DangerButton
+                    onClick={() => {
+                      deleteItem('skills', data.skills[currentIndex].id);
+                      if (currentIndex === data.skills.length - 1) {
+                        setCurrentIndex(Math.max(0, currentIndex - 1));
+                      }
+                    }}
+                    className="ml-2"
+                  >
+                    Delete
+                  </DangerButton>
+                </div>
+              </>
+            )}
+          </div>
+        </>
+      ) : (
+        <p className="text-center text-gray-500">No skills added yet.</p>
+      )}
+    </section>
+  );
+};
+
+const ExperiencesTab = ({ data, setData, deleteItem }) => {
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  const goToNext = () => {
+    if (currentIndex < (data.experiences?.length || 0) - 1) {
+      setCurrentIndex(currentIndex + 1);
+    }
+  };
+
+  const goToPrevious = () => {
+    if (currentIndex > 0) {
+      setCurrentIndex(currentIndex - 1);
+    }
+  };
+
+  return (
+    <section className="space-y-6">
+      <div className="flex justify-between items-center">
+        <h2 className="text-2xl font-semibold">Experiences</h2>
+        <PrimaryButton
+          onClick={() => {
+            const updated = [...(data.experiences || []), {
+              name: '',
+              from: '',
+              to: '',
+              still_doing: false,
+              description: '',
+              learned: '',
+              role: ''
+            }];
+            setData(prev => ({ ...prev, experiences: updated }));
+            setCurrentIndex(updated.length - 1);
+          }}
+        >
+          Add Experience
+        </PrimaryButton>
+      </div>
+      
+      {data.experiences?.length > 0 ? (
+        <>
+          <div className="flex justify-between items-center mb-4">
+            <button
+              onClick={goToPrevious}
+              disabled={currentIndex === 0}
+              className={`px-4 py-2 rounded ${currentIndex === 0 ? '!bg-gray-300' : '!bg-blue-500 hover:!bg-blue-600'} !text-white`}
+            >
+              Previous
+            </button>
+            <span className="text-sm">
+              {currentIndex + 1} of {data.experiences.length}
+            </span>
+            <button
+              onClick={goToNext}
+              disabled={currentIndex === data.experiences.length - 1}
+              className={`px-4 py-2 rounded ${currentIndex === data.experiences.length - 1 ? '!bg-gray-300' : '!bg-blue-500 hover:!bg-blue-600'} !text-white`}
+            >
+              Next
+            </button>
+          </div>
+
+          <div className="border border-gray-200 rounded-lg p-4">
+            {data.experiences[currentIndex] && (
+              <>
+                <div className="mb-4">
+                  <label className="block font-medium mb-1">Name:</label>
+                  <input
+                    type="text"
+                    value={data.experiences[currentIndex].name || ''}
+                    onChange={(e) => {
+                      const updated = [...data.experiences];
+                      updated[currentIndex].name = e.target.value;
+                      setData(prev => ({ ...prev, experiences: updated }));
+                    }}
+                    className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                  <div>
+                    <label className="block font-medium mb-1">From:</label>
+                    <input
+                      type="date"
+                      value={data.experiences[currentIndex].from || ''}
+                      onChange={(e) => {
+                        const updated = [...data.experiences];
+                        updated[currentIndex].from = e.target.value;
+                        setData(prev => ({ ...prev, experiences: updated }));
+                      }}
+                      className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block font-medium mb-1">To:</label>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="date"
+                        value={data.experiences[currentIndex].to || ''}
+                        disabled={data.experiences[currentIndex].still_doing}
+                        onChange={(e) => {
+                          const updated = [...data.experiences];
+                          updated[currentIndex].to = e.target.value;
+                          setData(prev => ({ ...prev, experiences: updated }));
+                        }}
+                        className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50"
+                      />
+                      <label className="flex items-center gap-1">
+                        <input
+                          type="checkbox"
+                          checked={data.experiences[currentIndex].still_doing || false}
+                          onChange={(e) => {
+                            const updated = [...data.experiences];
+                            updated[currentIndex].still_doing = e.target.checked;
+                            setData(prev => ({ ...prev, experiences: updated }));
+                          }}
+                          className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                        />
+                        Still Doing
+                      </label>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="mb-4">
+                  <label className="block font-medium mb-1">Description:</label>
+                  <textarea
+                    value={data.experiences[currentIndex].description || ''}
+                    onChange={(e) => {
+                      const updated = [...data.experiences];
+                      updated[currentIndex].description = e.target.value;
+                      setData(prev => ({ ...prev, experiences: updated }));
+                    }}
+                    className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    rows={3}
+                  />
+                </div>
+                
+                <div className="mb-4">
+                  <label className="block font-medium mb-1">What I Learned:</label>
+                  <textarea
+                    value={data.experiences[currentIndex].learned || ''}
+                    onChange={(e) => {
+                      const updated = [...data.experiences];
+                      updated[currentIndex].learned = e.target.value;
+                      setData(prev => ({ ...prev, experiences: updated }));
+                    }}
+                    className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    rows={3}
+                  />
+                </div>
+                
+                <div className="mb-4">
+                  <label className="block font-medium mb-1">Job Description/Role:</label>
+                  <textarea
+                    value={data.experiences[currentIndex].role || ''}
+                    onChange={(e) => {
+                      const updated = [...data.experiences];
+                      updated[currentIndex].role = e.target.value;
+                      setData(prev => ({ ...prev, experiences: updated }));
+                    }}
+                    className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    rows={3}
+                  />
+                </div>
+                
+                <div className="flex justify-end">
+                  <DangerButton
+                    onClick={() => {
+                      deleteItem('experiences', data.experiences[currentIndex].id);
+                      if (currentIndex === data.experiences.length - 1) {
+                        setCurrentIndex(Math.max(0, currentIndex - 1));
+                      }
+                    }}
+                    className="ml-2"
+                  >
+                    Delete
+                  </DangerButton>
+                </div>
+              </>
+            )}
+          </div>
+        </>
+      ) : (
+        <p className="text-center text-gray-500">No experiences added yet.</p>
+      )}
+    </section>
+  );
+};
+
+const WorksTab = ({ data, setData, deleteItem, convertToBase64, sanitizeLanguages }) => {
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  const goToNext = () => {
+    if (currentIndex < (data.works?.length || 0) - 1) {
+      setCurrentIndex(currentIndex + 1);
+    }
+  };
+
+  const goToPrevious = () => {
+    if (currentIndex > 0) {
+      setCurrentIndex(currentIndex - 1);
+    }
+  };
+
+  return (
+    <section className="space-y-6">
+      <div className="flex justify-between items-center">
+        <h2 className="text-2xl font-semibold">Projects</h2>
+        <PrimaryButton
+          onClick={() => {
+            const newProject = {
+              title: '',
+              category: '',
+              description: '',
+              year: '',
+              duration: '',
+              video_link: '',
+              languages: [],
+              images: [],
+              // Remove empty id since it will be generated by Firestore
+            };
+            const updated = [...(data.works || []), newProject];
+            setData(prev => ({ ...prev, works: updated }));
+            setCurrentIndex(updated.length - 1);
+          }}
+        >
+          Add Project
+        </PrimaryButton>
+      </div>
+
+      {data.works?.length > 0 ? (
+        <>
+          <div className="flex justify-between items-center mb-4">
+            <button
+              onClick={goToPrevious}
+              disabled={currentIndex === 0}
+              className={`px-4 py-2 rounded ${currentIndex === 0 ? '!bg-gray-300' : '!bg-blue-500 hover:!bg-blue-600'} !text-white`}
+            >
+              Previous
+            </button>
+            <span className="text-sm">
+              {currentIndex + 1} of {data.works.length}
+            </span>
+            <button
+              onClick={goToNext}
+              disabled={currentIndex === data.works.length - 1}
+              className={`px-4 py-2 rounded ${currentIndex === data.works.length - 1 ? '!bg-gray-300' : '!bg-blue-500 hover:!bg-blue-600'} !text-white`}
+            >
+              Next
+            </button>
+          </div>
+
+          <div className="border border-gray-200 rounded-lg p-4">
+            {data.works[currentIndex] && (
+              <>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                  <div>
+                    <label className="block font-medium mb-1">Title:</label>
+                    <input
+                      type="text"
+                      value={data.works[currentIndex].title || ''}
+                      onChange={(e) => {
+                        const updated = [...data.works];
+                        updated[currentIndex].title = e.target.value;
+                        setData(prev => ({ ...prev, works: updated }));
+                      }}
+                      className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block font-medium mb-1">Category:</label>
+                    <select
+                      value={data.works[currentIndex].category || ''}
+                      onChange={(e) => {
+                        const updated = [...data.works];
+                        updated[currentIndex].category = e.target.value;
+                        setData(prev => ({ ...prev, works: updated }));
+                      }}
+                      className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    >
+                      <option value="">Select Category</option>
+                      <option value="Work">Work</option>
+                      <option value="Commission">Commission</option>
+                      <option value="School">School</option>
+                      <option value="Side Project">Side Project</option>
+                    </select>
+                  </div>
+                </div>
+                
+                <div className="mb-4">
+                  <label className="block font-medium mb-1">Description:</label>
+                  <textarea
+                    value={data.works[currentIndex].description || ''}
+                    onChange={(e) => {
+                      const updated = [...data.works];
+                      updated[currentIndex].description = e.target.value;
+                      setData(prev => ({ ...prev, works: updated }));
+                    }}
+                    className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    rows={3}
+                  />
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                  <div>
+                    <label className="block font-medium mb-1">Year:</label>
+                    <input
+                      type="number"
+                      value={data.works[currentIndex].year || ''}
+                      onChange={(e) => {
+                        const updated = [...data.works];
+                        updated[currentIndex].year = e.target.value;
+                        setData(prev => ({ ...prev, works: updated }));
+                      }}
+                      className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block font-medium mb-1">Duration:</label>
+                    <input
+                      type="text"
+                      value={data.works[currentIndex].duration || ''}
+                      onChange={(e) => {
+                        const updated = [...data.works];
+                        updated[currentIndex].duration = e.target.value;
+                        setData(prev => ({ ...prev, works: updated }));
+                      }}
+                      className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    />
+                  </div>
+                </div>
+                
+                <div className="mb-4">
+                  <label className="block font-medium mb-1">Video Link (YouTube/Vimeo Embed URL):</label>
+                  <input
+                    type="text"
+                    placeholder="e.g., https://www.youtube.com/embed/VIDEO_ID"
+                    value={data.works[currentIndex].video_link || ''}
+                    onChange={(e) => {
+                      const updated = [...data.works];
+                      updated[currentIndex].video_link = e.target.value;
+                      setData(prev => ({ ...prev, works: updated }));
+                    }}
+                    className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                  {data.works[currentIndex].video_link && (
+                    <div className="mt-2">
+                      <iframe
+                        width="100%"
+                        height="315"
+                        src={data.works[currentIndex].video_link}
+                        frameBorder="0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                        className="rounded"
+                      ></iframe>
+                    </div>
+                  )}
+                </div>
+                
+                <div className="mb-4">
+                  <label className="block font-medium mb-1">Technologies:</label>
+                  <div className="flex flex-wrap gap-2 mb-2">
+                    {sanitizeLanguages(data.works[currentIndex].languages).map((lang, langIndex) => (
+                      <div key={langIndex} className="flex items-center bg-gray-100 p-2 rounded">
+                        <LanguageIcon icon={lang.icon} name={lang.name} />
+                        <span className="ml-2">{lang.name}</span>
+                        <button
+                          onClick={() => {
+                            const updated = [...data.works];
+                            updated[currentIndex].languages = data.works[currentIndex].languages.filter((_, i) => i !== langIndex);
+                            setData(prev => ({ ...prev, works: updated }));
+                          }}
+                          className="ml-2 text-red-500 hover:text-red-700"
+                        >
+                          ×
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="flex gap-2">
+                    <select
+                      className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      onChange={(e) => {
+                        if (e.target.value) {
+                          const selectedLanguage = e.target.value;
+                          const updated = [...data.works];
+                          updated[currentIndex].languages = [
+                            ...(data.works[currentIndex].languages || []),
+                            {
+                              name: selectedLanguage,
+                              icon: `https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/${selectedLanguage}/${selectedLanguage}-original.svg`
+                            }
+                          ];
+                          setData(prev => ({ ...prev, works: updated }));
+                          e.target.value = '';
+                        }
+                      }}
+                    >
+                      <option value="">Select Technology</option>
+                      {ICONS.map((icon) => (
+                        <option key={icon} value={icon}>{icon}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+                
+                <div className="mb-4">
+                  <label className="block font-medium mb-1">Images:</label>
+                  <input
+                    type="file"
+                    multiple
+                    accept="image/*"
+                    onChange={async (e) => {
+                      const files = Array.from(e.target.files);
+                      const base64Images = await Promise.all(
+                        files.map(file => convertToBase64(file))
+                      );
+                      const updated = [...data.works];
+                      updated[currentIndex].images = [...(updated[currentIndex].images || []), ...base64Images];
+                      setData(prev => ({ ...prev, works: updated }));
+                    }}
+                    className="w-full border border-gray-300 rounded-md p-1 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-2 mt-2">
+                    {data.works[currentIndex].images?.map((img, imgIndex) => (
+                      <div key={imgIndex} className="relative group">
+                        <img
+                          src={img}
+                          alt={`Work ${imgIndex + 1}`}
+                          className="w-full h-32 object-cover rounded border"
+                        />
+                        <button
+                          onClick={() => {
+                            const updated = [...data.works];
+                            updated[currentIndex].images = data.works[currentIndex].images.filter((_, i) => i !== imgIndex);
+                            setData(prev => ({ ...prev, works: updated }));
+                          }}
+                          className="absolute top-1 right-1 bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                        >
+                          ×
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                
+                <div className="flex justify-end">
+                  <DangerButton
+                    onClick={() => {
+                      deleteItem('works', data.works[currentIndex].id);
+                      if (currentIndex === data.works.length - 1) {
+                        setCurrentIndex(Math.max(0, currentIndex - 1));
+                      }
+                    }}
+                    className="ml-2"
+                  >
+                    Delete
+                  </DangerButton>
+                </div>
+              </>
+            )}
+          </div>
+        </>
+      ) : (
+        <p className="text-center text-gray-500">No projects added yet.</p>
+      )}
+    </section>
+  );
+};
+
+const TestimonialsTab = ({ data, setData, deleteItem, convertToBase64 }) => {
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  const goToNext = () => {
+    if (currentIndex < (data.testimonials?.length || 0) - 1) {
+      setCurrentIndex(currentIndex + 1);
+    }
+  };
+
+  const goToPrevious = () => {
+    if (currentIndex > 0) {
+      setCurrentIndex(currentIndex - 1);
+    }
+  };
+
+  return (
+    <section className="space-y-6">
+      <div className="flex justify-between items-center">
+        <h2 className="text-2xl font-semibold">Testimonials</h2>
+        <PrimaryButton
+          onClick={() => {
+            const updated = [...(data.testimonials || []), {
+              company: '',
+              name: '',
+              role: '',
+              comment: '',
+              image: ''
+            }];
+            setData(prev => ({ ...prev, testimonials: updated }));
+            setCurrentIndex(updated.length - 1);
+          }}
+        >
+          Add Testimonial
+        </PrimaryButton>
+      </div>
+
+      {data.testimonials?.length > 0 ? (
+        <>
+          <div className="flex justify-between items-center mb-4">
+            <button
+              onClick={goToPrevious}
+              disabled={currentIndex === 0}
+              className={`px-4 py-2 rounded ${currentIndex === 0 ? '!bg-gray-300' : '!bg-blue-500 hover:!bg-blue-600'} !text-white`}
+            >
+              Previous
+            </button>
+            <span className="text-sm">
+              {currentIndex + 1} of {data.testimonials.length}
+            </span>
+            <button
+              onClick={goToNext}
+              disabled={currentIndex === data.testimonials.length - 1}
+              className={`px-4 py-2 rounded ${currentIndex === data.testimonials.length - 1 ? '!bg-gray-300' : '!bg-blue-500 hover:!bg-blue-600'} !text-white`}
+            >
+              Next
+            </button>
+          </div>
+
+          <div className="border border-gray-200 rounded-lg p-4">
+            {data.testimonials[currentIndex] && (
+              <>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                  <div>
+                    <label className="block font-medium mb-1">Company Name:</label>
+                    <input
+                      type="text"
+                      value={data.testimonials[currentIndex].company || ''}
+                      onChange={(e) => {
+                        const updated = [...data.testimonials];
+                        updated[currentIndex].company = e.target.value;
+                        setData(prev => ({ ...prev, testimonials: updated }));
+                      }}
+                      className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block font-medium mb-1">Name:</label>
+                    <input
+                      type="text"
+                      value={data.testimonials[currentIndex].name || ''}
+                      onChange={(e) => {
+                        const updated = [...data.testimonials];
+                        updated[currentIndex].name = e.target.value;
+                        setData(prev => ({ ...prev, testimonials: updated }));
+                      }}
+                      className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    />
+                  </div>
+                </div>
+                
+                <div className="mb-4">
+                  <label className="block font-medium mb-1">Role:</label>
+                  <input
+                    type="text"
+                    value={data.testimonials[currentIndex].role || ''}
+                    onChange={(e) => {
+                      const updated = [...data.testimonials];
+                      updated[currentIndex].role = e.target.value;
+                      setData(prev => ({ ...prev, testimonials: updated }));
+                    }}
+                    className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+                
+                <div className="mb-4">
+                  <label className="block font-medium mb-1">Comment:</label>
+                  <textarea
+                    value={data.testimonials[currentIndex].comment || ''}
+                    onChange={(e) => {
+                      const updated = [...data.testimonials];
+                      updated[currentIndex].comment = e.target.value;
+                      setData(prev => ({ ...prev, testimonials: updated }));
+                    }}
+                    className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    rows={3}
+                  />
+                </div>
+                
+                <div className="mb-4">
+                  <label className="block font-medium mb-1">Image:</label>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={async (e) => {
+                      const file = e.target.files[0];
+                      if (file) {
+                        const base64 = await convertToBase64(file);
+                        const updated = [...data.testimonials];
+                        updated[currentIndex].image = base64;
+                        setData(prev => ({ ...prev, testimonials: updated }));
+                      }
+                    }}
+                    className="w-full border border-gray-300 rounded-md p-1 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                  {data.testimonials[currentIndex].image && (
+                    <img
+                      src={data.testimonials[currentIndex].image}
+                      alt="Profile"
+                      className="mt-2 w-32 h-32 object-cover rounded-full border"
+                    />
+                  )}
+                </div>
+                
+                <div className="flex justify-end">
+                  <DangerButton
+                    onClick={() => {
+                      deleteItem('testimonials', data.testimonials[currentIndex].id);
+                      if (currentIndex === data.testimonials.length - 1) {
+                        setCurrentIndex(Math.max(0, currentIndex - 1));
+                      }
+                    }}
+                    className="ml-2"
+                  >
+                    Delete
+                  </DangerButton>
+                </div>
+              </>
+            )}
+          </div>
+        </>
+      ) : (
+        <p className="text-center text-gray-500">No testimonials added yet.</p>
+      )}
+    </section>
+  );
+};

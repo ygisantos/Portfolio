@@ -190,13 +190,18 @@ export const getAllWorks = async () => {
     const querySnapshot = await getDocs(collection(db, 'works'));
     const works = querySnapshot.docs.map(doc => {
       const data = doc.data();
+      const languages = data.languages?.map(lang => {
+        const langName = typeof lang === 'string' ? lang : lang?.name;
+        return langName ? {
+          name: langName,
+          icon: `https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/${langName}/${langName}-original.svg`
+        } : null;
+      }).filter(Boolean);
+
       return {
         id: doc.id,
         ...data,
-        languages: data.languages?.map(lang => ({
-          name: lang,
-          icon: `https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/${lang}/${lang}-original.svg`
-        }))
+        languages
       };
     });
     return JSON.stringify(works, null, 2);
@@ -309,7 +314,18 @@ export const updateWork = async (work) => {
   try {
     const colRef = collection(db, 'works');
     const docRef = work.id ? doc(colRef, work.id) : doc(colRef);
-    await setDoc(docRef, { ...work, id: docRef.id }, { merge: true });
+    
+    // Prepare work data for saving
+    const workData = {
+      ...work,
+      id: docRef.id,
+      // Ensure languages are stored as simple strings
+      languages: work.languages?.map(lang => 
+        typeof lang === 'string' ? lang : lang?.name
+      ).filter(Boolean) || []
+    };
+    
+    await setDoc(docRef, workData, { merge: true });
     return { success: true, id: docRef.id };
   } catch (error) {
     return { success: false, error: error.message };
