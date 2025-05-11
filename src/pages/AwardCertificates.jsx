@@ -8,6 +8,7 @@ function AwardsCertificates() {
     const [currentIndex, setCurrentIndex] = useState(0);
     const [showModal, setShowModal] = useState(false);
     const [selectedCertificate, setSelectedCertificate] = useState(null);
+    const [currentFilter, setCurrentFilter] = useState("ALL");
     const sliderRef = useRef(null);
     const [isAnimating, setIsAnimating] = useState(false);
     const autoplayIntervalRef = useRef(null);
@@ -93,19 +94,28 @@ function AwardsCertificates() {
         });
     };
 
-    // Function to get visible certificates with circular indexing
+    // Function to get visible certificates with circular indexing and filtering
     const getVisibleCertificates = () => {
         if (!certificates.length) return [];
         
+        const filteredCertificates = currentFilter === "ALL" 
+            ? certificates
+            : certificates.filter(cert => cert.type.toLowerCase() === currentFilter.toLowerCase());
+        
+        if (filteredCertificates.length === 0) return [];
+        
+        // Ensure currentIndex is within bounds of filtered certificates
+        const normalizedIndex = currentIndex % filteredCertificates.length;
+        
         // Show 3 on desktop, 1 on mobile
         const isMobile = window.innerWidth < 768;
-        const visibleCount = isMobile ? 1 : 3;
+        const visibleCount = Math.min(isMobile ? 1 : 3, filteredCertificates.length);
         
         let items = [];
         for (let i = 0; i < visibleCount; i++) {
-            const index = (currentIndex + i) % certificates.length;
+            const index = (normalizedIndex + i) % filteredCertificates.length;
             items.push({
-                certificate: certificates[index],
+                certificate: filteredCertificates[index],
                 position: i
             });
         }
@@ -114,6 +124,25 @@ function AwardsCertificates() {
 
     return (
         <div className="relative flex flex-col w-full">
+            {/* Filter Buttons */}
+            <div className="flex justify-center gap-2">
+                {["ALL", "CERTIFICATE", "AWARD"].map((filter) => (
+                    <button
+                        key={filter}
+                        onClick={() => {
+                            setCurrentFilter(filter);
+                            setCurrentIndex(0);
+                        }}
+                        className={`px-4 py-2 rounded-full transition-all duration-300 ${
+                            currentFilter === filter 
+                                ? 'bg-brown-dark text-beige' 
+                                : 'bg-brown-light text-brown-dark hover:bg-brown-dark hover:text-beige'
+                        }`}
+                    >
+                        {filter}
+                    </button>
+                ))}
+            </div>
             
             {certificates.length > 0 ? (
                 <div className="relative overflow-hidden px-4 py-8">
