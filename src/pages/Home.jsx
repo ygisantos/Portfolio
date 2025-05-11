@@ -1,31 +1,17 @@
-import CustomCard from '@components/CustomCard';
-import CustomButton from '@components/CustomButton';
-import Navigation from '@components/Navigation';
-import ButtonIcon from '@components/ButtonIcon';
-import { FaLocationDot } from "react-icons/fa6";
-import { SiNamemc } from "react-icons/si";
-import { MdDescription } from "react-icons/md";
-import { MdOutlineWork } from "react-icons/md";
-import { FaFacebookF } from "react-icons/fa";
-import { SiFacebookgaming } from "react-icons/si";
-import { FaTiktok } from "react-icons/fa";
-import { MdEmail } from "react-icons/md";
-import { FaPhoneAlt } from "react-icons/fa";
-import { FaLinkedinIn } from "react-icons/fa6";
-import { FaGithub } from "react-icons/fa";
-import { AgeCalculate } from '@/utils/Calculator';
-import {getAboutMe, getAllSkills} from '@api/Api';
-import { useEffect, useState } from 'react';
-import { RxDividerHorizontal } from "react-icons/rx";
-import { IoCalendar } from "react-icons/io5";
 import Menu from '@/components/Menu';
-import LanguageIcon from '@components/LanguageIcon';
-import SkillSlider from '@/components/SkillSlider'; // Import a new component for the slider
+import { getAboutMe, getAllSkills } from '@api/Api';
+import ButtonIcon from '@components/ButtonIcon';
+import CustomButton from '@components/CustomButton';
+import CustomCard from '@components/CustomCard';
+import { useEffect, useState } from 'react';
+import { FaFacebookF, FaPhoneAlt, FaTiktok } from "react-icons/fa";
+import { SiFacebookgaming } from "react-icons/si";
 // Add import for the animated background
 import AnimatedCodeBackground from '@/components/AnimatedCodeBackground';
-import SkillsCarousel from './Skills';
-import ProfileSection from './Profile';
 import PixelatedSlider from '@/components/PixelatedSlider'; // Import custom pixelated slider component
+import ProfileSection from './Profile';
+import SkillsCarousel from './Skills';
+import AwardsCertificates from './AwardCertificates';
 
 function Home() {
     const [profile, setProfile] = useState();
@@ -52,7 +38,7 @@ function Home() {
 
             {/* <Navigation /> */}
             <Menu />
-            <div className="relative flex flex-col gap-2 p-2 md:w-[80vw] w-[90vw]">
+            <div className="relative flex flex-col gap-2 p-2 md:w-[80dvw] w-[90dvw]">
                 {/* PROFILE */}
                 <section id="profile">
                     <ProfileSection profile={profile}/>
@@ -131,12 +117,7 @@ function Home() {
                     <section id="awards">
                         <h2>Awards & Certificates</h2>
                         {/* Awards & Certificates content */}
-                        <h1 className='h-[74px]'>TEST CONTENT</h1>
-                        <h1 className='h-[74px]'>TEST CONTENT</h1>
-                        <h1 className='h-[74px]'>TEST CONTENT</h1>
-                        <h1 className='h-[74px]'>TEST CONTENT</h1>
-                        <h1 className='h-[74px]'>TEST CONTENT</h1>
-                        <h1 className='h-[74px]'>TEST CONTENT</h1>
+                        <AwardsCertificates />
                     </section>
                 </CustomCard>
                 <CustomCard>
