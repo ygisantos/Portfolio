@@ -224,7 +224,7 @@ function AwardsCertificates() {
             
             {/* Certificate Modal */}
             {showModal && selectedCertificate && (
-                <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center z-50 bg-black bg-opacity-75" onClick={() => setShowModal(false)}>
+                <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center z-50 bg-[#000000c2] bg-opacity-75" onClick={() => setShowModal(false)}>
                     <div className="relative bg-white rounded-lg max-w-3xl w-11/12 max-h-[90vh] overflow-hidden" onClick={e => e.stopPropagation()}>
                         <button 
                             className="absolute top-2 right-2 text-gray-700 hover:text-black z-10 bg-white bg-opacity-70 rounded-full p-2"
