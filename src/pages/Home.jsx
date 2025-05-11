@@ -9,9 +9,11 @@ import { SiFacebookgaming } from "react-icons/si";
 // Add import for the animated background
 import AnimatedCodeBackground from '@/components/AnimatedCodeBackground';
 import PixelatedSlider from '@/components/PixelatedSlider'; // Import custom pixelated slider component
-import ProfileSection from './Profile';
-import SkillsCarousel from './Skills';
-import AwardsCertificates from './AwardCertificates';
+import ProfileSection from '@page/Profile';
+import SkillsCarousel from '@page/Skills';
+import AwardsCertificates from '@page/AwardCertificates';
+import Experience from '@page/Experience';
+import Project from '@page/Projects';
 
 function Home() {
     const [profile, setProfile] = useState();
@@ -66,7 +68,7 @@ function Home() {
                 {/* SKILLS */}
                 <section id="skills" className='mt-16'>
                     <div className={'w-fit z-1 -mb-1 ml-6 gooey-label bg-brown-dark !pt-6'} >
-                        <span className='text-center solid-shadow-title text-beige text-xl font-black'>WHAT I WORK WITH</span>
+                        <span className='text-center solid-shadow-title text-beige md:text-xl text-md font-black'>WHAT I WORK WITH</span>
                     </div>
                     <CustomCard className={``}>
                         <SkillsCarousel skills={skills}/>
@@ -113,37 +115,30 @@ function Home() {
                 </section>
 
                 {/* AWARDS & CERTIFICATES */}
-                <CustomCard>
-                    <section id="awards">
-                        <h2>Awards & Certificates</h2>
-                        {/* Awards & Certificates content */}
+                <section id="awards" className='mt-16 flex flex-col items-end'>
+                    <div className={'w-fit z-1 -mb-1 mr-6 gooey-label bg-brown-dark !pt-6'} >
+                        <span className='text-center solid-shadow-title text-beige md:text-xl text-md font-black'>AWARDS & CERTIFICATES</span>
+                    </div>
+                    {/* Awards & Certificates content */}
+                    <CustomCard>
                         <AwardsCertificates />
-                    </section>
-                </CustomCard>
+                    </CustomCard>
+                </section>
                 <CustomCard>
                     <section id="projects">
                         <h2>Projects</h2>
                         {/* Projects content */}
-                        <h1 className='h-[74px]'>TEST CONTENT</h1>
-                        <h1 className='h-[74px]'>TEST CONTENT</h1>
-                        <h1 className='h-[74px]'>TEST CONTENT</h1>
-                        <h1 className='h-[74px]'>TEST CONTENT</h1>
-                        <h1 className='h-[74px]'>TEST CONTENT</h1>
-                        <h1 className='h-[74px]'>TEST CONTENT</h1>
+                        <Project />
                     </section>
                 </CustomCard>
-                <CustomCard>
-                    <section id="experiences">
-                        <h2>Experiences</h2>
-                        {/* Experiences content */}
-                        <h1 className='h-[74px]'>TEST CONTENT</h1>
-                        <h1 className='h-[74px]'>TEST CONTENT</h1>
-                        <h1 className='h-[74px]'>TEST CONTENT</h1>
-                        <h1 className='h-[74px]'>TEST CONTENT</h1>
-                        <h1 className='h-[74px]'>TEST CONTENT</h1>
-                        <h1 className='h-[74px]'>TEST CONTENT</h1>
-                    </section>
-                </CustomCard>
+                <section id="experiences" className='mt-16 flex flex-col'>
+                    <div className={'w-fit z-1 -mb-1 ml-6 gooey-label bg-brown-dark !pt-6 self-center'} >
+                        <span className='text-center solid-shadow-title text-beige md:text-xl text-md font-black'>EXPERIENCES</span>
+                    </div>
+                    <CustomCard>
+                        <Experience />
+                    </CustomCard>
+                </section>
                 <CustomCard>
                     <section id="testimonials">
                         <h2>Testimonials</h2>
