@@ -4,8 +4,9 @@ import ButtonIcon from '@components/ButtonIcon';
 import CustomButton from '@components/CustomButton';
 import CustomCard from '@components/CustomCard';
 import { useEffect, useState } from 'react';
-import { FaFacebookF, FaPhoneAlt, FaTiktok } from "react-icons/fa";
+import { FaFacebookF, FaGithub, FaLinkedinIn, FaPhoneAlt, FaTiktok } from "react-icons/fa";
 import { SiFacebookgaming } from "react-icons/si";
+import { MdEmail } from "react-icons/md";
 // Add import for the animated background
 import AnimatedCodeBackground from '@/components/AnimatedCodeBackground';
 import PixelatedSlider from '@/components/PixelatedSlider'; // Import custom pixelated slider component
@@ -44,28 +45,60 @@ function Home() {
                 {/* PROFILE */}
                 <section id="profile">
                     <ProfileSection profile={profile}/>
-                    {/* SOCIALS and DOWNLOAD CV remain here */}
+                    {/* SOCIALS and DOWNLOAD CV  */}
                     <div className='flex md:flex-row flex-col flex-1/7'>
-                        {/* SOCIALS */}
-                        <CustomCard className={'flex md:flex-row flex-col gap-2 items-center justify-around flex-3/4'}>
-                            <span className='font-black text-4xl'>SOCIALS</span>
-                            <div className='flex md:flex-row flex-col gap-2'>
+                        {/* SOCIALS */}                        <CustomCard className={'flex md:flex-row flex-col gap-2 items-center justify-around flex-3/4'}>
+                            <span className='font-black text-4xl'>SOCIALS</span>                            <div className='flex md:flex-row flex-col gap-2'>
                                 <div className='flex flex-row gap-2'>
-                                    <ButtonIcon icon={<FaFacebookF size={32}/>} onclick={null}/>
-                                    <ButtonIcon icon={<SiFacebookgaming size={32}/>} onclick={null}/>
+                                    <ButtonIcon 
+                                        icon={<FaFacebookF size={32}/>} 
+                                        onclick={() => profile?.socials?.facebook && window.open(profile.socials.facebook, "_blank")}
+                                    />
+                                    <ButtonIcon 
+                                        icon={<SiFacebookgaming size={32}/>} 
+                                        onclick={() => profile?.socials?.facebook_page && window.open(profile.socials.facebook_page, "_blank")}
+                                    />
                                 </div>
                                 <div className='flex flex-row gap-2'>
-                                    <ButtonIcon  icon={<FaTiktok size={32}/>} onclick={null} />
-                                    <ButtonIcon  icon={<FaPhoneAlt size={32}/>} onclick={null} />
+                                    <ButtonIcon 
+                                        icon={<FaTiktok size={32}/>} 
+                                        onclick={() => profile?.socials?.tiktok && window.open(profile.socials.tiktok, "_blank")} 
+                                    />
+                                    <ButtonIcon 
+                                        icon={<FaPhoneAlt size={32}/>} 
+                                        onclick={() => profile?.socials?.phone && window.open(`tel:${profile.socials.phone}`, "_blank")} 
+                                    />
+                                </div>
+                                <div className='flex flex-row gap-2'>
+                                    <ButtonIcon 
+                                        icon={<FaGithub size={32}/>} 
+                                        onclick={() => profile?.socials?.github && window.open(profile.socials.github, "_blank")}
+                                    />
+                                    <ButtonIcon 
+                                        icon={<FaLinkedinIn size={32}/>} 
+                                        onclick={() => profile?.socials?.linkedin && window.open(profile.socials.linkedin, "_blank")}
+                                    />
+                                </div>
+                                <div className='flex flex-row gap-2'>
+                                    <ButtonIcon 
+                                        icon={<MdEmail size={32}/>} 
+                                        onclick={() => profile?.socials?.email && window.open(`mailto:${profile.socials.email}`, "_blank")}
+                                    />
                                 </div>
                             </div>
                         </CustomCard>
-                        {/* DOWNLOAD RESUME */}
-                        <CustomButton text={"DOWNLOAD CV"} onclick={null} className={'flex-1/4'} classText={'font-bold text-xl'}/>
-                    </div>
-                </section>
+                        <CustomButton
+                            text={"DOWNLOAD CV"}
+                            onclick={() => {
+                                if (profile?.resume_url) window.open(profile.resume_url, "_blank");
+                            }}
+                            className={'flex-1/4'}
+                            classText={'font-bold text-xl'}
+                        />
+                        </div>
+                        </section>
 
-                {/* SKILLS */}
+                        {/* SKILLS */}
                 <section id="skills" className='mt-16'>
                     <div className={'w-fit z-1 -mb-1 ml-6 gooey-label bg-brown-dark !pt-6'} >
                         <span className='text-center solid-shadow-title text-beige md:text-xl text-md font-black'>WHAT I WORK WITH</span>
