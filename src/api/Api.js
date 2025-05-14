@@ -64,7 +64,6 @@ export const getAboutMe = async () => {
   try {
     const docRef = doc(db, 'about_me', 'profile');
     const docSnap = await getDoc(docRef);
-    console.log(JSON.stringify(docSnap.exists() ? docSnap.data() : null, null, 2));
     return JSON.stringify(docSnap.exists() ? docSnap.data() : null, null, 2);
   } catch (error) {
     return {
