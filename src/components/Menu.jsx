@@ -61,7 +61,7 @@ function Menu() {
     ];
 
     return (
-        <div className={`!z-5 flex flex-col items-center justify-center ${isMobile ? 'bottom-2' : 'bottom-5'} fixed w-full`}>
+        <div className={`!z-20 flex flex-col items-center justify-center ${isMobile ? 'bottom-2' : 'bottom-5'} fixed w-full`}>
             {/* LABEL */}
             <span className={`gooey-label bg-brown-light opacity-95 shadow-2xl ${isMobile ? 'text-sm' : ''}`}>
                 {activeSection}

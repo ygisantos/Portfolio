@@ -1,0 +1,67 @@
+/* Certificate custom styles */
+
+.certificate-card {
+  transition: all 0.3s ease;
+}
+
+.certificate-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+.animate-slideInRight {
+  animation: slideInRight 0.5s ease-out;
+}
+
+.animate-slideInLeft {
+  animation: slideInLeft 0.5s ease-out;
+}
+
+/* Certificate Card Hover Effects */
+.certificate-card {
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.certificate-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* Accessibility focus styles */
+.certificate-card:focus-visible {
+  outline: 3px solid var(--color-brown-dark);
+  outline-offset: 3px;
+}
+
+/* Modal Backdrop */
+.modal-backdrop {
+  backdrop-filter: blur(4px);
+}
+
+/* Center Filter Button Text */
+.filter-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Make text more readable */
+.certificate-description {
+  line-height: 1.6;
+}
+
+/* Pagination dots animation */
+.pagination-dot {
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.pagination-dot.active {
+  transform: scale(1.3);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .certificate-modal-content {
+    flex-direction: column;
+  }
+}

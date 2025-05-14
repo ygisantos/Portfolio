@@ -1,0 +1,102 @@
+/* Projects.css - Custom styles for the Projects component */
+
+/* Card animation */
+.project-card {
+  transition: all 0.3s ease;
+}
+
+.project-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+/* Loading animation */
+.loader {
+  border-radius: 50%;
+  border: 3px solid #f3f3f3;
+  border-top: 3px solid #475569;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Project grid */
+.projects-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 2rem;
+  max-height: calc(2 * (48px + 300px + 2rem)); /* 2 rows: image height + content height + gap */
+  overflow-y: auto;
+  padding-right: 16px; /* Space for scrollbar */
+  padding-bottom: 10px; /* Extra space at bottom */
+  mask-image: linear-gradient(to bottom, transparent, black 10px, black calc(100% - 10px), transparent);
+  scrollbar-width: thin;
+  scrollbar-color: #475569 #f1f5f9;
+}
+
+.projects-grid::-webkit-scrollbar {
+  width: 8px;
+}
+
+.projects-grid::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 4px;
+}
+
+.projects-grid::-webkit-scrollbar-thumb {
+  background-color: #475569;
+  border-radius: 4px;
+}
+
+.projects-grid::-webkit-scrollbar-thumb:hover {
+  background-color: #334155;
+}
+
+/* Add subtle fade at top and bottom of grid to indicate scrollable content */
+.projects-container {
+  position: relative;
+}
+
+.projects-container::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 16px; /* Account for scrollbar */
+  height: 30px;
+  background: linear-gradient(to top, rgba(255,255,255,0.8), rgba(255,255,255,0));
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0.7;
+}
+
+/* Responsive pagination */
+@media (max-width: 640px) {
+  .pagination-compact .pagination-number {
+    display: none;
+  }
+}
+
+/* Modal backdrop blur */
+.modal-backdrop {
+  backdrop-filter: blur(5px);
+}
+
+/* Focus styles for better accessibility */
+button:focus, a:focus {
+  outline: 2px solid #4b5563;
+  outline-offset: 2px;
+}
+
+/* Empty state styling */
+.empty-state {
+  border: 2px dashed #e2e8f0;
+  border-radius: 0.5rem;
+  padding: 2rem;
+  text-align: center;
+}
