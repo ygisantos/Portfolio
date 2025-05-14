@@ -10,3 +10,31 @@
     position: relative;
 }
 
+/* Existing gooey effect styles */
+
+/* Media queries for mobile responsiveness */
+@media (max-width: 767px) {
+  .gooey-label {
+    font-size: 0.875rem;
+    padding: 0.25rem 0.75rem;
+    margin-bottom: 0.25rem;
+  }
+  
+  /* For smaller button spacing in mobile view */
+  .flex-wrap {
+    gap: 0.5rem !important;
+  }
+  
+  /* Adjust mobile menu container */
+  .max-w-\[95\%\] {
+    max-width: 95%;
+  }
+}
+
+/* For tablets */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .gooey-label {
+    font-size: 1rem;
+  }
+}
+
