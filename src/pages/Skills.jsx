@@ -7,6 +7,7 @@ const SLIDE_STEP = 2; // px
 
 export default function SkillsCarousel({skills}) {
     const [offset, setOffset] = useState(0);
+    const [isPaused, setIsPaused] = useState(false);
     const offsetRef = useRef(0);
     const animationRef = useRef(null);
 
@@ -14,21 +15,25 @@ export default function SkillsCarousel({skills}) {
         if (!skills.length) return;
 
         const slide = () => {
-            offsetRef.current += SLIDE_STEP;
-            const totalWidth = skills.length * ITEM_WIDTH;
-            if (offsetRef.current >= totalWidth) {
-                offsetRef.current %= totalWidth;
+            if (!isPaused) {
+                offsetRef.current += SLIDE_STEP;
+                const totalWidth = skills.length * ITEM_WIDTH;
+                if (offsetRef.current >= totalWidth) {
+                    offsetRef.current %= totalWidth;
+                }
+                setOffset(offsetRef.current);
             }
-            setOffset(offsetRef.current);
             animationRef.current = setTimeout(slide, SLIDE_INTERVAL);
         };
 
         animationRef.current = setTimeout(slide, SLIDE_INTERVAL);
         return () => clearTimeout(animationRef.current);
-    }, [skills]);
-
-    return (
-        <div className="relative w-full overflow-hidden h-[100px]">
+    }, [skills, isPaused]);    return (
+        <div 
+            className="relative w-full overflow-hidden h-[100px]"
+            onMouseEnter={() => setIsPaused(true)}
+            onMouseLeave={() => setIsPaused(false)}
+        >
             <div
                 className="flex items-center absolute left-0 top-0 h-full"
                 style={{ transform: `translateX(-${offset}px)`, width: skills.length ? `${skills.length * 2 * ITEM_WIDTH}px` : '100%' }}
