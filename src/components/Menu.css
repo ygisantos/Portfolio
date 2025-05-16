@@ -15,19 +15,25 @@
 /* Media queries for mobile responsiveness */
 @media (max-width: 767px) {
   .gooey-label {
-    font-size: 0.875rem;
+    font-size: 0.75rem; /* Changed to text-xs */
     padding: 0.25rem 0.75rem;
     margin-bottom: 0.25rem;
   }
   
-  /* For smaller button spacing in mobile view */
-  .flex-wrap {
-    gap: 0.5rem !important;
+  /* Smaller button container */
+  .max-w-\[90\%\] {
+    max-width: 90%;
+    padding: 0.5rem 1rem;
   }
   
-  /* Adjust mobile menu container */
-  .max-w-\[95\%\] {
-    max-width: 95%;
+  /* Smaller button size */
+  button {
+    transform: scale(0.85);
+  }
+  
+  /* Tighter spacing */
+  .gap-2 > * {
+    margin: 0.125rem;
   }
 }
 

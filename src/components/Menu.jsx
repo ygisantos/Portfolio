@@ -34,13 +34,16 @@ function Menu() {
                     }
                 });
             },
-            { threshold: 0.6 } 
+            { 
+                threshold: isMobile ? 0.3 : 0.6,
+                rootMargin: isMobile ? "-20px 0px" : "0px"
+            } 
         );
 
         sections.forEach((section) => observer.observe(section));
 
         return () => observer.disconnect();
-    }, []);
+    }, [isMobile]); // Add isMobile as a dependency
 
     const handleScrollTo = (sectionId) => {
         setActiveSection(sectionId);
@@ -52,23 +55,22 @@ function Menu() {
 
     // Menu item configuration
     const menuItems = [
-        { id: "profile", icon: <FaUser size={isMobile ? 24 : 32} />, label: "Profile" },
-        { id: "skills", icon: <FaTools size={isMobile ? 24 : 32} />, label: "Skills" },
-        { id: "awards", icon: <FaAward size={isMobile ? 24 : 32} />, label: "Awards" },
-        { id: "projects", icon: <FaProjectDiagram size={isMobile ? 24 : 32} />, label: "Projects" },
-        { id: "experiences", icon: <FaBriefcase size={isMobile ? 24 : 32} />, label: "Experiences" },
-        { id: "testimonials", icon: <FaCommentDots size={isMobile ? 24 : 32} />, label: "Testimonials" },
+        { id: "profile", icon: <FaUser size={isMobile ? 20 : 28} />, label: "Profile" },
+        { id: "skills", icon: <FaTools size={isMobile ? 20 : 28} />, label: "Skills" },
+        { id: "awards", icon: <FaAward size={isMobile ? 20 : 28} />, label: "Awards" },
+        { id: "projects", icon: <FaProjectDiagram size={isMobile ? 20 : 28} />, label: "Projects" },
+        { id: "experiences", icon: <FaBriefcase size={isMobile ? 20 : 28} />, label: "Experiences" },
+        { id: "testimonials", icon: <FaCommentDots size={isMobile ? 20 : 28} />, label: "Testimonials" },
     ];
 
     return (
-        <div className={`!z-20 flex flex-col items-center justify-center ${isMobile ? 'bottom-2' : 'bottom-5'} fixed w-full`}>
+        <div className={`!z-20 flex flex-col items-center justify-center ${isMobile ? 'bottom-1' : 'bottom-5'} fixed w-full`}>
             {/* LABEL */}
-            <span className={`gooey-label bg-brown-light opacity-95 shadow-2xl ${isMobile ? 'text-sm' : ''}`}>
+            <span className={`gooey-label bg-brown-light opacity-95 shadow-2xl ${isMobile ? 'text-xs' : 'text-sm'}`}>
                 {activeSection}
             </span>
-            <div className={`flex p-2 !px-10 ${isMobile ? 'flex-wrap justify-center' : 'flex-row'} gap-${isMobile ? '3' : '6'} 
-                p-${isMobile ? '3' : '5'} px-${isMobile ? '8' : '16'} bg-brown-light opacity-95 
-                rounded-4xl relative overflow-hidden ${isMobile ? 'max-w-[95%]' : ''}`}>
+            <div className={`flex ${isMobile ? 'flex-wrap justify-center gap-2 p-2 px-4 max-w-[90%]' : 'flex-row gap-6 p-5 px-16'} 
+                bg-brown-light opacity-95 rounded-4xl relative overflow-hidden`}>
                 {/* Decorative border-radius-1 blob at the bottom */}
                 <div className="absolute h-[40%] bg-beige left-0 bottom-0 w-full border-radius-1 pointer-events-none mask"></div>
                 
@@ -84,7 +86,7 @@ function Menu() {
                                 onclick={() => handleScrollTo(id)}
                                 className={`transition-all ${
                                     activeSection === id || hoveredButton === id
-                                        ? `transition-all bg-beige text-brown-dark !scale-${isMobile ? '110' : '125'} !-translate-y-${isMobile ? '1' : '1.5'}`
+                                        ? `transition-all bg-beige text-brown-dark ${isMobile ? 'scale-110' : 'scale-125'} ${isMobile ? '-translate-y-1' : '-translate-y-1.5'}`
                                         : "text-beige"
                                 }`}
                             />
