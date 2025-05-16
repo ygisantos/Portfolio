@@ -10,7 +10,7 @@ function Modal({
   maxWidth = '4xl',
   closeOnOutsideClick = true,
   showCloseButton = true,
-}) {  // Handle escape key press and focus trap
+}) { 
   useEffect(() => {
     if (!isOpen) return;
     

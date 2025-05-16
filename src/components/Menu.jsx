@@ -1,6 +1,6 @@
-import { useState, useEffect } from "react";
-import { FaUser, FaTools, FaAward, FaProjectDiagram, FaBriefcase, FaCommentDots } from 'react-icons/fa';
 import ButtonIcon from "@components/ButtonIcon";
+import { useEffect, useState } from "react";
+import { FaAward, FaBriefcase, FaCommentDots, FaProjectDiagram, FaTools, FaUser } from 'react-icons/fa';
 import "./Menu.css"; // Import custom CSS for gooey effect
 
 function Menu() {
@@ -66,7 +66,7 @@ function Menu() {
             <span className={`gooey-label bg-brown-light opacity-95 shadow-2xl ${isMobile ? 'text-sm' : ''}`}>
                 {activeSection}
             </span>
-            <div className={`flex ${isMobile ? 'flex-wrap justify-center' : 'flex-row'} gap-${isMobile ? '3' : '6'} 
+            <div className={`flex p-2 !px-10 ${isMobile ? 'flex-wrap justify-center' : 'flex-row'} gap-${isMobile ? '3' : '6'} 
                 p-${isMobile ? '3' : '5'} px-${isMobile ? '8' : '16'} bg-brown-light opacity-95 
                 rounded-4xl relative overflow-hidden ${isMobile ? 'max-w-[95%]' : ''}`}>
                 {/* Decorative border-radius-1 blob at the bottom */}

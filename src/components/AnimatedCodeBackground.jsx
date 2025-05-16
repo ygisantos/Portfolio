@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 
 const SYMBOLS = [
     '{ }', '( )', '< >', '[ ]', ';', '=', '+', '-', '/', '|', '&', '%', '!', '?'
@@ -104,13 +104,12 @@ const AnimatedCodeBackground = ({
             cancelAnimationFrame(animationRef.current);
             window.removeEventListener('resize', handleResize);
         };
-    }, [symbolCount, minSize, maxSize, minSpeed, maxSpeed, minOpacity, maxOpacity]);
-
-    return (
-        <div className="fixed top-0 left-0 w-full h-full z-0 pointer-events-none !blur-[2px]">
+    }, [symbolCount, minSize, maxSize, minSpeed, maxSpeed, minOpacity, maxOpacity]);    return (
+        <div className="fixed top-0 left-0 w-full h-full z-0 pointer-events-none !blur-[1.5px]">
+            <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-brown-light/10 to-brown-dark/20 z-0"></div>
             <canvas
                 ref={canvasRef}
-                className="absolute top-0 left-0 w-full h-full z-0 pointer-events-none"
+                className="absolute top-0 left-0 w-full h-full z-0 pointer-events-none opacity-70"
             />
         </div>
     );
