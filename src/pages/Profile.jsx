@@ -50,7 +50,7 @@ export default function ProfileSection({profile}) {
                 <CustomCard className={'flex flex-col flex-6/7 animate-fadeIn delay-100 hover:shadow-xl transition-all duration-300'}>
                     <div className='flex flex-col md:flex-row justify-between gap-4'>
                         <div className='flex flex-col'>
-                            <h1 className='font-black md:!text-4xl text-2xl text-brown-dark tracking-wide'>
+                            <h1 className='!font-bold md:!text-4xl text-2xl text-brown-dark tracking-wide'>
                                 YGI MARTIN B. SANTOS
                             </h1>
                             <div className="h-1 bg-brown-dark w-3/4 mt-2 rounded-full"></div>
