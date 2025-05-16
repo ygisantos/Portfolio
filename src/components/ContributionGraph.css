@@ -1,0 +1,41 @@
+.contribution-graph {
+    border: 1px solid rgba(133, 100, 78, 0.2);
+    position: relative;
+    background-color: rgba(245, 238, 230, 0.3);
+    transition: all 0.3s ease;
+}
+
+.contribution-graph:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+.contribution-graph img {
+    width: 100%;
+    opacity: 0.85;
+    transition: opacity 0.3s ease;
+}
+
+.contribution-graph:hover img {
+    opacity: 1;
+}
+
+.contribution-graph-skeleton {
+    width: 100%;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+}
+
+.contribution-graph-error {
+    padding: 1rem;
+    text-align: center;
+    color: #85644e;
+    background-color: rgba(133, 100, 78, 0.1);
+    border-radius: 0.5rem;
+}
+
+@media (max-width: 768px) {
+    .contribution-graph img {
+        height: auto;
+    }
+}

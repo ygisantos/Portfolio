@@ -1,6 +1,6 @@
 import ButtonIcon from "@components/ButtonIcon";
 import { useEffect, useState } from "react";
-import { FaAward, FaBriefcase, FaCommentDots, FaProjectDiagram, FaTools, FaUser } from 'react-icons/fa';
+import { FaAward, FaBriefcase, FaCommentDots, FaGithub, FaProjectDiagram, FaTools, FaUser } from 'react-icons/fa';
 import "./Menu.css"; // Import custom CSS for gooey effect
 
 function Menu() {
@@ -51,9 +51,7 @@ function Menu() {
     };
 
     const handleMouseEnter = (sectionId) => setHoveredButton(sectionId);
-    const handleMouseLeave = () => setHoveredButton(null);
-
-    // Menu item configuration
+    const handleMouseLeave = () => setHoveredButton(null);    // Menu item configuration
     const menuItems = [
         { id: "profile", icon: <FaUser size={isMobile ? 20 : 28} />, label: "Profile" },
         { id: "skills", icon: <FaTools size={isMobile ? 20 : 28} />, label: "Skills" },
@@ -61,6 +59,7 @@ function Menu() {
         { id: "projects", icon: <FaProjectDiagram size={isMobile ? 20 : 28} />, label: "Projects" },
         { id: "experiences", icon: <FaBriefcase size={isMobile ? 20 : 28} />, label: "Experiences" },
         { id: "testimonials", icon: <FaCommentDots size={isMobile ? 20 : 28} />, label: "Testimonials" },
+        { id: "github-stats", icon: <FaGithub size={isMobile ? 20 : 28} />, label: "GitHub" },
     ];
 
     return (

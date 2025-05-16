@@ -1,0 +1,45 @@
+.github-language-bar {
+  transition: width 1s ease-in-out;
+}
+
+.github-stats-card {
+  overflow: hidden;
+}
+
+/* GitHub README Stats styling */
+.github-readme-stats-container {
+  margin: 0 auto;
+  transition: all 0.3s ease;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.github-readme-stats-container:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px -2px rgba(0, 0, 0, 0.1);
+}
+
+.github-stats-img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  object-fit: contain;
+}
+
+/* Mobile responsive styles */
+@media (max-width: 768px) {
+  .contribution-graph img {
+    max-width: 100%;
+    overflow-x: auto;
+  }
+  
+  .github-readme-stats-container {
+    max-width: 100%;
+    overflow-x: auto;
+  }
+}

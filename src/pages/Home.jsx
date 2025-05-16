@@ -3,6 +3,7 @@ import { getAboutMe, getAllSkills } from '@api/Api';
 import ButtonIcon from '@components/ButtonIcon';
 import CustomButton from '@components/CustomButton';
 import CustomCard from '@components/CustomCard';
+import GitHubStats from '@components/GitHubStats';
 import { useEffect, useState } from 'react';
 import { FaFacebookF, FaGithub, FaLinkedinIn, FaPhoneAlt, FaTiktok } from "react-icons/fa";
 import { MdEmail } from "react-icons/md";
@@ -245,8 +246,15 @@ function Home() {
                                 </div>
                             </div>
                         </CustomCard>
-                    </ScrollReveal>                
-                    </section>
+                    </ScrollReveal>                    </section>
+                    <section id="github-stats" className='mt-16 flex flex-col mb-8'>
+                    <ScrollReveal animation="slideInRight">
+                        <div className={'w-fit z-1 -mb-1 mr-6 gooey-label bg-brown-dark !pt-6 self-end'} >
+                            <span className='text-center solid-shadow-title text-beige md:text-2xl text-lg font-black tracking-wider'>✦ GITHUB CODING ACTIVITY ✦</span>
+                        </div>
+                        <GitHubStats username="ygisantos" />
+                    </ScrollReveal>
+                </section>
             </div>
             <BackToTop />
         </div>
