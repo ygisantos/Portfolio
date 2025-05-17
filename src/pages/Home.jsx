@@ -189,7 +189,22 @@ function Home() {
                             <AwardsCertificates />
                         </CustomCard>
                     </ScrollReveal>
-                </section>                <section id="projects" className='mt-16 flex flex-col'>
+                </section>                
+                
+                {/* EXPERIENCE */}
+                <section id="experiences" className='mt-16 flex flex-col'>
+                    <ScrollReveal animation="slideInRight">
+                        <div className={'w-fit z-1 -mb-1 ml-6 gooey-label bg-brown-dark !pt-6 self-center'} >
+                            <span className='text-center solid-shadow-title text-beige md:text-2xl text-lg font-black tracking-wider'>✦ EXPERIENCES ✦</span>
+                        </div>
+                        <CustomCard className="hover:shadow-xl transition-all duration-300">
+                            <Experience />
+                        </CustomCard>
+                    </ScrollReveal>
+                </section>  
+
+                {/* PROJECTS */}
+                <section id="projects" className='mt-16 flex flex-col'>
                     <ScrollReveal animation="slideInLeft">
                         <div className={'w-fit z-1 -mb-1 ml-6 gooey-label bg-brown-dark !pt-6'} >
                             <span className='text-center solid-shadow-title text-beige md:text-2xl text-lg font-black tracking-wider'>✦ PROJECTS ✦</span>
@@ -200,53 +215,45 @@ function Home() {
                     </ScrollReveal>
                 </section>
                 
-                <section id="experiences" className='mt-16 flex flex-col'>
-                    <ScrollReveal animation="slideInRight">
-                        <div className={'w-fit z-1 -mb-1 ml-6 gooey-label bg-brown-dark !pt-6 self-center'} >
-                            <span className='text-center solid-shadow-title text-beige md:text-2xl text-lg font-black tracking-wider'>✦ EXPERIENCES ✦</span>
-                        </div>
-                        <CustomCard className="hover:shadow-xl transition-all duration-300">
-                            <Experience />
-                        </CustomCard>
-                    </ScrollReveal>
-                </section>                <section id="testimonials" className='mt-16 flex flex-col mb-8'>
-                    <ScrollReveal animation="slideInLeft">
-                        <div className={'w-fit z-1 -mb-1 ml-6 gooey-label bg-brown-dark !pt-6'} >
-                            <span className='text-center solid-shadow-title text-beige md:text-2xl text-lg font-black tracking-wider'>✦ TESTIMONIALS ✦</span>
-                        </div>
-                        <CustomCard className="hover:shadow-xl transition-all duration-300">
-                            <div className="flex flex-col gap-4">
-                                {/* Placeholder for actual testimonials */}
-                                <div className="flex flex-col md:flex-row gap-4">
-                                    <div className="bg-brown-light/10 p-4 rounded-lg border border-brown-light/20 hover:border-brown-medium transition-all duration-300 hover:-translate-y-1">
-                                        <div className="flex items-center mb-3">
-                                            <div className="w-12 h-12 rounded-full bg-brown-light/30 flex items-center justify-center">
-                                                <span className="text-2xl">👨‍💼</span>
-                                            </div>
-                                            <div className="ml-3">
-                                                <h3 className="font-bold">John Doe</h3>
-                                                <p className="text-sm text-brown-dark/70">CEO, Tech Company</p>
-                                            </div>
+                              <section id="testimonials" className='mt-16 flex flex-col mb-8'>
+                <ScrollReveal animation="slideInLeft">
+                    <div className={'w-fit z-1 -mb-1 ml-6 gooey-label bg-brown-dark !pt-6'} >
+                        <span className='text-center solid-shadow-title text-beige md:text-2xl text-lg font-black tracking-wider'>✦ TESTIMONIALS ✦</span>
+                    </div>
+                    <CustomCard className="hover:shadow-xl transition-all duration-300">
+                        <div className="flex flex-col gap-4">
+                            {/* Placeholder for actual testimonials */}
+                            <div className="flex flex-col md:flex-row gap-4">
+                                <div className="bg-brown-light/10 p-4 rounded-lg border border-brown-light/20 hover:border-brown-medium transition-all duration-300 hover:-translate-y-1">
+                                    <div className="flex items-center mb-3">
+                                        <div className="w-12 h-12 rounded-full bg-brown-light/30 flex items-center justify-center">
+                                            <span className="text-2xl">👨‍💼</span>
                                         </div>
-                                        <p className="italic text-brown-dark/80">"Excellent work ethic and technical skills. Delivered the project on time with high quality."</p>
-                                    </div>
-                                    
-                                    <div className="bg-brown-light/10 p-4 rounded-lg border border-brown-light/20 hover:border-brown-medium transition-all duration-300 hover:-translate-y-1">
-                                        <div className="flex items-center mb-3">
-                                            <div className="w-12 h-12 rounded-full bg-brown-light/30 flex items-center justify-center">
-                                                <span className="text-2xl">👩‍💼</span>
-                                            </div>
-                                            <div className="ml-3">
-                                                <h3 className="font-bold">Jane Smith</h3>
-                                                <p className="text-sm text-brown-dark/70">Project Manager</p>
-                                            </div>
+                                        <div className="ml-3">
+                                            <h3 className="font-bold">John Doe</h3>
+                                            <p className="text-sm text-brown-dark/70">CEO, Tech Company</p>
                                         </div>
-                                        <p className="italic text-brown-dark/80">"A pleasure to work with. Consistently exceeds expectations and brings creative solutions to complex problems."</p>
                                     </div>
+                                    <p className="italic text-brown-dark/80">"Excellent work ethic and technical skills. Delivered the project on time with high quality."</p>
+                                </div>
+                                
+                                <div className="bg-brown-light/10 p-4 rounded-lg border border-brown-light/20 hover:border-brown-medium transition-all duration-300 hover:-translate-y-1">
+                                    <div className="flex items-center mb-3">
+                                        <div className="w-12 h-12 rounded-full bg-brown-light/30 flex items-center justify-center">
+                                            <span className="text-2xl">👩‍💼</span>
+                                        </div>
+                                        <div className="ml-3">
+                                            <h3 className="font-bold">Jane Smith</h3>
+                                            <p className="text-sm text-brown-dark/70">Project Manager</p>
+                                        </div>
+                                    </div>
+                                    <p className="italic text-brown-dark/80">"A pleasure to work with. Consistently exceeds expectations and brings creative solutions to complex problems."</p>
                                 </div>
                             </div>
-                        </CustomCard>
-                    </ScrollReveal>                    </section>
+                        </div>
+                    </CustomCard>
+                </ScrollReveal>                    
+                </section>
                     <section id="github-stats" className='mt-16 flex flex-col mb-8'>
                     <ScrollReveal animation="slideInRight">
                         <div className={'w-fit z-1 -mb-1 mr-6 gooey-label bg-brown-dark !pt-6 self-end'} >
