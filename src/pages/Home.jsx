@@ -118,9 +118,10 @@ function Home() {
                         </section>
 
                 {/* SKILLS */}                
-                <section id="skills" className='mt-16'>                    <ScrollReveal animation="slideInLeft">
+                <section id="skills" className='mt-16'>                    
+                    <ScrollReveal animation="slideInLeft">
                         <div className={'w-fit z-1 -mb-1 ml-6 gooey-label bg-brown-dark !pt-6'} >
-                            <span className='text-center solid-shadow-title text-beige md:text-2xl text-lg font-black tracking-wider'>✦ WHAT I WORK WITH ✦</span>
+                            <span className='text-center solid-shadow-title text-beige md:text-2xl text-md font-black tracking-wider'>✦ WHAT I WORK WITH ✦</span>
                         </div>
                         <CustomCard className={`overflow-hidden`}>
                             <SkillsCarousel skills={skills}/>
@@ -135,7 +136,7 @@ function Home() {
                 <section id="awards" className='mt-16 flex flex-col items-end'>
                     <ScrollReveal animation="slideInRight">
                         <div className={'w-fit z-1 -mb-1 mr-6 gooey-label bg-brown-dark !pt-6'} >
-                            <span className='text-center solid-shadow-title text-beige md:text-2xl text-lg font-black tracking-wider'>✦ AWARDS & CERTIFICATES ✦</span>
+                            <span className='text-center solid-shadow-title text-beige md:text-2xl text-md font-black tracking-wider'>✦ AWARDS & CERTIFICATES ✦</span>
                         </div>
                         {/* Awards & Certificates content */}
                         <CustomCard className="hover:shadow-xl transition-all duration-300">
@@ -160,7 +161,7 @@ function Home() {
                 <section id="projects" className='mt-16 flex flex-col'>
                     <ScrollReveal animation="slideInLeft">
                         <div className={'w-fit z-1 -mb-1 ml-6 gooey-label bg-brown-dark !pt-6'} >
-                            <span className='text-center solid-shadow-title text-beige md:text-2xl text-lg font-black tracking-wider'>✦ PROJECTS ✦</span>
+                            <span className='text-center solid-shadow-title text-beige md:text-2xl text-md font-black tracking-wider'>✦ PROJECTS ✦</span>
                         </div>
                         <CustomCard className="overflow-hidden hover:shadow-xl transition-all duration-300">
                             <Project />
@@ -168,49 +169,52 @@ function Home() {
                     </ScrollReveal>
                 </section>
                 
-                              <section id="testimonials" className='mt-16 flex flex-col mb-8'>
-                <ScrollReveal animation="slideInLeft">
-                    <div className={'w-fit z-1 -mb-1 ml-6 gooey-label bg-brown-dark !pt-6'} >
-                        <span className='text-center solid-shadow-title text-beige md:text-2xl text-lg font-black tracking-wider'>✦ TESTIMONIALS ✦</span>
-                    </div>
-                    <CustomCard className="hover:shadow-xl transition-all duration-300">
-                        <div className="flex flex-col gap-4">
-                            {/* Placeholder for actual testimonials */}
-                            <div className="flex flex-col md:flex-row gap-4">
-                                <div className="bg-brown-light/10 p-4 rounded-lg border border-brown-light/20 hover:border-brown-medium transition-all duration-300 hover:-translate-y-1">
-                                    <div className="flex items-center mb-3">
-                                        <div className="w-12 h-12 rounded-full bg-brown-light/30 flex items-center justify-center">
-                                            <span className="text-2xl">👨‍💼</span>
+                {/* TESTIMONIAL */}
+                <section id="testimonials" className='mt-16 flex flex-col mb-8'>
+                    <ScrollReveal animation="slideInLeft">
+                        <div className={'w-fit z-1 -mb-1 ml-6 gooey-label bg-brown-dark !pt-6'} >
+                            <span className='text-center solid-shadow-title text-beige md:text-2xl text-md font-black tracking-wider'>✦ TESTIMONIALS ✦</span>
+                        </div>
+                        <CustomCard className="hover:shadow-xl transition-all duration-300">
+                            <div className="flex flex-col gap-4">
+                                {/* Placeholder for actual testimonials */}
+                                <div className="flex flex-col md:flex-row gap-4">
+                                    <div className="bg-brown-light/10 p-4 rounded-lg border border-brown-light/20 hover:border-brown-medium transition-all duration-300 hover:-translate-y-1">
+                                        <div className="flex items-center mb-3">
+                                            <div className="w-12 h-12 rounded-full bg-brown-light/30 flex items-center justify-center">
+                                                <span className="text-2xl">👨‍💼</span>
+                                            </div>
+                                            <div className="ml-3">
+                                                <h3 className="font-bold">John Doe</h3>
+                                                <p className="text-sm text-brown-dark/70">CEO, Tech Company</p>
+                                            </div>
                                         </div>
-                                        <div className="ml-3">
-                                            <h3 className="font-bold">John Doe</h3>
-                                            <p className="text-sm text-brown-dark/70">CEO, Tech Company</p>
-                                        </div>
+                                        <p className="italic text-brown-dark/80">"Excellent work ethic and technical skills. Delivered the project on time with high quality."</p>
                                     </div>
-                                    <p className="italic text-brown-dark/80">"Excellent work ethic and technical skills. Delivered the project on time with high quality."</p>
-                                </div>
-                                
-                                <div className="bg-brown-light/10 p-4 rounded-lg border border-brown-light/20 hover:border-brown-medium transition-all duration-300 hover:-translate-y-1">
-                                    <div className="flex items-center mb-3">
-                                        <div className="w-12 h-12 rounded-full bg-brown-light/30 flex items-center justify-center">
-                                            <span className="text-2xl">👩‍💼</span>
+                                    
+                                    <div className="bg-brown-light/10 p-4 rounded-lg border border-brown-light/20 hover:border-brown-medium transition-all duration-300 hover:-translate-y-1">
+                                        <div className="flex items-center mb-3">
+                                            <div className="w-12 h-12 rounded-full bg-brown-light/30 flex items-center justify-center">
+                                                <span className="text-2xl">👩‍💼</span>
+                                            </div>
+                                            <div className="ml-3">
+                                                <h3 className="font-bold">Jane Smith</h3>
+                                                <p className="text-sm text-brown-dark/70">Project Manager</p>
+                                            </div>
                                         </div>
-                                        <div className="ml-3">
-                                            <h3 className="font-bold">Jane Smith</h3>
-                                            <p className="text-sm text-brown-dark/70">Project Manager</p>
-                                        </div>
+                                        <p className="italic text-brown-dark/80">"A pleasure to work with. Consistently exceeds expectations and brings creative solutions to complex problems."</p>
                                     </div>
-                                    <p className="italic text-brown-dark/80">"A pleasure to work with. Consistently exceeds expectations and brings creative solutions to complex problems."</p>
                                 </div>
                             </div>
-                        </div>
-                    </CustomCard>
-                </ScrollReveal>                    
+                        </CustomCard>
+                    </ScrollReveal>                    
                 </section>
-                    <section id="github-stats" className='mt-16 flex flex-col mb-8'>
+
+                {/* GITHUB STAT */}
+                <section id="github-stats" className='mt-16 flex flex-col mb-48'>
                     <ScrollReveal animation="slideInRight">
                         <div className={'w-fit z-1 -mb-1 mr-6 gooey-label bg-brown-dark !pt-6 self-end'} >
-                            <span className='text-center solid-shadow-title text-beige md:text-2xl text-lg font-black tracking-wider'>✦ GITHUB CODING ACTIVITY ✦</span>
+                            <span className='text-center solid-shadow-title text-beige md:text-2xl text-md font-black tracking-wider'>✦ GITHUB CODING ACTIVITY ✦</span>
                         </div>
                         <GitHubStats username="ygisantos" />
                     </ScrollReveal>
