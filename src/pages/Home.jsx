@@ -11,10 +11,10 @@ import { SiFacebookgaming } from "react-icons/si";
 
 import AnimatedCodeBackground from '@/components/AnimatedCodeBackground';
 import BackToTop from '@/components/BackToTop';
-import PixelatedSlider from '@/components/PixelatedSlider';
 import ScrollReveal from '@/components/ScrollReveal';
 import AwardsCertificates from '@page/AwardCertificates';
 import Experience from '@page/Experience';
+import GroupedSkills from '@page/GroupedSkills';
 import ProfileSection from '@page/Profile';
 import Project from '@page/Projects';
 import SkillsCarousel from '@page/Skills';
@@ -118,8 +118,7 @@ function Home() {
                         </section>
 
                 {/* SKILLS */}                
-                <section id="skills" className='mt-16'>
-                    <ScrollReveal animation="slideInLeft">
+                <section id="skills" className='mt-16'>                    <ScrollReveal animation="slideInLeft">
                         <div className={'w-fit z-1 -mb-1 ml-6 gooey-label bg-brown-dark !pt-6'} >
                             <span className='text-center solid-shadow-title text-beige md:text-2xl text-lg font-black tracking-wider'>✦ WHAT I WORK WITH ✦</span>
                         </div>
@@ -128,54 +127,8 @@ function Home() {
                         </CustomCard>
                     </ScrollReveal>
 
-                    {/* Grouped Skills */}                    
-                    <div className='grid md:grid-cols-3 grid-cols-1 md:grid-rows-2 grid-rows-6 gap-4 mt-6'>
-                        {Object.entries(
-                            skills.reduce((acc, skill) => {
-                                acc[skill.category] = acc[skill.category] || [];
-                                acc[skill.category].push(skill);
-                                return acc;
-                            }, {})
-                        )
-                        .sort(([categoryA, skillsA], [categoryB, skillsB]) => {
-                            if (categoryA === "Others") return 1;
-                            if (categoryB === "Others") return -1;
-
-                            const maxProficiencyA = Math.max(...skillsA.map(skill => skill.proficiency));
-                            const maxProficiencyB = Math.max(...skillsB.map(skill => skill.proficiency));
-
-                            return maxProficiencyB - maxProficiencyA;
-                        })
-                        .map(([category, categorySkills], index) => (
-                            <CustomCard 
-                                key={category} 
-                                className={`transition-all duration-300 hover:shadow-lg hover:-translate-y-1 ${index % 2 === 0 ? 'animate-slideInLeft' : 'animate-slideInRight'} delay-${index * 100}`}
-                            >
-                                <div className="flex items-center mb-3">
-                                    <span className='font-black md:text-xl text-lg text-brown-dark'>{category.toUpperCase()}</span>
-                                    <div className="ml-2 h-0.5 flex-grow bg-brown-light opacity-50 rounded-full"></div>
-                                </div>
-                                <div className='flex flex-col gap-4 mt-2'>
-                                    {categorySkills.map((skill, idx) => (
-                                        <div key={skill.id} className={`flex flex-row items-center gap-4 p-2 rounded hover:bg-beige/30 transition-all duration-200`}>
-                                            <img
-                                                src={`https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/${skill.icon}/${skill.icon}-original.svg`}
-                                                alt={skill.title}
-                                                className="h-8 w-8 flex-1/10 object-contain drop-shadow-sm"
-                                                onError={(e) => {
-                                                    e.target.onerror = null;
-                                                    e.target.src = `https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/${skill.icon}/${skill.icon}-plain.svg`;
-                                                }}
-                                            />
-                                            <span className='flex-5/10 font-medium'>{skill.title}</span>
-                                            <span className='flex-1/10 font-bold text-brown-dark'>{skill.proficiency}%</span>
-                                            <PixelatedSlider value={skill.proficiency} className={`flex-4/10 w-full`}/>
-                                        </div>
-                                    ))}
-                                </div>
-                            </CustomCard>
-                        ))}
-                    </div>
+                    {/* Grouped Skills */}
+                    <GroupedSkills skills={skills} />
                 </section>
 
                 {/* AWARDS & CERTIFICATES */}                
