@@ -5,7 +5,6 @@ import { FaArrowLeft, FaArrowRight, FaTimes, FaExternalLinkAlt } from "react-ico
 import LoadingState from "@/components/LoadingState";
 import "./AwardCertificates.css";
 
-// Filter options constant
 const FILTER_OPTIONS = ["ALL", "CERTIFICATE", "AWARD"];
 const AUTOPLAY_DELAY = 5000;
 
@@ -41,11 +40,8 @@ function AwardsCertificates() {
         getCerts();
     }, [getCerts]);
 
-    // Handle window resize
     useEffect(() => {
-        const handleResize = () => {
-            setWindowWidth(window.innerWidth);
-        };
+        const handleResize = () => setWindowWidth(window.innerWidth);
         
         window.addEventListener('resize', handleResize);
         return () => window.removeEventListener('resize', handleResize);
@@ -55,13 +51,8 @@ function AwardsCertificates() {
     useEffect(() => {
         const startAutoplay = () => {
             if (certificates.length <= 1 || showModal) return;
-            
-            // Clear any existing interval first
-            if (autoplayIntervalRef.current) {
-                clearInterval(autoplayIntervalRef.current);
-            }
-            
-            // Set new interval
+            if (autoplayIntervalRef.current) clearInterval(autoplayIntervalRef.current);
+
             autoplayIntervalRef.current = setInterval(() => {
                 moveSlide(1);
             }, AUTOPLAY_DELAY);
@@ -69,7 +60,6 @@ function AwardsCertificates() {
         
         startAutoplay();
         
-        // Cleanup function
         return () => {
             if (autoplayIntervalRef.current) {
                 clearInterval(autoplayIntervalRef.current);
@@ -78,10 +68,8 @@ function AwardsCertificates() {
         };
     }, [certificates.length, currentIndex, showModal]);
 
-    // Handle keyboard navigation
     useEffect(() => {
         const handleKeyDown = (e) => {
-            // Don't capture keyboard events when modal is open
             if (showModal) return;
             
             switch (e.key) {
@@ -108,22 +96,15 @@ function AwardsCertificates() {
     const moveSlide = useCallback((direction) => {
         if (isAnimating || certificates.length <= 1) return;
         
-        // Get filtered certificates
-        const filteredCerts = currentFilter === "ALL" 
-            ? certificates
-            : certificates.filter(cert => cert.type.toLowerCase() === currentFilter.toLowerCase());
-            
+        const filteredCerts = currentFilter === "ALL" ? certificates : certificates.filter(cert => cert.type.toLowerCase() === currentFilter.toLowerCase());
         if (filteredCerts.length <= 1) return;
 
         setIsAnimating(true);
         let newIndex;
 
-        if (direction > 0) {
-            newIndex = (currentIndex + 1) % filteredCerts.length;
-        } else {
-            newIndex = (currentIndex - 1 + filteredCerts.length) % filteredCerts.length;
-        }
-
+        if (direction > 0) newIndex = (currentIndex + 1) % filteredCerts.length;
+        else newIndex = (currentIndex - 1 + filteredCerts.length) % filteredCerts.length;
+        
         setCurrentIndex(newIndex);
         
         // Reset animation state after transition finishes
@@ -153,21 +134,15 @@ function AwardsCertificates() {
         }
     }, []);
     
-    // Memoized filtered certificates
     const filteredCertificates = useMemo(() => {
-        return currentFilter === "ALL" 
-            ? certificates
-            : certificates.filter(cert => cert.type.toLowerCase() === currentFilter.toLowerCase());
+        return currentFilter === "ALL" ? certificates : certificates.filter(cert => cert.type.toLowerCase() === currentFilter.toLowerCase());
     }, [certificates, currentFilter]);
     
-    // Get visible certificates with circular indexing and filtering
     const visibleCertificates = useMemo(() => {
         if (!filteredCertificates.length) return [];
         
-        // Ensure currentIndex is within bounds of filtered certificates
         const normalizedIndex = currentIndex % filteredCertificates.length;
         
-        // Show 3 on desktop, 1 on mobile
         const isMobile = windowWidth < 768;
         const visibleCount = Math.min(isMobile ? 1 : 3, filteredCertificates.length);
         
@@ -182,7 +157,6 @@ function AwardsCertificates() {
         return items;
     }, [filteredCertificates, currentIndex, windowWidth]);
 
-    // Check if we should render the navigation arrows
     const shouldShowNavigation = useMemo(() => {
         return filteredCertificates.length > (windowWidth < 768 ? 1 : 3);
     }, [filteredCertificates.length, windowWidth]);
@@ -198,11 +172,8 @@ function AwardsCertificates() {
                             setCurrentFilter(filter);
                             setCurrentIndex(0);
                         }}
-                        className={`!px-5 !py-2.5 rounded-full transition-all duration-300 filter-button text-center min-w-[128px] hover:!scale-110 ${
-                            currentFilter === filter ? 'bg-brown-dark text-beige shadow-md' : 'bg-brown-light text-brown-dark hover:bg-brown-dark hover:text-beige'
-                        }`}
-                        aria-label={`Filter by ${filter}`}
-                    >
+                        className={`!px-5 !py-2.5 rounded-full transition-all duration-300 filter-button text-center min-w-[128px] hover:!scale-110 ${currentFilter === filter ? 'bg-brown-dark text-beige shadow-md' : 'bg-brown-light text-brown-dark hover:bg-brown-dark hover:text-beige'}`}
+                        aria-label={`Filter by ${filter}`}>
                         {filter}
                     </button>
                 ))}
@@ -221,9 +192,7 @@ function AwardsCertificates() {
             {/* Gradient background overlay */}
             <div
                 className="pointer-events-none absolute inset-0 z-0"
-                style={{
-                    background: "linear-gradient(to top, rgba(245, 222, 179, 1) 80%, rgba(245, 222, 179, 0.3) 0%)"
-                }}
+                style={{background: "linear-gradient(to top, rgba(245, 222, 179, 1) 80%, rgba(245, 222, 179, 0.3) 0%)"}}
             />
 
             {!isLoading && !error && filteredCertificates.length > 0 && (
@@ -256,15 +225,12 @@ function AwardsCertificates() {
                         ref={sliderRef}
                         className="flex justify-center transition-all duration-500 ease-in-out"
                         role="region"
-                        aria-label="Certificate carousel"
-                    >
+                        aria-label="Certificate carousel">
                         {visibleCertificates.map(({certificate, position}) => (
                             <div 
                                 key={certificate.id} 
-                                className={`md:w-1/3 w-full px-4 transform transition-all duration-500 ${
-                                    position === 1 ? 'scale-105 z-10' : 'scale-95 opacity-80'
-                                }`}
-                            >
+                                className={`md:w-1/3 w-full px-4 transform transition-all duration-500 ${position === 1 ? 'scale-105 z-10' : 'scale-95 opacity-80'
+                                }`}>
                                 <div 
                                     className="border border-brown-dark rounded-lg overflow-hidden bg-beige shadow-lg cursor-pointer hover:shadow-xl transition-all duration-300 h-full flex flex-col certificate-card"
                                     onClick={() => openCertificateModal(certificate)}
@@ -287,7 +253,7 @@ function AwardsCertificates() {
                                                 loading="lazy"
                                                 onError={(e) => {
                                                     e.target.onerror = null;
-                                                    e.target.src = 'placeholder-image-url'; // Add a placeholder image URL
+                                                    e.target.src = 'placeholder-image-url';
                                                 }}
                                             />
                                         </div>
