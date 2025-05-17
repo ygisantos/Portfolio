@@ -287,7 +287,7 @@ function AwardsCertificates() {
                                         </div>
                                     </div>
                                     <div className="p-4 flex-1 flex flex-col">
-                                        <h3 className="font-bold text-xl mb-2 line-clamp-2">{certificate.title}</h3>
+                                        <h3 className="!font-bold text-xl mb-2 line-clamp-2">{certificate.title}</h3>
                                         <p className="text-sm text-gray-500 mb-2">{formatDate(certificate.date)}</p>
                                         <p className="text-sm line-clamp-3 certificate-description">{certificate.description}</p>
                                         <div className="mt-auto pt-4">
