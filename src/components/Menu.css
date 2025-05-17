@@ -8,7 +8,15 @@
     text-transform: uppercase;
     text-align: center;
     position: relative;
-    width: 256px;
+    width: auto;
+    max-width: 95%;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    transition: box-shadow 0.3s ease, transform 0.2s ease;
+}
+
+.gooey-label:hover {
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    transform: translateY(-2px);
 }
 
 /* Existing gooey effect styles */
@@ -19,6 +27,22 @@
     font-size: 0.75rem; /* Changed to text-xs */
     padding: 0.25rem 0.75rem;
     margin-bottom: 0.25rem;
+    max-width: 90%;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    text-align: center;
+  }
+  
+  /* Center section header containers on mobile */
+  section .gooey-label {
+    align-self: center !important;
+  }
+  
+  /* Center sparkles on narrow screens */
+  .gooey-label span span {
+    display: inline-block;
+    text-align: center;
+    word-wrap: break-word;
   }
   
   /* Smaller button container */

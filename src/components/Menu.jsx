@@ -63,19 +63,19 @@ function Menu() {
     ];
 
     return (
-        <div className={`!z-20 flex flex-col items-center justify-center ${isMobile ? 'bottom-1' : 'bottom-5'} fixed w-full`}>
+        <div className={`!z-20 flex flex-col  items-center justify-center ${isMobile ? 'bottom-1' : 'bottom-5'} fixed w-full`}>
             {/* LABEL */}
-            <span className={`gooey-label bg-brown-light opacity-95 shadow-2xl ${isMobile ? 'text-xs' : 'text-sm'}`}>
-                {activeSection}
+            <span className={`gooey-label !shadow-xl/30 bg-brown-light outline-dashed outline-[#633f18] opacity-95 ${isMobile ? 'text-xs' : 'text-sm'}`}>
+                ✦ <span className="mx-1">{activeSection}</span> ✦
             </span>
-            <div className={`flex ${isMobile ? 'flex-wrap justify-center gap-2 p-2 px-4 max-w-[90%]' : 'flex-row gap-6 p-5 px-16'} 
-                bg-brown-light opacity-95 rounded-4xl relative overflow-hidden`}>
+            <div className={`!shadow-xl/30 flex ${isMobile ? 'flex-wrap justify-center gap-2 p-2 px-4 max-w-[90%]' : 'flex-row gap-6 p-5 px-16'} 
+                bg-brown-light opacity-95 rounded-4xl relative overflow-hidden shadow-xl hover:shadow-2xl transition-shadow duration-300`}>
                 {/* Decorative border-radius-1 blob at the bottom */}
                 <div className="absolute h-[40%] bg-beige left-0 bottom-0 w-full border-radius-1 pointer-events-none mask"></div>
                 
                 {/* Menu buttons */}
                 {menuItems.map(({ id, icon, label }) => (
-                    <div key={id} className="relative flex flex-col items-center">
+                    <div key={id} className="!shadow-xl/10 relative flex flex-col items-center">
                         <div 
                             onMouseEnter={() => handleMouseEnter(id)} 
                             onMouseLeave={handleMouseLeave}

@@ -120,8 +120,8 @@ function Home() {
                 {/* SKILLS */}                
                 <section id="skills" className='mt-16'>                    
                     <ScrollReveal animation="slideInLeft">
-                        <div className={'w-fit z-1 -mb-1 ml-6 gooey-label bg-brown-dark !pt-6'} >
-                            <span className='text-center solid-shadow-title text-beige md:text-2xl text-md font-black tracking-wider'>✦ WHAT I WORK WITH ✦</span>
+                        <div className={'w-fit z-1 -mb-1 md:ml-6 mx-auto gooey-label bg-brown-dark !pt-6 px-8 transform hover:scale-105 transition-all duration-300'} >
+                            <span className='text-center solid-shadow-title text-beige md:text-2xl text-md font-black tracking-wider flex items-center'><span className="text-amber-200">✦</span> <span className="mx-3 relative after:content-[''] after:absolute after:bottom-0 after:left-0 after:h-1 after:w-full after:bg-amber-200/30 after:rounded-full">WHAT I WORK WITH</span> <span className="text-amber-200">✦</span></span>
                         </div>
                         <CustomCard className={`overflow-hidden`}>
                             <SkillsCarousel skills={skills}/>
@@ -133,10 +133,10 @@ function Home() {
                 </section>
 
                 {/* AWARDS & CERTIFICATES */}                
-                <section id="awards" className='mt-16 flex flex-col items-end'>
+                <section id="awards" className='mt-16 flex flex-col md:items-end items-center'>
                     <ScrollReveal animation="slideInRight">
-                        <div className={'w-fit z-1 -mb-1 mr-6 gooey-label bg-brown-dark !pt-6'} >
-                            <span className='text-center solid-shadow-title text-beige md:text-2xl text-md font-black tracking-wider'>✦ AWARDS & CERTIFICATES ✦</span>
+                        <div className={'w-fit z-1 -mb-1 md:mr-6 mx-auto gooey-label bg-brown-dark !pt-6 px-8 transform hover:scale-105 transition-all duration-300'} >
+                            <span className='text-center solid-shadow-title text-beige md:text-2xl text-md font-black tracking-wider flex items-center'><span className="text-amber-200">✦</span> <span className="mx-3 relative after:content-[''] after:absolute after:bottom-0 after:left-0 after:h-1 after:w-full after:bg-amber-200/30 after:rounded-full">AWARDS & CERTIFICATES</span> <span className="text-amber-200">✦</span></span>
                         </div>
                         {/* Awards & Certificates content */}
                         <CustomCard className="hover:shadow-xl transition-all duration-300">
@@ -148,8 +148,8 @@ function Home() {
                 {/* EXPERIENCE */}
                 <section id="experiences" className='mt-16 flex flex-col'>
                     <ScrollReveal animation="slideInRight">
-                        <div className={'w-fit z-1 -mb-1 ml-6 gooey-label bg-brown-dark !pt-6 self-center'} >
-                            <span className='text-center solid-shadow-title text-beige md:text-2xl text-lg font-black tracking-wider'>✦ EXPERIENCES ✦</span>
+                        <div className={'w-fit z-1 -mb-1 mx-auto gooey-label bg-brown-dark !pt-6 px-8 transform hover:scale-105 transition-all duration-300'} >
+                            <span className='text-center solid-shadow-title text-beige md:text-2xl text-lg font-black tracking-wider flex items-center'><span className="text-amber-200">✦</span> <span className="mx-3 relative after:content-[''] after:absolute after:bottom-0 after:left-0 after:h-1 after:w-full after:bg-amber-200/30 after:rounded-full">EXPERIENCES</span> <span className="text-amber-200">✦</span></span>
                         </div>
                         <CustomCard className="hover:shadow-xl transition-all duration-300">
                             <Experience />
@@ -160,8 +160,8 @@ function Home() {
                 {/* PROJECTS */}
                 <section id="projects" className='mt-16 flex flex-col'>
                     <ScrollReveal animation="slideInLeft">
-                        <div className={'w-fit z-1 -mb-1 ml-6 gooey-label bg-brown-dark !pt-6'} >
-                            <span className='text-center solid-shadow-title text-beige md:text-2xl text-md font-black tracking-wider'>✦ PROJECTS ✦</span>
+                        <div className={'w-fit z-1 -mb-1 md:ml-6 mx-auto gooey-label bg-brown-dark !pt-6 px-8 transform hover:scale-105 transition-all duration-300'} >
+                            <span className='text-center solid-shadow-title text-beige md:text-2xl text-md font-black tracking-wider flex items-center'><span className="text-amber-200">✦</span> <span className="mx-3 relative after:content-[''] after:absolute after:bottom-0 after:left-0 after:h-1 after:w-full after:bg-amber-200/30 after:rounded-full">PROJECTS</span> <span className="text-amber-200">✦</span></span>
                         </div>
                         <CustomCard className="overflow-hidden hover:shadow-xl transition-all duration-300">
                             <Project />
@@ -172,8 +172,8 @@ function Home() {
                 {/* TESTIMONIAL */}
                 <section id="testimonials" className='mt-16 flex flex-col mb-8'>
                     <ScrollReveal animation="slideInLeft">
-                        <div className={'w-fit z-1 -mb-1 ml-6 gooey-label bg-brown-dark !pt-6'} >
-                            <span className='text-center solid-shadow-title text-beige md:text-2xl text-md font-black tracking-wider'>✦ TESTIMONIALS ✦</span>
+                        <div className={'w-fit z-1 -mb-1 md:ml-6 mx-auto gooey-label bg-brown-dark !pt-6 px-8 transform hover:scale-105 transition-all duration-300'} >
+                            <span className='text-center solid-shadow-title text-beige md:text-2xl text-md font-black tracking-wider flex items-center'><span className="text-amber-200">✦</span> <span className="mx-3 relative after:content-[''] after:absolute after:bottom-0 after:left-0 after:h-1 after:w-full after:bg-amber-200/30 after:rounded-full">TESTIMONIALS</span> <span className="text-amber-200">✦</span></span>
                         </div>
                         <CustomCard className="hover:shadow-xl transition-all duration-300">
                             <div className="flex flex-col gap-4">
@@ -213,8 +213,8 @@ function Home() {
                 {/* GITHUB STAT */}
                 <section id="github-stats" className='mt-16 flex flex-col mb-48'>
                     <ScrollReveal animation="slideInRight">
-                        <div className={'w-fit z-1 -mb-1 mr-6 gooey-label bg-brown-dark !pt-6 self-end'} >
-                            <span className='text-center solid-shadow-title text-beige md:text-2xl text-md font-black tracking-wider'>✦ GITHUB CODING ACTIVITY ✦</span>
+                        <div className={'w-fit z-1 -mb-1 md:mr-6 mx-auto gooey-label bg-brown-dark !pt-6 px-8 transform hover:scale-105 transition-all duration-300 md:self-end'} >
+                            <span className='text-center solid-shadow-title text-beige md:text-2xl text-md font-black tracking-wider flex items-center'><span className="text-amber-200">✦</span> <span className="mx-3 relative after:content-[''] after:absolute after:bottom-0 after:left-0 after:h-1 after:w-full after:bg-amber-200/30 after:rounded-full">GITHUB CODING ACTIVITY</span> <span className="text-amber-200">✦</span></span>
                         </div>
                         <GitHubStats username="ygisantos" />
                     </ScrollReveal>
