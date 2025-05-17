@@ -355,7 +355,7 @@ function AwardsCertificates() {
                                 />
                                 <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/50 to-transparent h-16 md:hidden"></div>
                             </div>
-                            <div className="md:w-1/3 p-6 overflow-y-auto animate-slideInRight">
+                            <div className="md:w-1/3 mt-5 md:mt-0 p-6 overflow-y-auto animate-slideInRight" style={{ maxHeight: '80vh' }}>
                                 <h3 id="certificate-modal-title" className="text-2xl font-bold mb-2 text-brown-dark">{selectedCertificate.title}</h3>
                                 <p className="text-sm text-gray-500 mb-4">{formatDate(selectedCertificate.date)}</p>
                                 <div className="mb-4 flex flex-wrap gap-2">
@@ -368,7 +368,7 @@ function AwardsCertificates() {
                                         </span>
                                     ))}
                                 </div>
-                                <p className="text-gray-700 certificate-description">{selectedCertificate.description}</p>
+                                <p className="text-gray-700 certificate-description overflow-y-auto max-h-[128px]">{selectedCertificate.description}</p>
                                 
                                 <div className="flex mt-6 gap-3 flex-wrap">
                                     {selectedCertificate.url && (
