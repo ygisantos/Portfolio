@@ -190,7 +190,7 @@ function AwardsCertificates() {
     return (
         <div className="relative flex flex-col w-full min-h-[400px]">
             {/* Filter Buttons */}
-            <div className="flex flex-wrap justify-center gap-2 mb-4">
+            <div className="flex flex-wrap justify-center gap-3 mb-6 px-4 py-2 top-0 z-20">
                 {FILTER_OPTIONS.map((filter) => (
                     <button
                         key={filter}
@@ -198,10 +198,8 @@ function AwardsCertificates() {
                             setCurrentFilter(filter);
                             setCurrentIndex(0);
                         }}
-                        className={`px-4 py-2 rounded-full transition-all duration-300 filter-button ${
-                            currentFilter === filter 
-                                ? 'bg-brown-dark text-beige shadow-md' 
-                                : 'bg-brown-light text-brown-dark hover:bg-brown-dark hover:text-beige'
+                        className={`!px-5 !py-2.5 rounded-full transition-all duration-300 filter-button text-center min-w-[128px] hover:!scale-110 ${
+                            currentFilter === filter ? 'bg-brown-dark text-beige shadow-md' : 'bg-brown-light text-brown-dark hover:bg-brown-dark hover:text-beige'
                         }`}
                         aria-label={`Filter by ${filter}`}
                     >
@@ -219,9 +217,17 @@ function AwardsCertificates() {
                 isEmpty={filteredCertificates.length === 0}
                 emptyMessage={`No ${currentFilter.toLowerCase() !== 'all' ? currentFilter.toLowerCase() : ''} certificates found`}
             />
-            
+
+            {/* Gradient background overlay */}
+            <div
+                className="pointer-events-none absolute inset-0 z-0"
+                style={{
+                    background: "linear-gradient(to top, rgba(245, 222, 179, 1) 80%, rgba(245, 222, 179, 0.3) 0%)"
+                }}
+            />
+
             {!isLoading && !error && filteredCertificates.length > 0 && (
-                <div className="relative overflow-hidden px-4 py-8">
+                <div className="relative overflow-hidden px-4 py-8 mt-4">{/* Added mt-4 for spacing */}
                     {/* Navigation Arrows */}
                     {shouldShowNavigation && (
                         <>
@@ -303,11 +309,11 @@ function AwardsCertificates() {
                     
                     {/* Pagination Dots */}
                     {filteredCertificates.length > 1 && (
-                        <div className="flex justify-center mt-6 flex-wrap gap-1">
+                        <div className="flex justify-center mt-8 mb-4 flex-wrap gap-2 pagination-container">
                             {filteredCertificates.map((_, index) => (
                                 <button
                                     key={index}
-                                    className={`w-3 h-3 mx-1 rounded-full transition-all duration-300 pagination-dot ${
+                                    className={`w-4 h-4 mx-1 rounded-full transition-all duration-300 pagination-dot ${
                                         index === currentIndex ? 'bg-brown-dark active' : 'bg-brown-light opacity-50 hover:opacity-75'
                                     }`}
                                     onClick={() => setCurrentIndex(index)}
@@ -327,35 +333,31 @@ function AwardsCertificates() {
                     onClick={() => setShowModal(false)}
                     role="dialog"
                     aria-modal="true"
-                    aria-labelledby="certificate-modal-title"
-                >
+                    aria-labelledby="certificate-modal-title">
                     <div 
                         className="relative bg-white rounded-lg max-w-3xl w-11/12 max-h-[90vh] overflow-hidden shadow-2xl animate-scaleIn certificate-modal-content" 
-                        onClick={e => e.stopPropagation()}
-                    >
+                        onClick={e => e.stopPropagation()} >
                         <button 
-                            className="absolute top-2 right-2 text-gray-700 hover:text-black z-10 bg-white bg-opacity-70 rounded-full p-2 transition-all hover:bg-opacity-100 focus:outline-none focus:ring-2 focus:ring-brown-dark"
+                            className="absolute top-2 right-2 text-gray-700 hover:text-black z-20 bg-white bg-opacity-70 rounded-full p-2 transition-all hover:bg-opacity-100 focus:outline-none focus:ring-2 focus:ring-brown-dark"
                             onClick={() => setShowModal(false)}
-                            aria-label="Close modal"
-                        >
+                            aria-label="Close modal">
                             <FaTimes size={24} />
                         </button>
                         
                         <div className="flex flex-col md:flex-row h-full certificate-modal-content">
-                            <div className="md:w-2/3 h-64 md:h-auto flex-shrink-0 bg-gray-100 relative">
+                            <div className="md:w-2/3 !h-full md:h-auto flex-shrink-0 bg-gray-100 relative">
                                 <img 
                                     src={selectedCertificate.image} 
                                     alt={selectedCertificate.title}
-                                    className="w-full h-full object-contain animate-fadeIn"
+                                    className="w-full object-contain animate-fadeIn"
                                     loading="eager"
                                     onError={(e) => {
                                         e.target.onerror = null;
                                         e.target.src = '/placeholder-certificate.png'; 
                                     }}
                                 />
-                                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/50 to-transparent h-16 md:hidden"></div>
                             </div>
-                            <div className="md:w-1/3 mt-5 md:mt-0 p-6 overflow-y-auto animate-slideInRight" style={{ maxHeight: '80vh' }}>
+                            <div className="md:w-1/3 mt-5 md:mt-0 z-10 bg-white p-6 overflow-y-auto animate-slideInRight" style={{ maxHeight: '80vh' }}>
                                 <h3 id="certificate-modal-title" className="text-2xl font-bold mb-2 text-brown-dark">{selectedCertificate.title}</h3>
                                 <p className="text-sm text-gray-500 mb-4">{formatDate(selectedCertificate.date)}</p>
                                 <div className="mb-4 flex flex-wrap gap-2">
@@ -370,25 +372,6 @@ function AwardsCertificates() {
                                 </div>
                                 <p className="text-gray-700 certificate-description overflow-y-auto max-h-[128px]">{selectedCertificate.description}</p>
                                 
-                                <div className="flex mt-6 gap-3 flex-wrap">
-                                    {selectedCertificate.url && (
-                                        <a 
-                                            href={selectedCertificate.url} 
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="inline-flex items-center gap-2 px-4 py-2 bg-brown-dark text-beige rounded-md hover:bg-brown-light transition-colors"
-                                            aria-label={`View certificate for ${selectedCertificate.title}`}
-                                        >
-                                            View Certificate <FaExternalLinkAlt size={14} />
-                                        </a>
-                                    )}
-
-                                    {selectedCertificate.issuer && (
-                                        <div className="mt-4 text-sm text-gray-600">
-                                            <strong>Issued by:</strong> {selectedCertificate.issuer}
-                                        </div>
-                                    )}
-                                </div>
                             </div>
                         </div>
                     </div>

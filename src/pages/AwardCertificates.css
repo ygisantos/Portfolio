@@ -38,11 +38,20 @@
   backdrop-filter: blur(4px);
 }
 
-/* Center Filter Button Text */
 .filter-button {
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
   display: flex;
   align-items: center;
   justify-content: center;
+  font-weight: 600;
+  white-space: nowrap;
+  transform: translateY(0);
+  touch-action: manipulation;
+}
+
+.filter-button:active {
+  transform: translateY(2px);
+  transition: transform 0.1s;
 }
 
 /* Make text more readable */
@@ -59,9 +68,54 @@
   transform: scale(1.3);
 }
 
-/* Responsive adjustments */
+/* Filter container sticky positioning */
+.filter-container {
+  top: 0;
+  z-index: 30;
+  backdrop-filter: blur(5px);
+  margin-bottom: 1.5rem;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+/* Spacing for main content to prevent overlap */
 @media (max-width: 768px) {
   .certificate-modal-content {
     flex-direction: column;
+  }
+  
+  .filter-container {
+    padding: 0.5rem 10px;
+    margin-bottom: 1rem;
+  }
+  
+  .filter-button {
+    width: 100%;
+    margin-bottom: 5px;
+    font-size: 14px;
+    padding: 15px 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .filter-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    gap: 8px;
+    width: 100%;
+    padding: 8px 10px;
+    margin-bottom: 16px; /* Added more space below filters */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  }
+  
+  .filter-button {
+    min-height: 44px;
+    padding: 8px 12px;
+    width: 100%;
+  }
+  
+  /* Add more space to slider content */
+  .certificate-card {
+    margin-top: 10px;
   }
 }
