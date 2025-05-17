@@ -56,8 +56,8 @@ function Menu() {
         { id: "profile", icon: <FaUser size={isMobile ? 20 : 28} />, label: "Profile" },
         { id: "skills", icon: <FaTools size={isMobile ? 20 : 28} />, label: "Skills" },
         { id: "awards", icon: <FaAward size={isMobile ? 20 : 28} />, label: "Awards" },
-        { id: "projects", icon: <FaProjectDiagram size={isMobile ? 20 : 28} />, label: "Projects" },
         { id: "experiences", icon: <FaBriefcase size={isMobile ? 20 : 28} />, label: "Experiences" },
+        { id: "projects", icon: <FaProjectDiagram size={isMobile ? 20 : 28} />, label: "Projects" },
         { id: "testimonials", icon: <FaCommentDots size={isMobile ? 20 : 28} />, label: "Testimonials" },
         { id: "github-stats", icon: <FaGithub size={isMobile ? 20 : 28} />, label: "GitHub" },
     ];
