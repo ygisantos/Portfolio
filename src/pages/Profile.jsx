@@ -40,7 +40,7 @@ export default function ProfileSection({profile}) {
                     </div>
                     <div className='flex flex-row items-center gap-3 p-2 rounded-md hover:bg-brown-light/10 transition-colors duration-200'>
                         <IoCalendar className='text-brown-dark text-xl'/>
-                        <span className='text-sm font-medium'>{AgeCalculate()} Years Old</span>
+                        <span className='text-sm font-medium'>October 15, 2002</span>
                     </div>
                 </div>
             </CustomCard>
