@@ -115,7 +115,7 @@ function Home() {
                             }
                         />
                         </div>
-                        </section>
+                    </section>
 
                 {/* SKILLS */}                
                 <section id="skills" className='mt-16'>                    
