@@ -197,6 +197,11 @@ export default function PortfolioAdmin() {
       }
 
       setSuccess('All data updated successfully!');
+      
+      // Refresh the page after a short delay to allow the user to see the success message
+      setTimeout(() => {
+        window.location.reload();
+      }, 2000);
     } catch (error) {
       console.error('Error updating data:', error);
       setError('Failed to update data. Please check your inputs and try again.');
