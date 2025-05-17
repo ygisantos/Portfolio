@@ -149,15 +149,15 @@ function Experience() {
                                         className={`bg-beige rounded-lg p-4 shadow-md border-l-4 border-brown-dark hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 experience-card experience-hover-effect ${activeYear === new Date(exp.from).getFullYear().toString() ? 'animate-card-pop' : ''}`}
                                         onMouseMove={(e) => handleMouseMove(e, exp.id)}
                                     >
-                                        <h3 className="text-xl font-bold">{exp.name}</h3>
-                                        <h4 className="text-lg font-semibold text-brown-dark">{exp.role}</h4>
+                                        <h3 className="text-xl !font-bold">{exp.name}</h3>
+                                        <h4 className="text-lg font-semibold text-brown-dark opacity-60">{exp.role}</h4>
                                         
                                         <div className="mt-4">
-                                            <p className={`${expandedItems[exp.id] ? 'content-expanded' : 'content-collapsed'} transition-all duration-300`}>{exp.description}</p>
+                                            <p className={`${expandedItems[exp.id] ? 'content-expanded' : 'content-collapsed'} transition-all duration-300 !text-sm opacity-75`}>{exp.description}</p>
                                         </div>
                                         
                                         {expandedItems[exp.id] && (
-                                            <div className="mt-4 bg-brown-light bg-opacity-20 p-3 rounded-lg animate-scaleIn">
+                                            <div className="mt-4 bg-brown-light bg-opacity-20 p-3 rounded-lg animate-scaleIn text-sm">
                                                 <h5 className="font-semibold text-brown-dark mb-2 flex items-center">
                                                     <span className="mr-2">💡</span>What I Learned:
                                                 </h5>
