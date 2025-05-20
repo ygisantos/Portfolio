@@ -124,9 +124,7 @@ export default function PortfolioAdmin() {
       }
     };
 
-    if (isLoggedIn) {
-      fetchData();
-    }
+    if (isLoggedIn) fetchData();
   }, [isLoggedIn]);
 
   const handleInputChange = (field, value) => {
@@ -191,9 +189,7 @@ export default function PortfolioAdmin() {
       // Update collections
       const collections = ['certificates', 'skills', 'experiences', 'works', 'testimonials'];
       for (const colName of collections) {
-        if (data[colName]) {
-          await updateCollection(colName, data[colName]);
-        }
+        if (data[colName]) await updateCollection(colName, data[colName]);
       }
 
       setSuccess('All data updated successfully!');
@@ -213,16 +209,11 @@ export default function PortfolioAdmin() {
   const sanitizeLanguages = (languages) => {
     if (!languages) return [];
     
-    // Convert all language entries to a consistent format
     return languages.map(lang => {
-      // If it's already in the correct format
       if (lang?.name && lang?.icon) return lang;
-      
-      // If it's a string or has a name property
       const langName = typeof lang === 'string' ? lang : lang?.name;
       if (!langName) return null;
       
-      // Create a properly formatted language object
       return {
         name: langName,
         icon: `https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/${langName}/${langName}-original.svg`
@@ -756,15 +747,11 @@ const SkillsTab = ({ data, setData, deleteItem }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
 
   const goToNext = () => {
-    if (currentIndex < (data.skills?.length || 0) - 1) {
-      setCurrentIndex(currentIndex + 1);
-    }
+    if (currentIndex < (data.skills?.length || 0) - 1) setCurrentIndex(currentIndex + 1);
   };
 
   const goToPrevious = () => {
-    if (currentIndex > 0) {
-      setCurrentIndex(currentIndex - 1);
-    }
+    if (currentIndex > 0) setCurrentIndex(currentIndex - 1);
   };
 
   return (
@@ -1110,17 +1097,22 @@ const ExperiencesTab = ({ data, setData, deleteItem }) => {
 
 const WorksTab = ({ data, setData, deleteItem, convertToBase64, sanitizeLanguages }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
+  
+  const sortWorksByPriority = (works) => {
+    return [...works].sort((a, b) => {
+      if (!a.priority && !b.priority) return 0;
+      if (!a.priority) return 1;
+      if (!b.priority) return -1;
+      return parseInt(a.priority) - parseInt(b.priority);
+    });
+  };
 
   const goToNext = () => {
-    if (currentIndex < (data.works?.length || 0) - 1) {
-      setCurrentIndex(currentIndex + 1);
-    }
+    if (currentIndex < (data.works?.length || 0) - 1) setCurrentIndex(currentIndex + 1);
   };
 
   const goToPrevious = () => {
-    if (currentIndex > 0) {
-      setCurrentIndex(currentIndex - 1);
-    }
+    if (currentIndex > 0) setCurrentIndex(currentIndex - 1);
   };
 
   // Function to move a project's priority up (decrease priority number)
@@ -1128,95 +1120,58 @@ const WorksTab = ({ data, setData, deleteItem, convertToBase64, sanitizeLanguage
     const currentWork = data.works[currentIndex];
     const currentPriority = parseInt(currentWork.priority);
     
-    // Can't move up if no priority is set or already at highest priority (1)
     if (!currentPriority || currentPriority <= 1) return;
-    
     const targetPriority = currentPriority - 1;
-    
-    // Find the work that currently has our target priority
     const targetIndex = data.works.findIndex(
       work => work.priority === targetPriority.toString()
     );
-    
-    // Update priorities
+
     const updatedWorks = [...data.works];
-    
-    // If another project has the target priority, swap priorities
-    if (targetIndex !== -1) {
-      updatedWorks[targetIndex].priority = currentPriority.toString();
-    }
-    
-    // Update current project priority
+    if (targetIndex !== -1) updatedWorks[targetIndex].priority = currentPriority.toString(); 
     updatedWorks[currentIndex].priority = targetPriority.toString();
     
-    // Update data
-    setData(prev => ({ ...prev, works: updatedWorks }));
+    const sortedWorks = sortWorksByPriority(updatedWorks);
+    setData(prev => ({ ...prev, works: sortedWorks }));
   };
   
-  // Function to move a project's priority down (increase priority number)
   const movePriorityDown = () => {
     const currentWork = data.works[currentIndex];
     const currentPriority = parseInt(currentWork.priority);
     
-    // Can't move down if no priority is set
     if (!currentPriority) return;
-    
     const maxPriority = data.works.length;
-    // Can't move down if already at lowest priority
     if (currentPriority >= maxPriority) return;
-    
     const targetPriority = currentPriority + 1;
-    
-    // Find the work that currently has our target priority
     const targetIndex = data.works.findIndex(
       work => work.priority === targetPriority.toString()
     );
     
-    // Update priorities
     const updatedWorks = [...data.works];
     
-    // If another project has the target priority, swap priorities
-    if (targetIndex !== -1) {
-      updatedWorks[targetIndex].priority = currentPriority.toString();
-    }
+    if (targetIndex !== -1) updatedWorks[targetIndex].priority = currentPriority.toString();
     
-    // Update current project priority
     updatedWorks[currentIndex].priority = targetPriority.toString();
-    
-    // Update data
-    setData(prev => ({ ...prev, works: updatedWorks }));
+    const sortedWorks = sortWorksByPriority(updatedWorks);
+    setData(prev => ({ ...prev, works: sortedWorks }));
   };
 
-  // Function to ensure projects have consecutive priority numbers without gaps and proper order
   const fixPriorityNumbering = () => {
-    // First, separate and sort works with priority
-    const worksWithPriority = data.works
-      .filter(work => work.priority)
-      .sort((a, b) => parseInt(a.priority) - parseInt(b.priority));
-    
-    // Get works without priority
+    const worksWithPriority = data.works.filter(work => work.priority);
     const worksWithoutPriority = data.works.filter(work => !work.priority);
     
-    // Reassign consecutive numbers starting from 1
-    const updatedPrioritizedWorks = worksWithPriority.map((work, index) => ({
-      ...work,
-      priority: (index + 1).toString()
-    }));
+    const updatedWorks = [
+      ...worksWithPriority
+        .sort((a, b) => parseInt(a.priority) - parseInt(b.priority))
+        .map((work, index) => ({
+          ...work,
+          priority: (index + 1).toString()
+        })),
+      ...worksWithoutPriority
+    ];
     
-    // Combine the arrays: prioritized works first, then unprioritized works
-    const updatedWorks = [...updatedPrioritizedWorks, ...worksWithoutPriority];
-    
-    // Update the entire data array to maintain the new order
     setData(prev => ({ ...prev, works: updatedWorks }));
   };
   
-  // Function to navigate to a specific project by its priority number
-  const goToProjectByPriority = (priority) => {
-    const targetIndex = data.works.findIndex(work => work.priority === priority.toString());
-    if (targetIndex !== -1) {
-      setCurrentIndex(targetIndex);
-    }
-  };
   
   return (
     <section className="space-y-6">
@@ -1234,7 +1189,6 @@ const WorksTab = ({ data, setData, deleteItem, convertToBase64, sanitizeLanguage
               video_link: '',
               languages: [],
               images: [],
-              // Remove empty id since it will be generated by Firestore
             };
             const updated = [...(data.works || []), newProject];
             setData(prev => ({ ...prev, works: updated }));
@@ -1407,12 +1361,7 @@ const WorksTab = ({ data, setData, deleteItem, convertToBase64, sanitizeLanguage
                           updated[currentIndex].priority = newPriority;
                           
                           // Sort the array by priority after updating
-                          const sortedWorks = updated.sort((a, b) => {
-                            if (!a.priority && !b.priority) return 0;
-                            if (!a.priority) return 1;
-                            if (!b.priority) return -1;
-                            return parseInt(a.priority) - parseInt(b.priority);
-                          });
+                          const sortedWorks = sortWorksByPriority(updated);
                           
                           setData(prev => ({ ...prev, works: sortedWorks }));
                         }}
@@ -1630,15 +1579,11 @@ const TestimonialsTab = ({ data, setData, deleteItem, convertToBase64 }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
 
   const goToNext = () => {
-    if (currentIndex < (data.testimonials?.length || 0) - 1) {
-      setCurrentIndex(currentIndex + 1);
-    }
+    if (currentIndex < (data.testimonials?.length || 0) - 1) setCurrentIndex(currentIndex + 1);
   };
 
   const goToPrevious = () => {
-    if (currentIndex > 0) {
-      setCurrentIndex(currentIndex - 1);
-    }
+    if (currentIndex > 0) setCurrentIndex(currentIndex - 1);
   };
 
   return (

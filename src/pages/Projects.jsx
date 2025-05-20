@@ -13,7 +13,6 @@ const getPriorityNum = (work) => {
 };
 
 function Project() {
-  // Utility functions with memoization
   const extractLanguages = useCallback((languagesArray) => {
     if (!languagesArray || !Array.isArray(languagesArray)) return [];
     
@@ -22,11 +21,9 @@ function Project() {
         if (lang?.name && lang?.icon) return lang.name;
         if (typeof lang === 'string') return lang;
         let current = lang;
-        while (current?.name && typeof current.name !== 'string') {
-          current = current.name;
-        }
+        while (current?.name && typeof current.name !== 'string') current = current.name;
         return current?.name || null;
-      }).filter(Boolean); // Remove any null values
+      }).filter(Boolean); 
     } catch (error) {
       console.error("Error extracting languages:", error);
       return [];
@@ -67,7 +64,7 @@ function Project() {
   const truncateText = useCallback((text, maxLength) => {
     if (!text) return '';
     return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
-  }, []);  // State
+  }, []);  
   const [works, setWorks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -109,7 +106,6 @@ function Project() {
 
   // Filter and sort works based on selected criteria
   const filteredWorks = useMemo(() => {
-    // First filter
     const filtered = works.filter(work => {
       const matchesCategory = !selectedCategory || work.category === selectedCategory.value;
       const matchesLanguage = !selectedLanguage || 
@@ -117,15 +113,12 @@ function Project() {
       return matchesCategory && matchesLanguage;
     });
 
-    // Then sort
     return [...filtered].sort((a, b) => {
       const priorityA = getPriorityNum(a);
       const priorityB = getPriorityNum(b);
       
       // Always sort by priority first (lowest to highest)
-      if (priorityA !== priorityB) {
-        return priorityA - priorityB; // Ascending order (1,2,3...)
-      }
+      if (priorityA !== priorityB) return priorityA - priorityB; 
       
       // For items with same priority or no priority, use the selected sort
       switch (selectedSort?.value) {
@@ -153,11 +146,8 @@ function Project() {
         const priorityB = getPriorityNum(b);
         
         // If priorities are different, sort by priority (lowest first)
-        if (priorityA !== priorityB) {
-          return priorityA - priorityB; // Ascending order (1,2,3...)
-        }
+        if (priorityA !== priorityB) return priorityA - priorityB; 
         
-        // If priorities are the same (or both missing), sort by year (newest first)
         return parseInt(b.year) - parseInt(a.year);
       });
       
