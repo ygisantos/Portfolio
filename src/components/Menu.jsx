@@ -29,21 +29,28 @@ function Menu() {
         const observer = new IntersectionObserver(
             (entries) => {
                 entries.forEach((entry) => {
-                    if (entry.isIntersecting) {
+                    // Debug logging
+                    console.log(`Section ${entry.target.id}: ${entry.isIntersecting ? 'visible' : 'hidden'} (${entry.intersectionRatio})`);
+                    
+                    // Only update if the new section is more visible than current threshold
+                    if (entry.isIntersecting && entry.intersectionRatio > 0.15) {
                         setActiveSection(entry.target.id);
                     }
                 });
             },
             { 
-                threshold: isMobile ? 0.3 : 0.6,
-                rootMargin: isMobile ? "-20px 0px" : "0px"
+                threshold: [0.15, 0.3, 0.5],  // Multiple thresholds for better detection
+                rootMargin: "-10% 0px -10% 0px"  // Percentage-based margins
             } 
         );
 
         sections.forEach((section) => observer.observe(section));
 
-        return () => observer.disconnect();
-    }, [isMobile]); // Add isMobile as a dependency
+        return () => {
+            sections.forEach((section) => observer.unobserve(section));
+            observer.disconnect();
+        };
+    }, []);  // Remove isMobile dependency since we're using percentage-based values
 
     const handleScrollTo = (sectionId) => {
         setActiveSection(sectionId);
