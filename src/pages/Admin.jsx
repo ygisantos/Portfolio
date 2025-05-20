@@ -1123,6 +1123,101 @@ const WorksTab = ({ data, setData, deleteItem, convertToBase64, sanitizeLanguage
     }
   };
 
+  // Function to move a project's priority up (decrease priority number)
+  const movePriorityUp = () => {
+    const currentWork = data.works[currentIndex];
+    const currentPriority = parseInt(currentWork.priority);
+    
+    // Can't move up if no priority is set or already at highest priority (1)
+    if (!currentPriority || currentPriority <= 1) return;
+    
+    const targetPriority = currentPriority - 1;
+    
+    // Find the work that currently has our target priority
+    const targetIndex = data.works.findIndex(
+      work => work.priority === targetPriority.toString()
+    );
+    
+    // Update priorities
+    const updatedWorks = [...data.works];
+    
+    // If another project has the target priority, swap priorities
+    if (targetIndex !== -1) {
+      updatedWorks[targetIndex].priority = currentPriority.toString();
+    }
+    
+    // Update current project priority
+    updatedWorks[currentIndex].priority = targetPriority.toString();
+    
+    // Update data
+    setData(prev => ({ ...prev, works: updatedWorks }));
+  };
+  
+  // Function to move a project's priority down (increase priority number)
+  const movePriorityDown = () => {
+    const currentWork = data.works[currentIndex];
+    const currentPriority = parseInt(currentWork.priority);
+    
+    // Can't move down if no priority is set
+    if (!currentPriority) return;
+    
+    const maxPriority = data.works.length;
+    // Can't move down if already at lowest priority
+    if (currentPriority >= maxPriority) return;
+    
+    const targetPriority = currentPriority + 1;
+    
+    // Find the work that currently has our target priority
+    const targetIndex = data.works.findIndex(
+      work => work.priority === targetPriority.toString()
+    );
+    
+    // Update priorities
+    const updatedWorks = [...data.works];
+    
+    // If another project has the target priority, swap priorities
+    if (targetIndex !== -1) {
+      updatedWorks[targetIndex].priority = currentPriority.toString();
+    }
+    
+    // Update current project priority
+    updatedWorks[currentIndex].priority = targetPriority.toString();
+    
+    // Update data
+    setData(prev => ({ ...prev, works: updatedWorks }));
+  };
+
+  // Function to ensure projects have consecutive priority numbers without gaps and proper order
+  const fixPriorityNumbering = () => {
+    // First, separate and sort works with priority
+    const worksWithPriority = data.works
+      .filter(work => work.priority)
+      .sort((a, b) => parseInt(a.priority) - parseInt(b.priority));
+    
+    // Get works without priority
+    const worksWithoutPriority = data.works.filter(work => !work.priority);
+    
+    // Reassign consecutive numbers starting from 1
+    const updatedPrioritizedWorks = worksWithPriority.map((work, index) => ({
+      ...work,
+      priority: (index + 1).toString()
+    }));
+    
+    // Combine the arrays: prioritized works first, then unprioritized works
+    const updatedWorks = [...updatedPrioritizedWorks, ...worksWithoutPriority];
+    
+    // Update the entire data array to maintain the new order
+    setData(prev => ({ ...prev, works: updatedWorks }));
+  };
+  
+  // Function to navigate to a specific project by its priority number
+  const goToProjectByPriority = (priority) => {
+    const targetIndex = data.works.findIndex(work => work.priority === priority.toString());
+    if (targetIndex !== -1) {
+      setCurrentIndex(targetIndex);
+    }
+  };
+  
   return (
     <section className="space-y-6">
       <div className="flex justify-between items-center">
@@ -1135,6 +1230,7 @@ const WorksTab = ({ data, setData, deleteItem, convertToBase64, sanitizeLanguage
               description: '',
               year: '',
               duration: '',
+              priority: null,
               video_link: '',
               languages: [],
               images: [],
@@ -1174,6 +1270,68 @@ const WorksTab = ({ data, setData, deleteItem, convertToBase64, sanitizeLanguage
           <div className="border border-gray-200 rounded-lg p-4">
             {data.works[currentIndex] && (
               <>
+                <div className="mb-4 p-2 bg-blue-50 rounded-lg">
+                  <h3 className="font-medium text-sm text-blue-800">Project Priority</h3>
+                  <div className="flex items-center gap-2 mt-1 overflow-x-auto pb-2">
+                    {Array.from({ length: Math.min(data.works.length, 10) }, (_, i) => i + 1).map(num => {
+                      const workWithThisPriority = data.works.find(w => w.priority === num.toString());
+                      const isCurrentWork = data.works[currentIndex].priority === num.toString();
+                      const workIndex = workWithThisPriority ? 
+                        data.works.findIndex(w => w.priority === num.toString()) : -1;
+                      
+                      return (
+                        <div 
+                          key={num}
+                          title={workWithThisPriority 
+                            ? `${workWithThisPriority.title} (Priority ${num})` 
+                            : `Priority ${num} - Unassigned (available)`
+                          }
+                          onClick={() => {
+                            if (workIndex !== -1) {
+                              setCurrentIndex(workIndex);
+                            }
+                          }}
+                          className={`
+                            w-8 h-8 flex items-center justify-center rounded-full text-sm font-medium
+                            ${isCurrentWork 
+                              ? 'bg-blue-600 text-white border-2 border-blue-300' 
+                              : workWithThisPriority 
+                                ? 'bg-gray-200 text-gray-700 hover:bg-gray-300 cursor-pointer' 
+                                : 'bg-gray-50 text-gray-400 border border-dashed border-gray-300 hover:bg-gray-100 hover:border-gray-400'
+                            }
+                            transition-all duration-200 shrink-0
+                          `}
+                        >
+                          {num}
+                        </div>
+                      );
+                    })}
+                  </div>
+                  <div className="flex justify-between items-center mt-2">
+                    <div className="flex items-center gap-2">
+                      <p className="text-xs text-gray-600">
+                        {data.works[currentIndex].priority 
+                          ? `Priority ${data.works[currentIndex].priority}`
+                          : 'No priority set'
+                        }
+                      </p>
+                      <p className="text-xs text-gray-400">
+                        (Lower numbers appear first)
+                      </p>
+                    </div>
+                    <button
+                      onClick={fixPriorityNumbering}
+                      className="text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-1.5 rounded-md transition-colors flex items-center gap-1"
+                      title="Fix any gaps in priority numbering while maintaining order"
+                    >
+                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12"/>
+                      </svg>
+                      Fix Order
+                    </button>
+                  </div>
+                </div>
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                   <div>
                     <label className="block font-medium mb-1">Title:</label>
@@ -1223,7 +1381,7 @@ const WorksTab = ({ data, setData, deleteItem, convertToBase64, sanitizeLanguage
                   />
                 </div>
                 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                   <div>
                     <label className="block font-medium mb-1">Year:</label>
                     <input
@@ -1236,6 +1394,82 @@ const WorksTab = ({ data, setData, deleteItem, convertToBase64, sanitizeLanguage
                       }}
                       className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     />
+                  </div>
+
+                  <div>
+                    <label className="block font-medium mb-1">Priority Number:</label>
+                    <div className="flex space-x-2">
+                      <select
+                        value={data.works[currentIndex].priority || ''}
+                        onChange={(e) => {
+                          const newPriority = e.target.value;
+                          const updated = [...data.works];
+                          updated[currentIndex].priority = newPriority;
+                          
+                          // Sort the array by priority after updating
+                          const sortedWorks = updated.sort((a, b) => {
+                            if (!a.priority && !b.priority) return 0;
+                            if (!a.priority) return 1;
+                            if (!b.priority) return -1;
+                            return parseInt(a.priority) - parseInt(b.priority);
+                          });
+                          
+                          setData(prev => ({ ...prev, works: sortedWorks }));
+                        }}
+                        className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      >
+                        <option value="">Select Priority</option>
+                        {Array.from({ length: Math.max(10, (data.works?.length || 0) + 3) }, (_, i) => i + 1).map(num => {
+                          // Check if this priority is already used by another project
+                          const isUsed = data.works?.some((work, idx) => 
+                            idx !== currentIndex && work.priority === num.toString()
+                          );
+                          
+                          return (
+                            <option 
+                              key={num} 
+                              value={num}
+                              disabled={isUsed}
+                            >
+                              {num}{isUsed ? ' (already assigned)' : ''}
+                            </option>
+                          );
+                        })}
+                      </select>
+                      <div className="flex space-x-1">
+                        <button
+                          onClick={movePriorityUp}
+                          disabled={!data.works[currentIndex].priority || data.works[currentIndex].priority === '1'}
+                          className={`px-2 py-1 rounded flex items-center justify-center ${
+                            !data.works[currentIndex].priority || data.works[currentIndex].priority === '1' 
+                              ? 'bg-gray-300 cursor-not-allowed' 
+                              : 'bg-blue-500 hover:bg-blue-600 text-white'
+                          }`}
+                          title="Move Up in Priority"
+                        >
+                          <span className="text-lg">↑</span>
+                        </button>
+                        <button
+                          onClick={movePriorityDown}
+                          disabled={
+                            !data.works[currentIndex].priority || 
+                            parseInt(data.works[currentIndex].priority) >= data.works.length
+                          }
+                          className={`px-2 py-1 rounded flex items-center justify-center ${
+                            !data.works[currentIndex].priority || 
+                            parseInt(data.works[currentIndex].priority) >= data.works.length
+                              ? 'bg-gray-300 cursor-not-allowed' 
+                              : 'bg-blue-500 hover:bg-blue-600 text-white'
+                          }`}
+                          title="Move Down in Priority"
+                        >
+                          <span className="text-lg">↓</span>
+                        </button>
+                      </div>
+                    </div>
+                    <p className="text-xs text-gray-500 mt-1">
+                      Use the arrows to reorder projects (lower number will appear first)
+                    </p>
                   </div>
                   
                   <div>

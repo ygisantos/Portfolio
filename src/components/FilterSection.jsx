@@ -11,8 +11,11 @@ function FilterSection({
   onCategoryChange, 
   onLanguageChange,
   onClearFilters,
+  onSortChange,
+  selectedSort,
   filteredWorks = []
-}) {const customSelectStyles = {
+}) {
+  const customSelectStyles = {
     control: (provided, state) => ({
       ...provided,
       borderRadius: '0.375rem',
@@ -68,7 +71,8 @@ function FilterSection({
     })
   };
   
-  const hasActiveFilters = selectedCategory || selectedLanguage;
+  const hasActiveFilters = selectedCategory || selectedLanguage || (selectedSort?.value !== 'priority');
+  
   return (
     <div className="mb-8">
       <div className="flex items-center justify-between mb-2">
@@ -92,29 +96,53 @@ function FilterSection({
         )}
       </div>
       
-      <div className="flex flex-col sm:flex-row gap-4">
-        <div className="flex-1">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
           <Select
-            isClearable
+            placeholder="Filter by category..."
+            options={categories}
             value={selectedCategory}
             onChange={onCategoryChange}
-            options={categories}
-            placeholder="Filter by category..."
+            isClearable
+            className="react-select-container"
+            classNamePrefix="react-select"
             styles={customSelectStyles}
             aria-label="Filter by category"
           />
         </div>
-        <div className="flex-1">
+        
+        <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">Technology</label>
           <Select
-            isClearable
+            placeholder="Filter by technology..."
+            options={languages}
             value={selectedLanguage}
             onChange={onLanguageChange}
-            options={languages}
-            placeholder="Filter by technology..."
+            isClearable
+            className="react-select-container"
+            classNamePrefix="react-select"
             styles={customSelectStyles}
             aria-label="Filter by technology"
+          />
+        </div>
+        
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Sort by</label>
+          <Select
+            placeholder="Sort projects by..."
+            options={[
+              { value: 'priority', label: 'Priority (Low to High)' },
+              { value: 'year', label: 'Year (Newest first)' },
+              { value: 'title', label: 'Title (A-Z)' }
+            ]}
+            value={selectedSort}
+            onChange={onSortChange}
+            className="react-select-container"
+            classNamePrefix="react-select"
+            styles={customSelectStyles}
+            aria-label="Sort projects"
+            defaultValue={{ value: 'priority', label: 'Priority (Low to High)' }}
           />
         </div>
       </div>
@@ -127,14 +155,17 @@ FilterSection.propTypes = {
   languages: PropTypes.array.isRequired,
   selectedCategory: PropTypes.object,
   selectedLanguage: PropTypes.object,
+  selectedSort: PropTypes.object,
   onCategoryChange: PropTypes.func.isRequired,
   onLanguageChange: PropTypes.func.isRequired,
+  onSortChange: PropTypes.func.isRequired,
   onClearFilters: PropTypes.func.isRequired,
   filteredWorks: PropTypes.array
 };
 
 FilterSection.defaultProps = {
-  filteredWorks: []
+  filteredWorks: [],
+  selectedSort: { value: 'priority', label: 'Priority (Low to High)' }
 };
 
 export default React.memo(FilterSection);

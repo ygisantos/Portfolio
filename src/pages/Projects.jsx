@@ -6,6 +6,12 @@ import FilterSection from "@/components/FilterSection";
 import LoadingState from "@/components/LoadingState";
 import "./Projects.css";
 
+const getPriorityNum = (work) => {
+  if (!work?.priority) return Infinity;
+  const num = parseInt(work.priority);
+  return isNaN(num) ? Infinity : num;
+};
+
 function Project() {
   // Utility functions with memoization
   const extractLanguages = useCallback((languagesArray) => {
@@ -69,6 +75,7 @@ function Project() {
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [selectedLanguage, setSelectedLanguage] = useState(null);
+  const [selectedSort, setSelectedSort] = useState({ value: 'priority', label: 'Priority (Low to High)' });
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   
   // Track window width for responsive design
@@ -99,26 +106,61 @@ function Project() {
       .sort((a, b) => a.localeCompare(b))
       .map(lang => ({ value: lang, label: getLanguageDisplayName(lang) }));
   }, [works, extractLanguages, getLanguageDisplayName]);
-  // Filter works based on selected category and language
+
+  // Filter and sort works based on selected criteria
   const filteredWorks = useMemo(() => {
-    return works.filter(work => {
+    // First filter
+    const filtered = works.filter(work => {
       const matchesCategory = !selectedCategory || work.category === selectedCategory.value;
       const matchesLanguage = !selectedLanguage || 
         extractLanguages(work.languages).includes(selectedLanguage.value);
       return matchesCategory && matchesLanguage;
     });
-  }, [works, selectedCategory, selectedLanguage, extractLanguages]);
+
+    // Then sort
+    return [...filtered].sort((a, b) => {
+      const priorityA = getPriorityNum(a);
+      const priorityB = getPriorityNum(b);
+      
+      // Always sort by priority first (lowest to highest)
+      if (priorityA !== priorityB) {
+        return priorityA - priorityB; // Ascending order (1,2,3...)
+      }
+      
+      // For items with same priority or no priority, use the selected sort
+      switch (selectedSort?.value) {
+        case 'year':
+          return parseInt(b.year) - parseInt(a.year);
+        case 'title':
+          return a.title.localeCompare(b.title);
+        default:
+          return parseInt(b.year) - parseInt(a.year);
+      }
+    });
+  }, [works, selectedCategory, selectedLanguage, selectedSort, extractLanguages]);
 
   const getWorks = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
+      
       const response = await getAllWorks();
       const parsedWorks = JSON.parse(response);
-      // Sort works by year (newest first)
+      
+      // Sort works by priority first (lowest to highest), then by year as default secondary sort
       const sortedWorks = parsedWorks.sort((a, b) => {
+        const priorityA = getPriorityNum(a);
+        const priorityB = getPriorityNum(b);
+        
+        // If priorities are different, sort by priority (lowest first)
+        if (priorityA !== priorityB) {
+          return priorityA - priorityB; // Ascending order (1,2,3...)
+        }
+        
+        // If priorities are the same (or both missing), sort by year (newest first)
         return parseInt(b.year) - parseInt(a.year);
       });
+      
       setWorks(sortedWorks);
     } catch (error) {
       console.error("Error fetching works:", error);
@@ -142,24 +184,26 @@ function Project() {
     // Restore scrolling when modal is closed
     document.body.style.overflow = 'auto';
   }, []);
-  
-  const handleClearFilters = useCallback(() => {
+    const handleClearFilters = useCallback(() => {
     setSelectedCategory(null);
     setSelectedLanguage(null);
+    setSelectedSort({ value: 'priority', label: 'Priority (Low to High)' });
   }, []);
   return (
     <div className="container mx-auto px-4 py-12">
       <h1 className="text-4xl font-bold mb-8 text-center">Projects</h1>
-        {/* Filter Section */}
-      <FilterSection 
+        {/* Filter Section */}      <FilterSection 
         categories={categories}
         languages={languages}
         selectedCategory={selectedCategory}
         selectedLanguage={selectedLanguage}
+        selectedSort={selectedSort}
         onCategoryChange={setSelectedCategory}
         onLanguageChange={setSelectedLanguage}
+        onSortChange={setSelectedSort}
         onClearFilters={handleClearFilters}
-        filteredWorks={filteredWorks}      />
+        filteredWorks={filteredWorks}
+      />
         <LoadingState
         isLoading={loading}
         isError={!!error}
