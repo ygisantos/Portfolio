@@ -133,9 +133,8 @@ function CustomCard({
                     }}
                 />
             )}
-            
-            {/* Card content */}
-            <div className="relative z-10">
+              {/* Card content */}
+            <div className="relative">
                 {children}
             </div>
 

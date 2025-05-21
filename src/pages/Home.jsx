@@ -139,19 +139,19 @@ function Home() {
                 </section>
 
                 {/* SKILLS */}                
-                <section id="skills" className='mt-20 min-h-screen flex flex-col'>
+                <section id="skills" className='mt-20'>
                     <SectionHeading title="WHAT I WORK WITH" alignment="left" animation="slideInLeft" />
                     
-                    <ScrollReveal animation="fadeIn" className="flex-grow">
+                    <ScrollReveal animation="fadeIn">
                         <CustomCard className="overflow-hidden shadow-lg border-l-4 border-brown-medium hover:shadow-xl transition-all duration-300">
                             <SkillsCarousel skills={skills}/>
                         </CustomCard>
-
-                        {/* Grouped Skills - Keep within the same ScrollReveal */}
-                        <div className="mt-8">
-                            <GroupedSkills skills={skills} />
-                        </div>
                     </ScrollReveal>
+
+                    {/* Grouped Skills */}
+                    <div className="mt-8">
+                        <GroupedSkills skills={skills} />
+                    </div>
                 </section>
 
                 {/* AWARDS & CERTIFICATES */}                
