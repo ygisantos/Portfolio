@@ -80,32 +80,7 @@ const GitHubStats = ({ username }) => {
         fetchGitHubStats();
     }, [username]);
     
-    // Function to get appropriate language color
-    const getLanguageColor = (language) => {
-        const colors = {
-            JavaScript: '#f1e05a',
-            TypeScript: '#2b7489',
-            HTML: '#e34c26',
-            CSS: '#563d7c',
-            Python: '#3572A5',
-            Java: '#b07219',
-            C: '#555555',
-            'C++': '#f34b7d',
-            'C#': '#178600',
-            PHP: '#4F5D95',
-            Ruby: '#701516',
-            Go: '#00ADD8',
-            Swift: '#ffac45',
-            Kotlin: '#F18E33',
-            Rust: '#dea584',
-            Dart: '#00B4AB',
-            Lua: '#000080',
-            Shell: '#89e051',
-            // Add more languages as needed
-        };
-        
-        return colors[language] || '#8a8a8a'; // Default gray for unknown languages
-    };    if (stats.loading) {
+    if (stats.loading) {
         return (
             <CustomCard className="flex flex-col p-4">
                 <div className="grid md:grid-cols-2 grid-cols-1 gap-4 mb-4">
@@ -129,7 +104,8 @@ const GitHubStats = ({ username }) => {
                     API limit exceeded. Using fallback stats.
                 </p>
                 
-                <div className="grid md:grid-cols-2 grid-cols-1 gap-4 mb-4">                    {/* GitHub Stats Card */}
+                <div className="grid md:grid-cols-2 grid-cols-1 gap-4 mb-4">                    
+                    {/* GitHub Stats Card */}
                     <div>
                         <h4 className="text-sm font-bold text-brown-dark mb-2 flex items-center gap-1">
                             <FaGithub className="text-sm" /> GitHub Stats
@@ -171,7 +147,9 @@ const GitHubStats = ({ username }) => {
 
     if (!stats.user) {
         return null;
-    }    return (
+    }   
+    
+    return (
         <CustomCard className="flex flex-col p-4 hover:shadow-lg transition-all duration-300 github-stats-card">            <div className="grid md:grid-cols-2 grid-cols-1 gap-4 mb-4">
                 {/* GitHub Stats Card */}
                 <div>

@@ -127,6 +127,16 @@ export default function PortfolioAdmin() {
     if (isLoggedIn) fetchData();
   }, [isLoggedIn]);
 
+  // Function to ensure data is properly sorted any time we load it
+  useEffect(() => {
+    if (data?.works?.length > 0) {
+      const sortedWorks = sortWorksByPriority(data.works);
+      if (JSON.stringify(sortedWorks) !== JSON.stringify(data.works)) {
+        setData(prev => ({ ...prev, works: sortedWorks }));
+      }
+    }
+  }, [data?.works]);
+
   const handleInputChange = (field, value) => {
     setEditableData((prev) => ({
       ...prev,
@@ -1191,8 +1201,9 @@ const WorksTab = ({ data, setData, deleteItem, convertToBase64, sanitizeLanguage
               images: [],
             };
             const updated = [...(data.works || []), newProject];
-            setData(prev => ({ ...prev, works: updated }));
-            setCurrentIndex(updated.length - 1);
+            const sortedWorks = sortWorksByPriority(updated);
+            setData(prev => ({ ...prev, works: sortedWorks }));
+            setCurrentIndex(sortedWorks.length - 1);
           }}
         >
           Add Project
@@ -1227,7 +1238,7 @@ const WorksTab = ({ data, setData, deleteItem, convertToBase64, sanitizeLanguage
                 <div className="mb-4 p-2 bg-blue-50 rounded-lg">
                   <h3 className="font-medium text-sm text-blue-800">Project Priority</h3>
                   <div className="flex items-center gap-2 mt-1 overflow-x-auto pb-2">
-                    {Array.from({ length: Math.min(data.works.length, 10) }, (_, i) => i + 1).map(num => {
+                    {Array.from({ length: Math.min(data.works.length, 20) }, (_, i) => i + 1).map(num => {
                       const workWithThisPriority = data.works.find(w => w.priority === num.toString());
                       const isCurrentWork = data.works[currentIndex].priority === num.toString();
                       const workIndex = workWithThisPriority ? 
