@@ -129,7 +129,7 @@ export default function ProfileSection({profile}) {
                 
                 <ScrollReveal animation="slideInUp">
                     <CustomCard className="mx-auto p-10 border-t-4 border-brown-medium shadow-2xl backdrop-blur-sm">
-                        <h3 className="text-4xl font-bold text-brown-dark mb-8 relative inline-block after:content-[''] after:absolute after:bottom-0 after:left-0 after:h-1 after:w-full after:bg-brown-medium after:rounded-full">
+                        <h3 className="!text-4xl !font-bold text-brown-dark mb-8 relative inline-block after:content-[''] after:absolute after:bottom-0 after:left-0 after:h-1 after:w-full after:bg-brown-medium after:rounded-full">
                             About Me
                         </h3>
 
