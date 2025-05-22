@@ -195,6 +195,8 @@ export default function PortfolioAdmin() {
         location: editableData.location || '',
         availability: editableData.availability || '',
         resume_url: editableData.resume_url || '',
+        image: editableData.image || '',
+        image_url: editableData.image || '', // Also set the image_url for compatibility with Profile.jsx
         socials: {
           github: editableData.socials?.github || '',
           linkedin: editableData.socials?.linkedin || '',
@@ -297,6 +299,7 @@ export default function PortfolioAdmin() {
             editableData={editableData} 
             setData={setData} 
             handleInputChange={handleInputChange} 
+            convertToBase64={convertToBase64}
           />
         );
       case 'certificates':
@@ -480,73 +483,121 @@ export default function PortfolioAdmin() {
 }
 
 // Tab Components
-const BasicInfoTab = ({ data, editableData, setData, handleInputChange }) => (
+const BasicInfoTab = ({ data, editableData, setData, handleInputChange, convertToBase64 }) => (
   <section className="space-y-6">
     <h2 className="text-2xl font-semibold">Basic Information</h2>
     
-    <div>
-      <label className="block font-medium mb-1">Short Description:</label>
-      <textarea
-        value={editableData.short_description || ''}
-        onChange={(e) => handleInputChange('short_description', e.target.value)}
-        className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-        rows={3}
-      />
-    </div>
-    
-    <div>
-      <label className="block font-medium mb-1">Description:</label>
-      <textarea
-        value={editableData.description || ''}
-        onChange={(e) => handleInputChange('description', e.target.value)}
-        className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-        rows={5}
-      />
-    </div>
-    
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-      <div>
-        <label className="block font-medium mb-1">Location:</label>
-        <input
-          type="text"
-          value={editableData.location || ''}
-          onChange={(e) => handleInputChange('location', e.target.value)}
-          className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-        />
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+      <div className="space-y-6">
+        <div>
+          <label className="block font-medium mb-1">Short Description:</label>
+          <textarea
+            value={editableData.short_description || ''}
+            onChange={(e) => handleInputChange('short_description', e.target.value)}
+            className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            rows={3}
+          />
+        </div>
+        
+        <div>
+          <label className="block font-medium mb-1">Description:</label>
+          <textarea
+            value={editableData.description || ''}
+            onChange={(e) => handleInputChange('description', e.target.value)}
+            className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            rows={5}
+          />
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="block font-medium mb-1">Location:</label>
+            <input
+              type="text"
+              value={editableData.location || ''}
+              onChange={(e) => handleInputChange('location', e.target.value)}
+              className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            />
+          </div>
+          
+          <div>
+            <label className="block font-medium mb-1">Availability:</label>
+            <select
+              value={editableData.availability || ''}
+              onChange={(e) => handleInputChange('availability', e.target.value)}
+              className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            >
+              <option value="">Select Availability</option>
+              <option value="Open for job">Open for job</option>
+              <option value="Hired">Hired</option>
+            </select>
+          </div>
+        </div>
+        
+        <div>
+          <label className="block font-medium mb-1">Resume (Direct Download Link):</label>
+          <input
+            type="text"
+            value={editableData.resume_url || ''}
+            onChange={(e) => handleInputChange('resume_url', e.target.value)}
+            className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 mb-2"
+          />
+          {editableData.resume_url && (
+            <a
+              href={editableData.resume_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-600 hover:text-blue-800 hover:underline"
+            >
+              View Resume
+            </a>
+          )}
+        </div>
       </div>
-      
-      <div>
-        <label className="block font-medium mb-1">Availability:</label>
-        <select
-          value={editableData.availability || ''}
-          onChange={(e) => handleInputChange('availability', e.target.value)}
-          className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-        >
-          <option value="">Select Availability</option>
-          <option value="Open for job">Open for job</option>
-          <option value="Hired">Hired</option>
-        </select>
+
+      <div className="space-y-4">
+        <div>
+          <label className="block font-medium mb-1">Profile Image:</label>
+          <div className="border border-gray-200 rounded-lg p-4 flex flex-col items-center">
+            {editableData.image ? (
+              <div className="mb-4 relative group">
+                <img 
+                  src={editableData.image}
+                  alt="Profile"
+                  className="w-48 h-48 object-cover rounded-full border-4 border-blue-500 shadow-lg"
+                />
+                <button
+                  onClick={() => handleInputChange('image', '')}
+                  className="absolute top-2 right-2 bg-red-500 text-white p-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                  title="Remove image"
+                >
+                  ×
+                </button>
+              </div>
+            ) : (
+              <div className="mb-4 w-48 h-48 rounded-full flex items-center justify-center bg-gray-100 border-2 border-dashed border-gray-300">
+                <p className="text-gray-500 text-center px-4">No profile image uploaded</p>
+              </div>
+            )}
+            
+            <input
+              type="file"
+              accept="image/*"
+              onChange={async (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                  const base64 = await convertToBase64(file);
+                  handleInputChange('image', base64);
+                }
+              }}
+              className="w-full border border-gray-300 rounded-md p-1 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            />
+            <p className="text-xs text-gray-500 mt-2">
+              Upload a profile image that will be displayed on your portfolio page
+            </p>
+          </div>
+        </div>
       </div>
-    </div>
-    
-    <div>
-      <label className="block font-medium mb-1">Resume (Direct Download Link):</label>
-      <input
-        type="text"
-        value={editableData.resume_url || ''}
-        onChange={(e) => handleInputChange('resume_url', e.target.value)}
-        className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 mb-2"
-      />
-      {editableData.resume_url && (
-        <a
-          href={editableData.resume_url}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-blue-600 hover:text-blue-800 hover:underline"
-        >
-          View Resume
-        </a>
-      )}
     </div>
   </section>
 );
