@@ -16,6 +16,16 @@ import {
 } from '@api/Api';
 import LanguageIcon from '@components/LanguageIcon';
 
+// Helper function to sort works by priority
+const sortWorksByPriority = (works) => {
+  return [...works].sort((a, b) => {
+    if (!a.priority && !b.priority) return 0;
+    if (!a.priority) return 1;
+    if (!b.priority) return -1;
+    return parseInt(a.priority) - parseInt(b.priority);
+  });
+};
+
 // Helper components
 const LoadingSpinner = () => (
   <div className="flex justify-center items-center py-8">
@@ -1108,15 +1118,6 @@ const ExperiencesTab = ({ data, setData, deleteItem }) => {
 const WorksTab = ({ data, setData, deleteItem, convertToBase64, sanitizeLanguages }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   
-  const sortWorksByPriority = (works) => {
-    return [...works].sort((a, b) => {
-      if (!a.priority && !b.priority) return 0;
-      if (!a.priority) return 1;
-      if (!b.priority) return -1;
-      return parseInt(a.priority) - parseInt(b.priority);
-    });
-  };
-
   const goToNext = () => {
     if (currentIndex < (data.works?.length || 0) - 1) setCurrentIndex(currentIndex + 1);
   };
