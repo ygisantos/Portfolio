@@ -72,7 +72,7 @@ function Project() {
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [selectedLanguage, setSelectedLanguage] = useState(null);
-  const [selectedSort, setSelectedSort] = useState({ value: 'priority', label: 'Priority (Low to High)' });
+  const [selectedSort, setSelectedSort] = useState({ value: 'importance', label: 'Importance (Low to High)' });
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   
   // Track window width for responsive design
@@ -114,20 +114,23 @@ function Project() {
     });
 
     return [...filtered].sort((a, b) => {
-      const priorityA = getPriorityNum(a);
-      const priorityB = getPriorityNum(b);
-      
-      // Always sort by priority first (lowest to highest)
-      if (priorityA !== priorityB) return priorityA - priorityB; 
-      
-      // For items with same priority or no priority, use the selected sort
+      // Sort based on the selected sort option
       switch (selectedSort?.value) {
+        case 'importance':
+          const priorityA = getPriorityNum(a);
+          const priorityB = getPriorityNum(b);
+          return priorityA - priorityB;
         case 'year':
-          return parseInt(b.year) - parseInt(a.year);
+          const yearA = parseInt(a.year) || 0;
+          const yearB = parseInt(b.year) || 0;
+          return yearB - yearA;
         case 'title':
           return a.title.localeCompare(b.title);
         default:
-          return parseInt(b.year) - parseInt(a.year);
+          // Default to importance sorting
+          const defaultPriorityA = getPriorityNum(a);
+          const defaultPriorityB = getPriorityNum(b);
+          return defaultPriorityA - defaultPriorityB;
       }
     });
   }, [works, selectedCategory, selectedLanguage, selectedSort, extractLanguages]);
@@ -177,7 +180,7 @@ function Project() {
     const handleClearFilters = useCallback(() => {
     setSelectedCategory(null);
     setSelectedLanguage(null);
-    setSelectedSort({ value: 'priority', label: 'Priority (Low to High)' });
+    setSelectedSort({ value: 'importance', label: 'Importance (Low to High)' });
   }, []);
   return (
     <div className="container mx-auto px-4 py-12">
