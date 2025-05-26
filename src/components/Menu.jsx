@@ -65,7 +65,7 @@ function Menu() {
         { id: "awards", icon: <FaAward size={isMobile ? 20 : 28} />, label: "Awards" },
         { id: "experiences", icon: <FaBriefcase size={isMobile ? 20 : 28} />, label: "Experiences" },
         { id: "projects", icon: <FaProjectDiagram size={isMobile ? 20 : 28} />, label: "Projects" },
-        { id: "testimonials", icon: <FaCommentDots size={isMobile ? 20 : 28} />, label: "Testimonials" },
+        // { id: "testimonials", icon: <FaCommentDots size={isMobile ? 20 : 28} />, label: "Testimonials" },
         { id: "github-stats", icon: <FaGithub size={isMobile ? 20 : 28} />, label: "GitHub" },
     ];
 

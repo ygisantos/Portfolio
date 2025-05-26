@@ -119,7 +119,7 @@ function Home() {
                 </section>
                 
                 {/* TESTIMONIAL */}
-                <section id="testimonials" className='mt-20 flex flex-col'>
+                <section id="testimonials" className='mt-20 flex-col hidden'>  {/* REPLACE HIDDEN TO FLEX KAPAG MERON TESTIMONIAL */}
                     <SectionHeading title="TESTIMONIALS" alignment="left" animation="slideInLeft" />
                     
                     <ScrollReveal animation="fadeIn">
