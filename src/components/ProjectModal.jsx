@@ -87,8 +87,11 @@ function ProjectModal({ project, onClose, extractLanguages, getLanguageDisplayNa
                     onError={(e) => {
                       e.target.onerror = null;
                       e.target.src = "/api/placeholder/600/400";
-                    }}
-                  />
+                    }}                  />
+                  {/* Image counter - always show */}
+                  <div className="absolute top-2 right-2 bg-black bg-opacity-60 text-white text-sm px-3 py-1 rounded-full">
+                    {currentImageIndex + 1} out of {project.images.length}
+                  </div>
                   {project.images.length > 1 && (
                     <>
                       <button
@@ -104,8 +107,7 @@ function ProjectModal({ project, onClose, extractLanguages, getLanguageDisplayNa
                         aria-label="Next image"
                       >
                         <FaChevronRight size={20} />
-                      </button>
-                      <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 flex gap-2">
+                      </button>                      <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 flex gap-2">
                         {project.images.map((_, index) => (
                           <button
                             key={index}
@@ -119,8 +121,7 @@ function ProjectModal({ project, onClose, extractLanguages, getLanguageDisplayNa
                             aria-label={`Go to image ${index + 1}`}
                             aria-current={index === currentImageIndex ? 'true' : 'false'}
                           />
-                        ))}
-                      </div>
+                        ))}                      </div>
                     </>
                   )}
                 </div>

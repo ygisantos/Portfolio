@@ -201,8 +201,7 @@ function Project() {
     setSelectedSort({ value: 'importance', label: 'Importance (Low to High)' });
   }, []);
   return (
-    <div className="container mx-auto px-4 py-12">
-      <h1 className="text-4xl font-bold mb-8 text-center">Projects</h1>
+    <div className="container mx-auto px-4 py-6">
         {/* Filter Section */}      <FilterSection 
         categories={categories}
         languages={languages}

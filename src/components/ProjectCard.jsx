@@ -32,7 +32,7 @@ function ProjectCard({ work, onClick, truncateText, getLanguageDisplayName, extr
           <div className="w-full h-full bg-gray-200 flex items-center justify-center">
             <span className="text-gray-400">No image available</span>
           </div>
-        )}        <div className="absolute top-2 left-2 text-white text-xs flex flex-row gap-0 opacity-75">
+        )}        <div className="absolute top-2 left-2 text-white text-xs flex flex-row gap-1 opacity-75">
           <div className='bg-slate-800 px-2 py-1 rounded-full'>
             {work.year}
           </div>
@@ -40,6 +40,11 @@ function ProjectCard({ work, onClick, truncateText, getLanguageDisplayName, extr
             {work.category}
           </div>
         </div>
+        {work.images && work.images.length > 1 && (
+          <div className="absolute top-2 right-2 bg-black bg-opacity-60 text-white text-xs px-2 py-1 rounded-full">
+            📷 {work.images.length}
+          </div>
+        )}
       </div>
       
       <div className="p-6">
