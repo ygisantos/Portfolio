@@ -13,6 +13,12 @@ import {
   updateCollection,
   loginWithEmailAndPassword,
   logout,
+  updateWorkImages,
+  getWorkImages,
+  deleteWorkImages,
+  deleteWorkImage,
+  debugImageCounts,
+  testImageOperations,
 } from '@api/Api';
 import LanguageIcon from '@components/LanguageIcon';
 
@@ -165,25 +171,39 @@ export default function PortfolioAdmin() {
   };
 
   const deleteItem = async (collectionName, id) => {
-    if (!id) return;
+    if (!id) {
+      setError('Cannot delete item: No ID provided');
+      return;
+    }
     
     try {
       setIsLoading(true);
+      setError(null);
+      
+      // For works, provide specific feedback about subcollection deletion
+      if (collectionName === 'works') {
+        setSuccess('Deleting project and its images...');
+      }
+      
       await deleteDocument(collectionName, id);
+      
       setData((prevData) => ({
         ...prevData,
         [collectionName]: prevData[collectionName].filter((item) => item.id !== id),
       }));
-      setSuccess(`${collectionName} item deleted successfully!`);
+      
+      if (collectionName === 'works') {
+        setSuccess('Project and all its images deleted successfully!');
+      } else {
+        setSuccess(`${collectionName} item deleted successfully!`);
+      }
     } catch (error) {
       console.error(`Error deleting ${collectionName}:`, error);
-      setError(`Failed to delete ${collectionName}. Please try again.`);
+      setError(`Failed to delete ${collectionName}. Please try again. Error: ${error.message}`);
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const updateData = async () => {
+  };  const updateData = async () => {
     try {
       setIsUpdating(true);
       setError(null);
@@ -210,12 +230,42 @@ export default function PortfolioAdmin() {
 
       // Update collections
       const collections = ['certificates', 'skills', 'experiences', 'works', 'testimonials'];
+      const updateResults = [];
+      
       for (const colName of collections) {
-        if (data[colName]) await updateCollection(colName, data[colName]);
+        if (data[colName]) {
+          const result = await updateCollection(colName, data[colName]);
+          updateResults.push({ collection: colName, result });
+        }
       }
 
-      setSuccess('All data updated successfully!');
-      
+      // Check for any image-related issues
+      const worksResult = updateResults.find(r => r.collection === 'works')?.result;
+      if (worksResult && worksResult.details) {
+        const imageIssues = worksResult.details.filter(d => d.result.imageError);
+        if (imageIssues.length > 0) {
+          const issueDetails = imageIssues.map(issue => 
+            `${issue.item}: ${issue.result.savedCount}/${issue.result.totalCount} images saved`
+          ).join('; ');
+          setError(`Some images failed to save: ${issueDetails}`);
+          return;
+        }
+        
+        // Show success with image details
+        const imageDetails = worksResult.details
+          .filter(d => d.hasImages && d.result.success)
+          .map(d => `${d.item}: ${d.result.imagesSaved} images`)
+          .join('; ');
+        
+        if (imageDetails) {
+          setSuccess(`All data updated successfully! Images saved: ${imageDetails}`);
+        } else {
+          setSuccess('All data updated successfully!');
+        }
+      } else {
+        setSuccess('All data updated successfully!');
+      }
+
       // Refresh the page after a short delay to allow the user to see the success message
       setTimeout(() => {
         window.location.reload();
@@ -467,7 +517,36 @@ export default function PortfolioAdmin() {
 
           {renderTabContent()}
 
-          <div className="mt-6 flex justify-end">
+          <div className="mt-6 flex justify-end gap-2">
+            <button 
+              onClick={async () => {
+                const results = await debugImageCounts();
+                console.log('Debug results:', results);
+                alert(`Image count check complete. See console for details. Total works: ${results.length}`);
+              }}
+              className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-md transition-colors"
+            >
+              Debug Image Counts
+            </button>
+            <button 
+              onClick={async () => {
+                if (data.works && data.works.length > 0) {
+                  const workWithImages = data.works.find(work => work.images && work.images.length > 0);
+                  if (workWithImages) {
+                    const results = await testImageOperations(workWithImages.id);
+                    console.log('Test results:', results);
+                    alert(`Test complete for "${workWithImages.title}". Images: ${results.imageCount}. See console for details.`);
+                  } else {
+                    alert('No works with images found to test.');
+                  }
+                } else {
+                  alert('No works found to test.');
+                }
+              }}
+              className="bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded-md transition-colors"
+            >
+              Test Image Ops
+            </button>
             <PrimaryButton 
               onClick={updateData} 
               disabled={isUpdating || isLoading}
@@ -1168,6 +1247,9 @@ const ExperiencesTab = ({ data, setData, deleteItem }) => {
 
 const WorksTab = ({ data, setData, deleteItem, convertToBase64, sanitizeLanguages }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
+  const [success, setSuccess] = useState('');
+  const [error, setError] = useState('');
   
   const goToNext = () => {
     if (currentIndex < (data.works?.length || 0) - 1) setCurrentIndex(currentIndex + 1);
@@ -1285,6 +1367,18 @@ const WorksTab = ({ data, setData, deleteItem, convertToBase64, sanitizeLanguage
           </div>
 
           <div className="border border-gray-200 rounded-lg p-4">
+            {success && (
+              <SuccessAlert 
+                message={success} 
+                onClose={() => setSuccess('')} 
+              />
+            )}
+            {error && (
+              <ErrorAlert 
+                message={error} 
+                onClose={() => setError('')} 
+              />
+            )}
             {data.works[currentIndex] && (
               <>
                 <div className="mb-4 p-2 bg-blue-50 rounded-lg">
@@ -1582,15 +1676,35 @@ const WorksTab = ({ data, setData, deleteItem, convertToBase64, sanitizeLanguage
                     accept="image/*"
                     onChange={async (e) => {
                       const files = Array.from(e.target.files);
-                      const base64Images = await Promise.all(
-                        files.map(file => convertToBase64(file))
-                      );
-                      const updated = [...data.works];
-                      updated[currentIndex].images = [...(updated[currentIndex].images || []), ...base64Images];
-                      setData(prev => ({ ...prev, works: updated }));
+                      if (files.length === 0) return;
+                      
+                      setIsLoading(true);
+                      setSuccess(`Processing ${files.length} image(s)...`);
+                      
+                      try {
+                        const base64Images = await Promise.all(
+                          files.map(file => convertToBase64(file))
+                        );
+                        const updated = [...data.works];
+                        updated[currentIndex].images = [...(updated[currentIndex].images || []), ...base64Images];
+                        setData(prev => ({ ...prev, works: updated }));
+                        
+                        if (files.length > 10) {
+                          setSuccess(`${files.length} image(s) added! Note: Large batches will be saved in groups of 5 to avoid database limits. Use "Save All Changes" to upload to database.`);
+                        } else {
+                          setSuccess(`${files.length} image(s) added successfully! Use "Save All Changes" to upload to database.`);
+                        }
+                      } catch (error) {
+                        setError('Failed to process images. Please try again.');
+                      } finally {
+                        setIsLoading(false);
+                      }
                     }}
                     className="w-full border border-gray-300 rounded-md p-1 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   />
+                  <p className="text-xs text-gray-500 mt-1">
+                    Images are stored efficiently in subcollections. Large batches (10+) are uploaded in groups of 5 to prevent database limits.
+                  </p>
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-2 mt-2">
                     {data.works[currentIndex].images?.map((img, imgIndex) => (
                       <div key={imgIndex} className="relative group">
@@ -1600,10 +1714,42 @@ const WorksTab = ({ data, setData, deleteItem, convertToBase64, sanitizeLanguage
                           className="w-full h-32 object-cover rounded border"
                         />
                         <button
-                          onClick={() => {
-                            const updated = [...data.works];
-                            updated[currentIndex].images = data.works[currentIndex].images.filter((_, i) => i !== imgIndex);
-                            setData(prev => ({ ...prev, works: updated }));
+                          onClick={async () => {
+                            try {
+                              setIsLoading(true);
+                              
+                              // If the work has an ID (saved to database), delete from subcollection
+                              if (data.works[currentIndex].id) {
+                                const result = await deleteWorkImage(data.works[currentIndex].id, imgIndex);
+                                if (result.success) {
+                                  // Update local state to reflect the deletion
+                                  const updated = [...data.works];
+                                  updated[currentIndex].images = data.works[currentIndex].images.filter((_, i) => i !== imgIndex);
+                                  setData(prev => ({ ...prev, works: updated }));
+                                  setSuccess(`Image deleted successfully! ${result.remainingCount} images remaining.`);
+                                } else {
+                                  throw new Error(result.error || 'Failed to delete image');
+                                }
+                              } else {
+                                // For new projects not yet saved, just update local state
+                                const updated = [...data.works];
+                                updated[currentIndex].images = data.works[currentIndex].images.filter((_, i) => i !== imgIndex);
+                                setData(prev => ({ ...prev, works: updated }));
+                                setSuccess('Image removed from new project!');
+                              }
+                            } catch (error) {
+                              console.error('Error deleting image:', error);
+                              setError(`Failed to delete image: ${error.message}`);
+                              // Reload data to restore original state on error
+                              try {
+                                const refreshedData = await getAllWorks();
+                                setData(prev => ({ ...prev, works: refreshedData }));
+                              } catch (refreshError) {
+                                console.error('Error refreshing data:', refreshError);
+                              }
+                            } finally {
+                              setIsLoading(false);
+                            }
                           }}
                           className="absolute top-1 right-1 bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
                         >

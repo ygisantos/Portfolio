@@ -38,10 +38,34 @@ export const fetchAndUpdateStats = async () => {
 };
 
 export const deleteDocument = async (collectionName, id) => {
-  if (!id) return false;
-  const itemRef = doc(db, collectionName, id);
-  await deleteDoc(itemRef);
-  return true;
+  if (!id) {
+    console.error('deleteDocument: No ID provided');
+    return false;
+  }
+  
+  try {
+    console.log(`Deleting ${collectionName} document with ID: ${id}`);
+    
+    // If deleting a work, also delete its images subcollection
+    if (collectionName === 'works') {
+      console.log(`Deleting images subcollection for work ${id}`);
+      const imageResult = await deleteWorkImages(id);
+      if (!imageResult.success) {
+        console.warn(`Failed to delete some images for work ${id}:`, imageResult.error);
+      } else {
+        console.log(`Deleted ${imageResult.deletedCount} images for work ${id}`);
+      }
+    }
+    
+    const itemRef = doc(db, collectionName, id);
+    await deleteDoc(itemRef);
+    
+    console.log(`Successfully deleted ${collectionName} document ${id}`);
+    return true;
+  } catch (error) {
+    console.error(`Error deleting ${collectionName} document ${id}:`, error);
+    throw error; // Re-throw to let the calling function handle the error
+  }
 };
 
 export const updateProfile = async (data) => {
@@ -50,12 +74,55 @@ export const updateProfile = async (data) => {
 };
 
 export const updateCollection = async (collectionName, items) => {
-  const colRef = collection(db, collectionName);
-  for (const item of items) {
-    if (item.title || item.name || item.comment) {
-      const itemRef = item.id ? doc(colRef, item.id) : doc(colRef);
-      await setDoc(itemRef, { ...item, id: itemRef.id }, { merge: true });
+  if (collectionName === 'works') {
+    // Handle works separately to manage images in subcollections
+    const results = [];
+    for (const item of items) {
+      if (item.title) { // Ensure the work has a title (valid work)
+        const result = await updateWork(item);
+        results.push({ 
+          item: item.title, 
+          result,
+          hasImages: item.images && item.images.length > 0
+        });
+      }
     }
+    
+    // Provide summary of results
+    const failed = results.filter(r => !r.result.success);
+    const withImageIssues = results.filter(r => r.result.imageError);
+    
+    if (failed.length > 0 || withImageIssues.length > 0) {
+      const errors = [];
+      if (failed.length > 0) {
+        errors.push(`${failed.length} work(s) failed to save`);
+      }
+      if (withImageIssues.length > 0) {
+        errors.push(`${withImageIssues.length} work(s) had image saving issues`);
+      }
+      
+      return { 
+        success: false, 
+        error: errors.join(', '),
+        details: results
+      };
+    }
+    
+    return { 
+      success: true, 
+      results,
+      message: `Successfully saved ${results.length} work(s)`
+    };
+  } else {
+    // Handle other collections normally
+    const colRef = collection(db, collectionName);
+    for (const item of items) {
+      if (item.title || item.name || item.comment) {
+        const itemRef = item.id ? doc(colRef, item.id) : doc(colRef);
+        await setDoc(itemRef, { ...item, id: itemRef.id }, { merge: true });
+      }
+    }
+    return { success: true };
   }
 };
 
@@ -183,12 +250,12 @@ export const getAllTestimonials = async () => {
   }
 };
 
-// 9. Retrieve all works with language icons
+// 9. Retrieve all works with language icons and images from subcollections
 export const getAllWorks = async () => {
   try {
     const querySnapshot = await getDocs(collection(db, 'works'));
-    const works = querySnapshot.docs.map(doc => {
-      const data = doc.data();
+    const works = await Promise.all(querySnapshot.docs.map(async (docSnap) => {
+      const data = docSnap.data();
       const languages = data.languages?.map(lang => {
         const langName = typeof lang === 'string' ? lang : lang?.name;
         return langName ? {
@@ -197,12 +264,16 @@ export const getAllWorks = async () => {
         } : null;
       }).filter(Boolean);
 
+      // Fetch images from subcollection
+      const images = await getWorkImages(docSnap.id);
+
       return {
-        id: doc.id,
+        id: docSnap.id,
         ...data,
-        languages
+        languages,
+        images
       };
-    });
+    }));
     return JSON.stringify(works, null, 2);
   } catch (error) {
     return {
@@ -224,13 +295,18 @@ export const getWorkById = async (id) => {
       };
     }
     const data = docSnap.data();
+    
+    // Fetch images from subcollection
+    const images = await getWorkImages(id);
+    
     return JSON.stringify({
       id: docSnap.id,
       ...data,
+      images,
       languages: data.languages?.map(lang => ({
         name: lang,
         icon: `https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/${lang}/${lang}-original.svg`
-      }))
+      })) || []
     }, null, 2);
   } catch (error) {
     return {
@@ -314,9 +390,12 @@ export const updateWork = async (work) => {
     const colRef = collection(db, 'works');
     const docRef = work.id ? doc(colRef, work.id) : doc(colRef);
     
-    // Prepare work data for saving
+    // Extract images from the work data
+    const { images, ...workDataWithoutImages } = work;
+    
+    // Prepare work data for saving (without images)
     const workData = {
-      ...work,
+      ...workDataWithoutImages,
       id: docRef.id,
       // Ensure languages are stored as simple strings
       languages: work.languages?.map(lang => 
@@ -324,7 +403,29 @@ export const updateWork = async (work) => {
       ).filter(Boolean) || []
     };
     
+    // Save the main work document
     await setDoc(docRef, workData, { merge: true });
+    
+    // Handle images in subcollection
+    if (images && images.length > 0) {
+      const imageResult = await updateWorkImages(docRef.id, images);
+      if (!imageResult.success) {
+        return { 
+          success: false, 
+          error: imageResult.error,
+          imageError: true,
+          savedCount: imageResult.savedCount,
+          totalCount: imageResult.totalCount
+        };
+      }
+      return { 
+        success: true, 
+        id: docRef.id,
+        imagesSaved: imageResult.savedCount,
+        totalImages: imageResult.totalCount
+      };
+    }
+    
     return { success: true, id: docRef.id };
   } catch (error) {
     return { success: false, error: error.message };
@@ -388,4 +489,207 @@ export const requireLogin = async () => {
       }
     });
   });
+};
+
+// Helper function to update work images in subcollection
+export const updateWorkImages = async (workId, images) => {
+  try {
+    const imagesColRef = collection(db, 'works', workId, 'images');
+    
+    // Clear existing images first
+    const existingImagesSnap = await getDocs(imagesColRef);
+    const deletePromises = existingImagesSnap.docs.map(doc => deleteDoc(doc.ref));
+    await Promise.all(deletePromises);
+    
+    // Add new images in batches to avoid overwhelming Firestore
+    const BATCH_SIZE = 5; // Process 5 images at a time
+    const results = [];
+    
+    for (let i = 0; i < images.length; i += BATCH_SIZE) {
+      const batch = images.slice(i, i + BATCH_SIZE);
+      const batchPromises = batch.map((imageData, batchIndex) => {
+        const globalIndex = i + batchIndex;
+        const imageDocRef = doc(imagesColRef);
+        return setDoc(imageDocRef, {
+          data: imageData,
+          order: globalIndex,
+          created_at: new Date().toISOString()
+        });
+      });
+      
+      // Wait for this batch to complete before processing the next
+      const batchResults = await Promise.allSettled(batchPromises);
+      results.push(...batchResults);
+      
+      // Add a small delay between batches to avoid rate limiting
+      if (i + BATCH_SIZE < images.length) {
+        await new Promise(resolve => setTimeout(resolve, 100));
+      }
+    }
+    
+    // Check if all images were successfully saved
+    const failedImages = results.filter(result => result.status === 'rejected');
+    if (failedImages.length > 0) {
+      console.warn(`${failedImages.length} images failed to save:`, failedImages);
+      return { 
+        success: false, 
+        error: `${failedImages.length} out of ${images.length} images failed to save`,
+        savedCount: results.length - failedImages.length,
+        totalCount: images.length
+      };
+    }
+    
+    return { 
+      success: true, 
+      savedCount: images.length,
+      totalCount: images.length
+    };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+};
+
+// Helper function to get work images from subcollection
+export const getWorkImages = async (workId) => {
+  try {
+    const imagesColRef = collection(db, 'works', workId, 'images');
+    const imagesSnap = await getDocs(imagesColRef);
+    
+    const images = imagesSnap.docs
+      .map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }))
+      .sort((a, b) => (a.order || 0) - (b.order || 0))
+      .map(img => img.data);
+    
+    return images;
+  } catch (error) {
+    console.error('Error fetching work images:', error);
+    return [];
+  }
+};
+
+// Helper function to delete work images subcollection
+export const deleteWorkImages = async (workId) => {
+  try {
+    const imagesColRef = collection(db, 'works', workId, 'images');
+    const imagesSnap = await getDocs(imagesColRef);
+    
+    console.log(`Deleting ${imagesSnap.docs.length} images for work ${workId}`);
+    
+    if (imagesSnap.docs.length === 0) {
+      console.log(`No images found for work ${workId}`);
+      return { success: true, deletedCount: 0 };
+    }
+    
+    const deletePromises = imagesSnap.docs.map(doc => deleteDoc(doc.ref));
+    await Promise.all(deletePromises);
+    
+    console.log(`Successfully deleted ${imagesSnap.docs.length} images for work ${workId}`);
+    return { success: true, deletedCount: imagesSnap.docs.length };
+  } catch (error) {
+    console.error(`Error deleting images for work ${workId}:`, error);
+    return { success: false, error: error.message };
+  }
+};
+
+// Delete a specific image by its order/index from a work's subcollection
+export const deleteWorkImage = async (workId, imageIndex) => {
+  try {
+    console.log(`Attempting to delete image at index ${imageIndex} for work ${workId}`);
+    
+    const imagesColRef = collection(db, 'works', workId, 'images');
+    const imagesSnap = await getDocs(imagesColRef);
+    
+    if (imagesSnap.docs.length === 0) {
+      console.log(`No images found for work ${workId}`);
+      return { success: false, error: 'No images found' };
+    }
+    
+    // Sort images by order to find the correct one to delete
+    const imagesDocs = imagesSnap.docs.sort((a, b) => {
+      const orderA = a.data().order || 0;
+      const orderB = b.data().order || 0;
+      return orderA - orderB;
+    });
+    
+    if (imageIndex >= imagesDocs.length) {
+      console.log(`Image index ${imageIndex} out of range. Total images: ${imagesDocs.length}`);
+      return { success: false, error: 'Image index out of range' };
+    }
+    
+    // Delete the specific image
+    const imageToDelete = imagesDocs[imageIndex];
+    await deleteDoc(imageToDelete.ref);
+    
+    // Update the order of remaining images
+    const remainingImages = imagesDocs.filter((doc, idx) => idx !== imageIndex);
+    const updatePromises = remainingImages.map((doc, newIndex) => {
+      return setDoc(doc.ref, { ...doc.data(), order: newIndex }, { merge: true });
+    });
+    
+    await Promise.all(updatePromises);
+    
+    console.log(`Successfully deleted image at index ${imageIndex} for work ${workId}`);
+    return { success: true, deletedIndex: imageIndex, remainingCount: remainingImages.length };
+  } catch (error) {
+    console.error(`Error deleting image at index ${imageIndex} for work ${workId}:`, error);
+    return { success: false, error: error.message };
+  }
+};
+
+// Debug function to verify image counts (can be removed later)
+export const debugImageCounts = async () => {
+  try {
+    const worksSnap = await getDocs(collection(db, 'works'));
+    const results = [];
+    
+    for (const workDoc of worksSnap.docs) {
+      const workData = workDoc.data();
+      const imagesSnap = await getDocs(collection(db, 'works', workDoc.id, 'images'));
+      
+      results.push({
+        workId: workDoc.id,
+        title: workData.title,
+        imageCount: imagesSnap.docs.length,
+        images: imagesSnap.docs.map(doc => ({
+          id: doc.id,
+          order: doc.data().order,
+          created_at: doc.data().created_at
+        }))
+      });
+    }
+    
+    console.log('Image count debug results:', results);
+    return results;
+  } catch (error) {
+    console.error('Error debugging image counts:', error);
+    return [];
+  }
+};
+
+// Test function to verify image operations (can be removed later)
+export const testImageOperations = async (workId) => {
+  try {
+    console.log(`Testing image operations for work ${workId}`);
+    
+    // Get current images
+    const currentImages = await getWorkImages(workId);
+    console.log(`Current images count: ${currentImages.length}`);
+    
+    if (currentImages.length > 0) {
+      console.log('Current images:', currentImages.map((img, idx) => ({ index: idx, dataLength: img.length })));
+    }
+    
+    return {
+      success: true,
+      workId,
+      imageCount: currentImages.length,
+      images: currentImages.map((img, idx) => ({ index: idx, dataLength: img.length }))
+    };
+  } catch (error) {
+    console.error('Error testing image operations:', error);
+    return { success: false, error: error.message };
+  }
 };
