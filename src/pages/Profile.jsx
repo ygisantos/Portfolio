@@ -116,7 +116,7 @@ export default function ProfileSection({profile}) {
                 </div>
 
                 {/* Scroll indicator */}
-                <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce opacity-70">
+                <div className="absolute md:bottom-8 -bottom-14 left-1/2 transform -translate-x-1/2 animate-bounce opacity-70">
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
                     </svg>
@@ -124,14 +124,14 @@ export default function ProfileSection({profile}) {
             </section>
 
             {/* About Me Section - Reorganized with two columns */}
-            <section id="about-me" className="relative md:mt-20">
+            <section id="about-me" className="relative md:mt-20 mt-10">
                 <div className="absolute inset-0 bg-gradient-to-r from-brown-light/5 to-brown-dark/10 rounded-3xl -z-10"></div>
                 
                 <ScrollReveal animation="slideInUp">
                     <CustomCard className="mx-auto p-10 border-t-4 border-brown-medium shadow-2xl backdrop-blur-sm">
                         <div className='flex md:flex-row flex-col gap-2'>
                             <div className='flex-3/5 flex flex-col'>
-                                <h3 className="!text-4xl !font-bold text-brown-dark mb-8 relative inline-block after:content-[''] after:absolute after:bottom-0 after:left-0 after:h-1 after:w-full after:bg-brown-medium after:rounded-full">
+                                <h3 className="md:!text-4xl text-2xl !font-bold text-brown-dark !mb-4 relative inline-block after:content-[''] after:absolute after:bottom-0 after:left-0 after:h-1 after:w-full after:bg-brown-medium after:rounded-full">
                                     About Me
                                 </h3>
                                 <div className="flex-1">
@@ -141,7 +141,7 @@ export default function ProfileSection({profile}) {
                                 </div>
                             </div>
                             <div className="flex-2/5 flex flex-col">
-                                <h4 className="!text-4xl !font-bold text-brown-dark mb-8 relative inline-block after:content-[''] after:absolute after:bottom-0 after:left-0 after:h-1 after:w-full after:bg-brown-medium after:rounded-full">Personal Info</h4>
+                                <h4 className="md:!text-4xl text-2xl !font-bold text-brown-dark !mb-4 relative inline-block after:content-[''] after:absolute after:bottom-0 after:left-0 after:h-1 after:w-full after:bg-brown-medium after:rounded-full">Personal Info</h4>
                                 <div className="space-y-5">
                                     <div className="flex items-center gap-4">
                                         <div className="bg-brown-light/20 p-3 rounded-full">
