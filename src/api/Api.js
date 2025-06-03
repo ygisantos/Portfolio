@@ -253,9 +253,14 @@ export const getAllTestimonials = async () => {
 // 9. Retrieve all works with language icons and images from subcollections
 export const getAllWorks = async () => {
   try {
+    console.log('getAllWorks: Starting to fetch works...');
     const querySnapshot = await getDocs(collection(db, 'works'));
+    console.log(`getAllWorks: Found ${querySnapshot.docs.length} works`);
+    
     const works = await Promise.all(querySnapshot.docs.map(async (docSnap) => {
       const data = docSnap.data();
+      console.log(`getAllWorks: Processing work ${docSnap.id} - ${data.title}`);
+      
       const languages = data.languages?.map(lang => {
         const langName = typeof lang === 'string' ? lang : lang?.name;
         return langName ? {
@@ -265,7 +270,9 @@ export const getAllWorks = async () => {
       }).filter(Boolean);
 
       // Fetch images from subcollection
+      console.log(`getAllWorks: Fetching images for work ${docSnap.id}...`);
       const images = await getWorkImages(docSnap.id);
+      console.log(`getAllWorks: Found ${images.length} images for work ${docSnap.id}`);
 
       return {
         id: docSnap.id,
@@ -274,8 +281,18 @@ export const getAllWorks = async () => {
         images
       };
     }));
+    
+    console.log('getAllWorks: All works processed successfully');
+    console.log('getAllWorks: Sample of first work:', works[0] ? {
+      id: works[0].id,
+      title: works[0].title,
+      imageCount: works[0].images?.length || 0,
+      firstImageLength: works[0].images?.[0]?.length || 0
+    } : 'No works found');
+    
     return JSON.stringify(works, null, 2);
   } catch (error) {
+    console.error('getAllWorks: Error occurred:', error);
     return {
       success: false,
       error: error.message
@@ -552,20 +569,30 @@ export const updateWorkImages = async (workId, images) => {
 // Helper function to get work images from subcollection
 export const getWorkImages = async (workId) => {
   try {
+    console.log(`getWorkImages: Fetching images for work ${workId}`);
     const imagesColRef = collection(db, 'works', workId, 'images');
     const imagesSnap = await getDocs(imagesColRef);
     
+    console.log(`getWorkImages: Found ${imagesSnap.docs.length} image documents for work ${workId}`);
+    
     const images = imagesSnap.docs
-      .map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      }))
+      .map(doc => {
+        const docData = doc.data();
+        console.log(`getWorkImages: Image doc ${doc.id} - order: ${docData.order}, dataLength: ${docData.data?.length || 'no data'}`);
+        return {
+          id: doc.id,
+          ...docData
+        };
+      })
       .sort((a, b) => (a.order || 0) - (b.order || 0))
       .map(img => img.data);
     
+    console.log(`getWorkImages: Returning ${images.length} images for work ${workId}`);
+    console.log(`getWorkImages: First image preview:`, images[0] ? images[0].substring(0, 50) + '...' : 'No images');
+    
     return images;
   } catch (error) {
-    console.error('Error fetching work images:', error);
+    console.error(`getWorkImages: Error fetching work images for ${workId}:`, error);
     return [];
   }
 };

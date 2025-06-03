@@ -141,7 +141,25 @@ function Project() {
       setError(null);
       
       const response = await getAllWorks();
-      const parsedWorks = JSON.parse(response);
+      console.log('Raw getAllWorks response:', response);
+      
+      // Check if response is an error object
+      if (response && typeof response === 'object' && response.success === false) {
+        throw new Error(response.error || 'Failed to fetch works');
+      }
+      
+      // Try to parse the response
+      let parsedWorks;
+      try {
+        parsedWorks = typeof response === 'string' ? JSON.parse(response) : response;
+      } catch (parseError) {
+        console.error('JSON parse error:', parseError);
+        console.log('Response that failed to parse:', response);
+        throw new Error('Invalid response format from server');
+      }
+      
+      console.log('Parsed works:', parsedWorks);
+      console.log('First work images:', parsedWorks[0]?.images);
       
       // Sort works by priority first (lowest to highest), then by year as default secondary sort
       const sortedWorks = parsedWorks.sort((a, b) => {
@@ -157,7 +175,7 @@ function Project() {
       setWorks(sortedWorks);
     } catch (error) {
       console.error("Error fetching works:", error);
-      setError("Failed to load projects. Please try again later.");
+      setError(`Failed to load projects: ${error.message}`);
     } finally {
       setLoading(false);
     }
