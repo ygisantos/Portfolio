@@ -124,27 +124,24 @@ export default function ProfileSection({profile}) {
             </section>
 
             {/* About Me Section - Reorganized with two columns */}
-            <section id="about-me" className="relative mt-20">
+            <section id="about-me" className="relative md:mt-20">
                 <div className="absolute inset-0 bg-gradient-to-r from-brown-light/5 to-brown-dark/10 rounded-3xl -z-10"></div>
                 
                 <ScrollReveal animation="slideInUp">
                     <CustomCard className="mx-auto p-10 border-t-4 border-brown-medium shadow-2xl backdrop-blur-sm">
-                        <h3 className="!text-4xl !font-bold text-brown-dark mb-8 relative inline-block after:content-[''] after:absolute after:bottom-0 after:left-0 after:h-1 after:w-full after:bg-brown-medium after:rounded-full">
-                            About Me
-                        </h3>
-
-                        <div className="flex flex-col md:flex-row gap-10">
-                            {/* Left column - About me description */}
-                            <div className="flex-1">
-                                <p className="text-2xl leading-relaxed text-brown-dark/80">
-                                    {profile?.description || "Loading my professional profile..."}
-                                </p>
+                        <div className='flex md:flex-row flex-col gap-2'>
+                            <div className='flex-3/5 flex flex-col'>
+                                <h3 className="!text-4xl !font-bold text-brown-dark mb-8 relative inline-block after:content-[''] after:absolute after:bottom-0 after:left-0 after:h-1 after:w-full after:bg-brown-medium after:rounded-full">
+                                    About Me
+                                </h3>
+                                <div className="flex-1">
+                                    <p className="md:text-2xl text-lg leading-relaxed text-brown-dark/80">
+                                        {profile?.description || "Loading my professional profile..."}
+                                    </p>
+                                </div>
                             </div>
-
-                            {/* Right column - Personal info */}
-                            <div className="flex-1 md:border-l-2 border-brown-light/30 md:pl-10">
-                                <h4 className="text-3xl font-bold text-brown-dark mb-6">Personal Info</h4>
-                                
+                            <div className="flex-2/5 flex flex-col">
+                                <h4 className="!text-4xl !font-bold text-brown-dark mb-8 relative inline-block after:content-[''] after:absolute after:bottom-0 after:left-0 after:h-1 after:w-full after:bg-brown-medium after:rounded-full">Personal Info</h4>
                                 <div className="space-y-5">
                                     <div className="flex items-center gap-4">
                                         <div className="bg-brown-light/20 p-3 rounded-full">
