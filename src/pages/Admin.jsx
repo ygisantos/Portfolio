@@ -11,6 +11,7 @@ import {
   deleteDocument,
   updateProfile,
   updateCollection,
+  updateWork,
   loginWithEmailAndPassword,
   logout,
   updateWorkImages,
@@ -40,10 +41,24 @@ const LoadingSpinner = () => (
 );
 
 const SuccessAlert = ({ message, onClose }) => (
-  <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4" role="alert">
+  <div 
+    className="border px-4 py-3 rounded relative mb-4" 
+    role="alert"
+    style={{
+      backgroundColor: '#dcfce7',
+      borderColor: '#16a34a',
+      color: '#166534'
+    }}
+  >
     <span className="block sm:inline">{message}</span>
     <span className="absolute top-0 bottom-0 right-0 px-4 py-3" onClick={onClose}>
-      <svg className="fill-current h-6 w-6 text-green-500" role="button" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+      <svg 
+        className="fill-current h-6 w-6" 
+        role="button" 
+        xmlns="http://www.w3.org/2000/svg" 
+        viewBox="0 0 20 20"
+        style={{ color: '#16a34a' }}
+      >
         <title>Close</title>
         <path d="M14.348 14.849a1.2 1.2 0 0 1-1.697 0L10 11.819l-2.651 3.029a1.2 1.2 0 1 1-1.697-1.697l2.758-3.15-2.759-3.152a1.2 1.2 0 1 1 1.697-1.697L10 8.183l2.651-3.031a1.2 1.2 0 1 1 1.697 1.697l-2.758 3.152 2.758 3.15a1.2 1.2 0 0 1 0 1.698z"/>
       </svg>
@@ -52,10 +67,24 @@ const SuccessAlert = ({ message, onClose }) => (
 );
 
 const ErrorAlert = ({ message, onClose }) => (
-  <div className="!bg-red-100 border !border-red-400 !text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
+  <div 
+    className="border px-4 py-3 rounded relative mb-4" 
+    role="alert"
+    style={{
+      backgroundColor: '#fef2f2',
+      borderColor: '#ef4444',
+      color: '#dc2626'
+    }}
+  >
     <span className="block sm:inline">{message}</span>
     <span className="absolute top-0 bottom-0 right-0 px-4 py-3" onClick={onClose}>
-      <svg className="fill-current h-6 w-6 !text-red-500" role="button" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+      <svg 
+        className="fill-current h-6 w-6" 
+        role="button" 
+        xmlns="http://www.w3.org/2000/svg" 
+        viewBox="0 0 20 20"
+        style={{ color: '#ef4444' }}
+      >
         <title>Close</title>
         <path d="M14.348 14.849a1.2 1.2 0 0 1-1.697 0L10 11.819l-2.651 3.029a1.2 1.2 0 1 1-1.697-1.697l2.758-3.15-2.759-3.152a1.2 1.2 0 1 1 1.697-1.697L10 8.183l2.651-3.031a1.2 1.2 0 1 1 1.697 1.697l-2.758 3.152 2.758 3.15a1.2 1.2 0 0 1 0 1.698z"/>
       </svg>
@@ -66,9 +95,11 @@ const ErrorAlert = ({ message, onClose }) => (
 const TabButton = ({ active, onClick, children }) => (
   <button
     onClick={onClick}
-    className={`mr-2 px-4 py-2 rounded-md transition-colors ${
-      active ? '!bg-blue-500 !text-white' : '!bg-gray-200 hover:!bg-gray-300'
-    }`}
+    className="mr-2 px-4 py-2 rounded-md transition-colors"
+    style={active ? 
+      { backgroundColor: '#3b82f6', color: 'white', border: 'none' } : 
+      { backgroundColor: '#e5e7eb', color: '#374151', border: 'none' }
+    }
   >
     {children}
   </button>
@@ -78,9 +109,24 @@ const PrimaryButton = ({ onClick, children, className = '', disabled = false }) 
   <button
     onClick={onClick}
     disabled={disabled}
-    className={`!bg-blue-500 !text-white py-2 px-4 rounded-md hover:!bg-blue-600 transition-colors ${
+    className={`py-2 px-4 rounded-md transition-colors ${
       disabled ? 'opacity-50 cursor-not-allowed' : ''
     } ${className}`}
+    style={{
+      backgroundColor: disabled ? '#93c5fd' : '#3b82f6',
+      color: 'white',
+      border: 'none'
+    }}
+    onMouseEnter={(e) => {
+      if (!disabled) {
+        e.target.style.backgroundColor = '#2563eb';
+      }
+    }}
+    onMouseLeave={(e) => {
+      if (!disabled) {
+        e.target.style.backgroundColor = '#3b82f6';
+      }
+    }}
   >
     {children}
   </button>
@@ -89,7 +135,18 @@ const PrimaryButton = ({ onClick, children, className = '', disabled = false }) 
 const DangerButton = ({ onClick, children, className = '' }) => (
   <button
     onClick={onClick}
-    className={`!bg-red-500 !text-white py-2 px-4 rounded-md hover:!bg-red-600 transition-colors ${className}`}
+    className={`py-2 px-4 rounded-md transition-colors ${className}`}
+    style={{
+      backgroundColor: '#ef4444',
+      color: 'white',
+      border: 'none'
+    }}
+    onMouseEnter={(e) => {
+      e.target.style.backgroundColor = '#dc2626';
+    }}
+    onMouseLeave={(e) => {
+      e.target.style.backgroundColor = '#ef4444';
+    }}
   >
     {children}
   </button>
@@ -106,6 +163,16 @@ export default function PortfolioAdmin() {
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
   const [isUpdating, setIsUpdating] = useState(false);
+  
+  // Individual section loading states
+  const [savingStates, setSavingStates] = useState({
+    basicInfo: false,
+    contact: false,
+    skills: false,
+    experiences: false,
+    certificates: false,
+    testimonials: false
+  });
 
   useEffect(() => {
     const fetchData = async () => {
@@ -293,12 +360,40 @@ export default function PortfolioAdmin() {
     }).filter(Boolean);
   };
 
-  const convertToBase64 = (file) => {
+  const convertToBase64 = (file, maxWidth = 800, quality = 0.7) => {
     return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = () => resolve(reader.result);
-      reader.onerror = (error) => reject(error);
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      const img = new Image();
+      
+      img.onload = () => {
+        // Calculate new dimensions while maintaining aspect ratio
+        let { width, height } = img;
+        
+        if (width > maxWidth) {
+          height = (height * maxWidth) / width;
+          width = maxWidth;
+        }
+        
+        // Set canvas size
+        canvas.width = width;
+        canvas.height = height;
+        
+        // Draw and compress the image
+        ctx.drawImage(img, 0, 0, width, height);
+        
+        // Convert to base64 with compression
+        const compressedBase64 = canvas.toDataURL('image/jpeg', quality);
+        
+        console.log(`Image compressed: ${file.name} - Original: ~${(file.size / 1024).toFixed(1)}KB, Compressed: ~${(compressedBase64.length * 0.75 / 1024).toFixed(1)}KB`);
+        
+        resolve(compressedBase64);
+      };
+      
+      img.onerror = (error) => reject(error);
+      
+      // Create object URL for the image
+      img.src = URL.createObjectURL(file);
     });
   };
 
@@ -338,6 +433,153 @@ export default function PortfolioAdmin() {
     }
   };
 
+  // Individual save functions
+  const saveBasicInfo = async () => {
+    try {
+      setSavingStates(prev => ({ ...prev, basicInfo: true }));
+      setError(null);
+      
+      await updateProfile({
+        short_description: editableData.short_description || '',
+        description: editableData.description || '',
+        location: editableData.location || '',
+        availability: editableData.availability || '',
+        resume_url: editableData.resume_url || '',
+        image: editableData.image || '',
+        image_url: editableData.image || '',
+      });
+
+      setSuccess('Basic information saved successfully!');
+    } catch (error) {
+      console.error('Error saving basic info:', error);
+      setError('Failed to save basic information. Please try again.');
+    } finally {
+      setSavingStates(prev => ({ ...prev, basicInfo: false }));
+    }
+  };
+
+  const saveContact = async () => {
+    try {
+      setSavingStates(prev => ({ ...prev, contact: true }));
+      setError(null);
+      
+      await updateProfile({
+        socials: {
+          github: editableData.socials?.github || '',
+          linkedin: editableData.socials?.linkedin || '',
+          facebook: editableData.socials?.facebook || '',
+          facebook_page: editableData.socials?.facebook_page || '',
+          phone: editableData.socials?.phone || '',
+          email: editableData.socials?.email || '',
+          tiktok: editableData.socials?.tiktok || '',
+        },
+      });
+
+      setSuccess('Contact information saved successfully!');
+    } catch (error) {
+      console.error('Error saving contact info:', error);
+      setError('Failed to save contact information. Please try again.');
+    } finally {
+      setSavingStates(prev => ({ ...prev, contact: false }));
+    }
+  };
+
+  const saveSkills = async () => {
+    try {
+      setSavingStates(prev => ({ ...prev, skills: true }));
+      setError(null);
+      
+      if (data.skills && data.skills.length > 0) {
+        const result = await updateCollection('skills', data.skills);
+        
+        if (result.success) {
+          setSuccess('Skills saved successfully!');
+        } else {
+          setError(`Failed to save skills: ${result.error}`);
+        }
+      } else {
+        setSuccess('No skills to save.');
+      }
+    } catch (error) {
+      console.error('Error saving skills:', error);
+      setError('Failed to save skills. Please try again.');
+    } finally {
+      setSavingStates(prev => ({ ...prev, skills: false }));
+    }
+  };
+
+  const saveExperiences = async () => {
+    try {
+      setSavingStates(prev => ({ ...prev, experiences: true }));
+      setError(null);
+      
+      if (data.experiences && data.experiences.length > 0) {
+        const result = await updateCollection('experiences', data.experiences);
+        
+        if (result.success) {
+          setSuccess('Experiences saved successfully!');
+        } else {
+          setError(`Failed to save experiences: ${result.error}`);
+        }
+      } else {
+        setSuccess('No experiences to save.');
+      }
+    } catch (error) {
+      console.error('Error saving experiences:', error);
+      setError('Failed to save experiences. Please try again.');
+    } finally {
+      setSavingStates(prev => ({ ...prev, experiences: false }));
+    }
+  };
+
+  const saveCertificates = async () => {
+    try {
+      setSavingStates(prev => ({ ...prev, certificates: true }));
+      setError(null);
+      
+      if (data.certificates && data.certificates.length > 0) {
+        const result = await updateCollection('certificates', data.certificates);
+        
+        if (result.success) {
+          setSuccess('Certificates saved successfully!');
+        } else {
+          setError(`Failed to save certificates: ${result.error}`);
+        }
+      } else {
+        setSuccess('No certificates to save.');
+      }
+    } catch (error) {
+      console.error('Error saving certificates:', error);
+      setError('Failed to save certificates. Please try again.');
+    } finally {
+      setSavingStates(prev => ({ ...prev, certificates: false }));
+    }
+  };
+
+  const saveTestimonials = async () => {
+    try {
+      setSavingStates(prev => ({ ...prev, testimonials: true }));
+      setError(null);
+      
+      if (data.testimonials && data.testimonials.length > 0) {
+        const result = await updateCollection('testimonials', data.testimonials);
+        
+        if (result.success) {
+          setSuccess('Testimonials saved successfully!');
+        } else {
+          setError(`Failed to save testimonials: ${result.error}`);
+        }
+      } else {
+        setSuccess('No testimonials to save.');
+      }
+    } catch (error) {
+      console.error('Error saving testimonials:', error);
+      setError('Failed to save testimonials. Please try again.');
+    } finally {
+      setSavingStates(prev => ({ ...prev, testimonials: false }));
+    }
+  };
+
   const renderTabContent = () => {
     if (isLoading) return <LoadingSpinner />;
     
@@ -350,6 +592,8 @@ export default function PortfolioAdmin() {
             setData={setData} 
             handleInputChange={handleInputChange} 
             convertToBase64={convertToBase64}
+            saveBasicInfo={saveBasicInfo}
+            savingStates={savingStates}
           />
         );
       case 'certificates':
@@ -359,6 +603,8 @@ export default function PortfolioAdmin() {
             setData={setData} 
             deleteItem={deleteItem} 
             convertToBase64={convertToBase64} 
+            saveCertificates={saveCertificates}
+            savingStates={savingStates}
           />
         );
       case 'contact':
@@ -366,6 +612,8 @@ export default function PortfolioAdmin() {
           <ContactTab 
             editableData={editableData} 
             handleNestedInputChange={handleNestedInputChange} 
+            saveContact={saveContact}
+            savingStates={savingStates}
           />
         );
       case 'skills':
@@ -374,6 +622,8 @@ export default function PortfolioAdmin() {
             data={data} 
             setData={setData} 
             deleteItem={deleteItem} 
+            saveSkills={saveSkills}
+            savingStates={savingStates}
           />
         );
       case 'experiences':
@@ -382,6 +632,8 @@ export default function PortfolioAdmin() {
             data={data} 
             setData={setData} 
             deleteItem={deleteItem} 
+            saveExperiences={saveExperiences}
+            savingStates={savingStates}
           />
         );
       case 'works':
@@ -401,6 +653,8 @@ export default function PortfolioAdmin() {
             setData={setData} 
             deleteItem={deleteItem} 
             convertToBase64={convertToBase64} 
+            saveTestimonials={saveTestimonials}
+            savingStates={savingStates}
           />
         );
       default:
@@ -445,7 +699,7 @@ export default function PortfolioAdmin() {
             <PrimaryButton 
               onClick={handleLogin} 
               disabled={isLoading}
-              className="w-full flex justify-center text-black"
+              className="w-full flex justify-center"
             >
               {isLoading ? 'Logging in...' : 'Login'}
             </PrimaryButton>
@@ -456,7 +710,7 @@ export default function PortfolioAdmin() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 p-4 md:p-8 !text-black">
+    <div className="min-h-screen bg-gray-100 p-4 md:p-8" style={{ color: 'black' }}>
       <div className="max-w-7xl mx-auto">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-3xl font-bold text-gray-800">Portfolio Admin Dashboard</h1>
@@ -547,13 +801,7 @@ export default function PortfolioAdmin() {
             >
               Test Image Ops
             </button>
-            <PrimaryButton 
-              onClick={updateData} 
-              disabled={isUpdating || isLoading}
-              className="w-full md:w-auto"
-            >
-              {isUpdating ? 'Saving...' : 'Save All Changes'}
-            </PrimaryButton>
+
           </div>
         </div>
       </div>
@@ -562,9 +810,18 @@ export default function PortfolioAdmin() {
 }
 
 // Tab Components
-const BasicInfoTab = ({ data, editableData, setData, handleInputChange, convertToBase64 }) => (
+const BasicInfoTab = ({ data, editableData, setData, handleInputChange, convertToBase64, saveBasicInfo, savingStates }) => (
   <section className="space-y-6">
-    <h2 className="text-2xl font-semibold">Basic Information</h2>
+    <div className="flex justify-between items-center">
+      <h2 className="text-2xl font-semibold">Basic Information</h2>
+      <PrimaryButton 
+        onClick={saveBasicInfo} 
+        disabled={savingStates.basicInfo}
+        className="w-auto"
+      >
+        {savingStates.basicInfo ? 'Saving...' : 'Save Basic Info'}
+      </PrimaryButton>
+    </div>
     
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
       <div className="space-y-6">
@@ -681,9 +938,18 @@ const BasicInfoTab = ({ data, editableData, setData, handleInputChange, convertT
   </section>
 );
 
-const ContactTab = ({ editableData, handleNestedInputChange }) => (
+const ContactTab = ({ editableData, handleNestedInputChange, saveContact, savingStates }) => (
   <section className="space-y-6">
-    <h2 className="text-2xl font-semibold">Contact Information</h2>
+    <div className="flex justify-between items-center">
+      <h2 className="text-2xl font-semibold">Contact Information</h2>
+      <PrimaryButton 
+        onClick={saveContact} 
+        disabled={savingStates.contact}
+        className="w-auto"
+      >
+        {savingStates.contact ? 'Saving...' : 'Save Contact Info'}
+      </PrimaryButton>
+    </div>
     
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
       {['email', 'phone'].map((field) => (
@@ -718,7 +984,7 @@ const ContactTab = ({ editableData, handleNestedInputChange }) => (
   </section>
 );
 
-const CertificatesTab = ({ data, setData, deleteItem, convertToBase64 }) => {
+const CertificatesTab = ({ data, setData, deleteItem, convertToBase64, saveCertificates, savingStates }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
 
   const goToNext = () => {
@@ -737,21 +1003,30 @@ const CertificatesTab = ({ data, setData, deleteItem, convertToBase64 }) => {
     <section className="space-y-6">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-semibold">Certificates</h2>
-        <PrimaryButton
-          onClick={() => {
-            const updated = [...(data.certificates || []), {
-              type: 'Certificate',
-              title: '',
-              description: '',
-              date: '',
-              image: ''
-            }];
-            setData(prev => ({ ...prev, certificates: updated }));
-            setCurrentIndex(updated.length - 1);
-          }}
-        >
-          Add Certificate
-        </PrimaryButton>
+        <div className="flex gap-2">
+          <PrimaryButton
+            onClick={() => {
+              const updated = [...(data.certificates || []), {
+                type: 'Certificate',
+                title: '',
+                description: '',
+                date: '',
+                image: ''
+              }];
+              setData(prev => ({ ...prev, certificates: updated }));
+              setCurrentIndex(updated.length - 1);
+            }}
+          >
+            Add Certificate
+          </PrimaryButton>
+          <PrimaryButton 
+            onClick={saveCertificates} 
+            disabled={savingStates.certificates}
+            className="w-auto"
+          >
+            {savingStates.certificates ? 'Saving...' : 'Save Certificates'}
+          </PrimaryButton>
+        </div>
       </div>
 
       {data.certificates?.length > 0 ? (
@@ -760,7 +1035,22 @@ const CertificatesTab = ({ data, setData, deleteItem, convertToBase64 }) => {
             <button
               onClick={goToPrevious}
               disabled={currentIndex === 0}
-              className={`px-4 py-2 rounded ${currentIndex === 0 ? '!bg-gray-300' : '!bg-blue-500 hover:!bg-blue-600'} !text-white`}
+              className="px-4 py-2 rounded"
+              style={{
+                backgroundColor: currentIndex === 0 ? '#d1d5db' : '#3b82f6',
+                color: 'white',
+                border: 'none'
+              }}
+              onMouseEnter={(e) => {
+                if (currentIndex !== 0) {
+                  e.target.style.backgroundColor = '#2563eb';
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (currentIndex !== 0) {
+                  e.target.style.backgroundColor = '#3b82f6';
+                }
+              }}
             >
               Previous
             </button>
@@ -770,7 +1060,22 @@ const CertificatesTab = ({ data, setData, deleteItem, convertToBase64 }) => {
             <button
               onClick={goToNext}
               disabled={currentIndex === data.certificates.length - 1}
-              className={`px-4 py-2 rounded ${currentIndex === data.certificates.length - 1 ? '!bg-gray-300' : '!bg-blue-500 hover:!bg-blue-600'} !text-white`}
+              className="px-4 py-2 rounded"
+              style={{
+                backgroundColor: currentIndex === data.certificates.length - 1 ? '#d1d5db' : '#3b82f6',
+                color: 'white',
+                border: 'none'
+              }}
+              onMouseEnter={(e) => {
+                if (currentIndex !== data.certificates.length - 1) {
+                  e.target.style.backgroundColor = '#2563eb';
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (currentIndex !== data.certificates.length - 1) {
+                  e.target.style.backgroundColor = '#3b82f6';
+                }
+              }}
             >
               Next
             </button>
@@ -893,7 +1198,7 @@ const CertificatesTab = ({ data, setData, deleteItem, convertToBase64 }) => {
   );
 };
 
-const SkillsTab = ({ data, setData, deleteItem }) => {
+const SkillsTab = ({ data, setData, deleteItem, saveSkills, savingStates }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
 
   const goToNext = () => {
@@ -908,20 +1213,29 @@ const SkillsTab = ({ data, setData, deleteItem }) => {
     <section className="space-y-6">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-semibold">Skills</h2>
-        <PrimaryButton
-          onClick={() => {
-            const updated = [...(data.skills || []), {
-              title: '',
-              proficiency: 0,
-              icon: '',
-              category: ''
-            }];
-            setData(prev => ({ ...prev, skills: updated }));
-            setCurrentIndex(updated.length - 1);
-          }}
-        >
-          Add Skill
-        </PrimaryButton>
+        <div className="flex gap-2">
+          <PrimaryButton
+            onClick={() => {
+              const updated = [...(data.skills || []), {
+                title: '',
+                proficiency: 0,
+                icon: '',
+                category: ''
+              }];
+              setData(prev => ({ ...prev, skills: updated }));
+              setCurrentIndex(updated.length - 1);
+            }}
+          >
+            Add Skill
+          </PrimaryButton>
+          <PrimaryButton 
+            onClick={saveSkills} 
+            disabled={savingStates.skills}
+            className="w-auto"
+          >
+            {savingStates.skills ? 'Saving...' : 'Save Skills'}
+          </PrimaryButton>
+        </div>
       </div>
 
       {data.skills?.length > 0 ? (
@@ -930,7 +1244,22 @@ const SkillsTab = ({ data, setData, deleteItem }) => {
             <button
               onClick={goToPrevious}
               disabled={currentIndex === 0}
-              className={`px-4 py-2 rounded ${currentIndex === 0 ? '!bg-gray-300' : '!bg-blue-500 hover:!bg-blue-600'} !text-white`}
+              className="px-4 py-2 rounded"
+              style={{
+                backgroundColor: currentIndex === 0 ? '#d1d5db' : '#3b82f6',
+                color: 'white',
+                border: 'none'
+              }}
+              onMouseEnter={(e) => {
+                if (currentIndex !== 0) {
+                  e.target.style.backgroundColor = '#2563eb';
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (currentIndex !== 0) {
+                  e.target.style.backgroundColor = '#3b82f6';
+                }
+              }}
             >
               Previous
             </button>
@@ -940,7 +1269,22 @@ const SkillsTab = ({ data, setData, deleteItem }) => {
             <button
               onClick={goToNext}
               disabled={currentIndex === data.skills.length - 1}
-              className={`px-4 py-2 rounded ${currentIndex === data.skills.length - 1 ? '!bg-gray-300' : '!bg-blue-500 hover:!bg-blue-600'} !text-white`}
+              className="px-4 py-2 rounded"
+              style={{
+                backgroundColor: currentIndex === data.skills.length - 1 ? '#d1d5db' : '#3b82f6',
+                color: 'white',
+                border: 'none'
+              }}
+              onMouseEnter={(e) => {
+                if (currentIndex !== data.skills.length - 1) {
+                  e.target.style.backgroundColor = '#2563eb';
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (currentIndex !== data.skills.length - 1) {
+                  e.target.style.backgroundColor = '#3b82f6';
+                }
+              }}
             >
               Next
             </button>
@@ -1056,7 +1400,7 @@ const SkillsTab = ({ data, setData, deleteItem }) => {
   );
 };
 
-const ExperiencesTab = ({ data, setData, deleteItem }) => {
+const ExperiencesTab = ({ data, setData, deleteItem, saveExperiences, savingStates }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
 
   const goToNext = () => {
@@ -1075,23 +1419,32 @@ const ExperiencesTab = ({ data, setData, deleteItem }) => {
     <section className="space-y-6">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-semibold">Experiences</h2>
-        <PrimaryButton
-          onClick={() => {
-            const updated = [...(data.experiences || []), {
-              name: '',
-              from: '',
-              to: '',
-              still_doing: false,
-              description: '',
-              learned: '',
-              role: ''
-            }];
-            setData(prev => ({ ...prev, experiences: updated }));
-            setCurrentIndex(updated.length - 1);
-          }}
-        >
-          Add Experience
-        </PrimaryButton>
+        <div className="flex gap-2">
+          <PrimaryButton
+            onClick={() => {
+              const updated = [...(data.experiences || []), {
+                name: '',
+                from: '',
+                to: '',
+                still_doing: false,
+                description: '',
+                learned: '',
+                role: ''
+              }];
+              setData(prev => ({ ...prev, experiences: updated }));
+              setCurrentIndex(updated.length - 1);
+            }}
+          >
+            Add Experience
+          </PrimaryButton>
+          <PrimaryButton 
+            onClick={saveExperiences} 
+            disabled={savingStates.experiences}
+            className="w-auto"
+          >
+            {savingStates.experiences ? 'Saving...' : 'Save Experiences'}
+          </PrimaryButton>
+        </div>
       </div>
       
       {data.experiences?.length > 0 ? (
@@ -1100,7 +1453,22 @@ const ExperiencesTab = ({ data, setData, deleteItem }) => {
             <button
               onClick={goToPrevious}
               disabled={currentIndex === 0}
-              className={`px-4 py-2 rounded ${currentIndex === 0 ? '!bg-gray-300' : '!bg-blue-500 hover:!bg-blue-600'} !text-white`}
+              className="px-4 py-2 rounded"
+              style={{
+                backgroundColor: currentIndex === 0 ? '#d1d5db' : '#3b82f6',
+                color: 'white',
+                border: 'none'
+              }}
+              onMouseEnter={(e) => {
+                if (currentIndex !== 0) {
+                  e.target.style.backgroundColor = '#2563eb';
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (currentIndex !== 0) {
+                  e.target.style.backgroundColor = '#3b82f6';
+                }
+              }}
             >
               Previous
             </button>
@@ -1110,7 +1478,22 @@ const ExperiencesTab = ({ data, setData, deleteItem }) => {
             <button
               onClick={goToNext}
               disabled={currentIndex === data.experiences.length - 1}
-              className={`px-4 py-2 rounded ${currentIndex === data.experiences.length - 1 ? '!bg-gray-300' : '!bg-blue-500 hover:!bg-blue-600'} !text-white`}
+              className="px-4 py-2 rounded"
+              style={{
+                backgroundColor: currentIndex === data.experiences.length - 1 ? '#d1d5db' : '#3b82f6',
+                color: 'white',
+                border: 'none'
+              }}
+              onMouseEnter={(e) => {
+                if (currentIndex !== data.experiences.length - 1) {
+                  e.target.style.backgroundColor = '#2563eb';
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (currentIndex !== data.experiences.length - 1) {
+                  e.target.style.backgroundColor = '#3b82f6';
+                }
+              }}
             >
               Next
             </button>
@@ -1315,6 +1698,50 @@ const WorksTab = ({ data, setData, deleteItem, convertToBase64, sanitizeLanguage
     
     setData(prev => ({ ...prev, works: updatedWorks }));
   };
+
+  // Function to save only the current project
+  const saveCurrentProject = async () => {
+    const currentWork = data.works[currentIndex];
+    
+    if (!currentWork.title.trim()) {
+      setError('Project title is required to save.');
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      setError('');
+      setSuccess('Saving project...');
+
+      const result = await updateWork(currentWork);
+
+      if (result.success) {
+        // Update the local data with the saved work ID if it's a new project
+        if (!currentWork.id && result.id) {
+          const updatedWorks = [...data.works];
+          updatedWorks[currentIndex] = { ...currentWork, id: result.id };
+          setData(prev => ({ ...prev, works: updatedWorks }));
+        }
+
+        if (result.imagesSaved && result.totalImages) {
+          setSuccess(`Project "${currentWork.title}" saved successfully! ${result.imagesSaved}/${result.totalImages} images saved.`);
+        } else {
+          setSuccess(`Project "${currentWork.title}" saved successfully!`);
+        }
+      } else {
+        if (result.imageError) {
+          setError(`Project saved but some images failed: ${result.error}. Saved ${result.savedCount}/${result.totalCount} images.`);
+        } else {
+          setError(`Failed to save project: ${result.error}`);
+        }
+      }
+    } catch (error) {
+      console.error('Error saving current project:', error);
+      setError(`Failed to save project: ${error.message}`);
+    } finally {
+      setIsLoading(false);
+    }
+  };
   
   
   return (
@@ -1350,7 +1777,22 @@ const WorksTab = ({ data, setData, deleteItem, convertToBase64, sanitizeLanguage
             <button
               onClick={goToPrevious}
               disabled={currentIndex === 0}
-              className={`px-4 py-2 rounded ${currentIndex === 0 ? '!bg-gray-300' : '!bg-blue-500 hover:!bg-blue-600'} !text-white`}
+              className="px-4 py-2 rounded"
+              style={{
+                backgroundColor: currentIndex === 0 ? '#d1d5db' : '#3b82f6',
+                color: 'white',
+                border: 'none'
+              }}
+              onMouseEnter={(e) => {
+                if (currentIndex !== 0) {
+                  e.target.style.backgroundColor = '#2563eb';
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (currentIndex !== 0) {
+                  e.target.style.backgroundColor = '#3b82f6';
+                }
+              }}
             >
               Previous
             </button>
@@ -1360,7 +1802,22 @@ const WorksTab = ({ data, setData, deleteItem, convertToBase64, sanitizeLanguage
             <button
               onClick={goToNext}
               disabled={currentIndex === data.works.length - 1}
-              className={`px-4 py-2 rounded ${currentIndex === data.works.length - 1 ? '!bg-gray-300' : '!bg-blue-500 hover:!bg-blue-600'} !text-white`}
+              className="px-4 py-2 rounded"
+              style={{
+                backgroundColor: currentIndex === data.works.length - 1 ? '#d1d5db' : '#3b82f6',
+                color: 'white',
+                border: 'none'
+              }}
+              onMouseEnter={(e) => {
+                if (currentIndex !== data.works.length - 1) {
+                  e.target.style.backgroundColor = '#2563eb';
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (currentIndex !== data.works.length - 1) {
+                  e.target.style.backgroundColor = '#3b82f6';
+                }
+              }}
             >
               Next
             </button>
@@ -1690,9 +2147,9 @@ const WorksTab = ({ data, setData, deleteItem, convertToBase64, sanitizeLanguage
                         setData(prev => ({ ...prev, works: updated }));
                         
                         if (files.length > 10) {
-                          setSuccess(`${files.length} image(s) added! Note: Large batches will be saved in groups of 5 to avoid database limits. Use "Save All Changes" to upload to database.`);
+                          setSuccess(`${files.length} image(s) added! Note: Large batches will be saved in groups of 5 to avoid database limits. Use "Save Project" to save this project or "Save All Changes" to save everything.`);
                         } else {
-                          setSuccess(`${files.length} image(s) added successfully! Use "Save All Changes" to upload to database.`);
+                          setSuccess(`${files.length} image(s) added successfully! Use "Save Project" to save this project or "Save All Changes" to save everything.`);
                         }
                       } catch (error) {
                         setError('Failed to process images. Please try again.');
@@ -1704,6 +2161,7 @@ const WorksTab = ({ data, setData, deleteItem, convertToBase64, sanitizeLanguage
                   />
                   <p className="text-xs text-gray-500 mt-1">
                     Images are stored efficiently in subcollections. Large batches (10+) are uploaded in groups of 5 to prevent database limits.
+                    Use "Save Project" below to save just this project quickly, or "Save All Changes" to save all changes at once.
                   </p>
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-2 mt-2">
                     {data.works[currentIndex].images?.map((img, imgIndex) => (
@@ -1760,7 +2218,42 @@ const WorksTab = ({ data, setData, deleteItem, convertToBase64, sanitizeLanguage
                   </div>
                 </div>
                 
-                <div className="flex justify-end">
+                <div className="flex justify-between items-center">
+                  <button
+                    onClick={saveCurrentProject}
+                    disabled={isLoading || !data.works[currentIndex]?.title?.trim()}
+                    className={`px-4 py-2 rounded-md font-medium transition-colors duration-200 ${
+                      isLoading || !data.works[currentIndex]?.title?.trim()
+                        ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                        : 'bg-green-600 hover:bg-green-700 text-white shadow-md hover:shadow-lg'
+                    }`}
+                    title="Save only this project (faster than saving all projects)"
+                  >
+                    {isLoading ? (
+                      <span className="flex items-center gap-2">
+                        <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
+                          <circle
+                            className="opacity-25"
+                            cx="12"
+                            cy="12"
+                            r="10"
+                            stroke="currentColor"
+                            strokeWidth="4"
+                            fill="none"
+                          />
+                          <path
+                            className="opacity-75"
+                            fill="currentColor"
+                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                          />
+                        </svg>
+                        Saving...
+                      </span>
+                    ) : (
+                      '💾 Save Project'
+                    )}
+                  </button>
+                  
                   <DangerButton
                     onClick={() => {
                       deleteItem('works', data.works[currentIndex].id);
@@ -1784,7 +2277,7 @@ const WorksTab = ({ data, setData, deleteItem, convertToBase64, sanitizeLanguage
   );
 };
 
-const TestimonialsTab = ({ data, setData, deleteItem, convertToBase64 }) => {
+const TestimonialsTab = ({ data, setData, deleteItem, convertToBase64, saveTestimonials, savingStates }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
 
   const goToNext = () => {
@@ -1799,21 +2292,30 @@ const TestimonialsTab = ({ data, setData, deleteItem, convertToBase64 }) => {
     <section className="space-y-6">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-semibold">Testimonials</h2>
-        <PrimaryButton
-          onClick={() => {
-            const updated = [...(data.testimonials || []), {
-              company: '',
-              name: '',
-              role: '',
-              comment: '',
-              image: ''
-            }];
-            setData(prev => ({ ...prev, testimonials: updated }));
-            setCurrentIndex(updated.length - 1);
-          }}
-        >
-          Add Testimonial
-        </PrimaryButton>
+        <div className="flex gap-2">
+          <PrimaryButton
+            onClick={() => {
+              const updated = [...(data.testimonials || []), {
+                company: '',
+                name: '',
+                role: '',
+                comment: '',
+                image: ''
+              }];
+              setData(prev => ({ ...prev, testimonials: updated }));
+              setCurrentIndex(updated.length - 1);
+            }}
+          >
+            Add Testimonial
+          </PrimaryButton>
+          <PrimaryButton 
+            onClick={saveTestimonials} 
+            disabled={savingStates.testimonials}
+            className="w-auto"
+          >
+            {savingStates.testimonials ? 'Saving...' : 'Save Testimonials'}
+          </PrimaryButton>
+        </div>
       </div>
 
       {data.testimonials?.length > 0 ? (
@@ -1822,7 +2324,22 @@ const TestimonialsTab = ({ data, setData, deleteItem, convertToBase64 }) => {
             <button
               onClick={goToPrevious}
               disabled={currentIndex === 0}
-              className={`px-4 py-2 rounded ${currentIndex === 0 ? '!bg-gray-300' : '!bg-blue-500 hover:!bg-blue-600'} !text-white`}
+              className="px-4 py-2 rounded"
+              style={{
+                backgroundColor: currentIndex === 0 ? '#d1d5db' : '#3b82f6',
+                color: 'white',
+                border: 'none'
+              }}
+              onMouseEnter={(e) => {
+                if (currentIndex !== 0) {
+                  e.target.style.backgroundColor = '#2563eb';
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (currentIndex !== 0) {
+                  e.target.style.backgroundColor = '#3b82f6';
+                }
+              }}
             >
               Previous
             </button>
@@ -1832,7 +2349,22 @@ const TestimonialsTab = ({ data, setData, deleteItem, convertToBase64 }) => {
             <button
               onClick={goToNext}
               disabled={currentIndex === data.testimonials.length - 1}
-              className={`px-4 py-2 rounded ${currentIndex === data.testimonials.length - 1 ? '!bg-gray-300' : '!bg-blue-500 hover:!bg-blue-600'} !text-white`}
+              className="px-4 py-2 rounded"
+              style={{
+                backgroundColor: currentIndex === data.testimonials.length - 1 ? '#d1d5db' : '#3b82f6',
+                color: 'white',
+                border: 'none'
+              }}
+              onMouseEnter={(e) => {
+                if (currentIndex !== data.testimonials.length - 1) {
+                  e.target.style.backgroundColor = '#2563eb';
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (currentIndex !== data.testimonials.length - 1) {
+                  e.target.style.backgroundColor = '#3b82f6';
+                }
+              }}
             >
               Next
             </button>

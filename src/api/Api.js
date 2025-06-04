@@ -508,6 +508,49 @@ export const requireLogin = async () => {
   });
 };
 
+// Helper function to compress base64 images to reduce size
+export const compressBase64Image = (base64String, maxWidth = 800, quality = 0.7) => {
+  return new Promise((resolve) => {
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    const img = new Image();
+    
+    img.onload = () => {
+      // Calculate new dimensions while maintaining aspect ratio
+      let { width, height } = img;
+      
+      if (width > maxWidth) {
+        height = (height * maxWidth) / width;
+        width = maxWidth;
+      }
+      
+      // Set canvas size
+      canvas.width = width;
+      canvas.height = height;
+      
+      // Draw and compress the image
+      ctx.drawImage(img, 0, 0, width, height);
+      
+      // Convert to base64 with compression
+      const compressedBase64 = canvas.toDataURL('image/jpeg', quality);
+      
+      const originalSize = (base64String.length * 0.75 / 1024).toFixed(1);
+      const compressedSize = (compressedBase64.length * 0.75 / 1024).toFixed(1);
+      console.log(`Image compressed: Original: ${originalSize}KB, Compressed: ${compressedSize}KB`);
+      
+      resolve(compressedBase64);
+    };
+    
+    img.onerror = (error) => {
+      console.error('Error compressing image:', error);
+      resolve(base64String); // Return original if compression fails
+    };
+    
+    // Set the image source
+    img.src = base64String;
+  });
+};
+
 // Helper function to update work images in subcollection
 export const updateWorkImages = async (workId, images) => {
   try {
