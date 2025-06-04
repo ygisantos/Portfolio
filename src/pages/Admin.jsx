@@ -12,6 +12,8 @@ import {
   updateProfile,
   updateCollection,
   updateWork,
+  updateWorkPriority,
+  updateMultipleWorkPriorities,
   loginWithEmailAndPassword,
   logout,
   updateWorkImages,
@@ -1661,13 +1663,40 @@ const WorksTab = ({ data, setData, deleteItem, convertToBase64, sanitizeLanguage
     setData(prev => ({ ...prev, works: sortedWorks }));
   };
   
+  // Helper function to check if move up is possible
+  const canMoveUp = () => {
+    if (!data.works[currentIndex].priority) return false;
+    return data.works[currentIndex].priority !== '1';
+  };
+
+  // Helper function to check if move down is possible
+  const canMoveDown = () => {
+    if (!data.works[currentIndex].priority) return false;
+    
+    const currentPriority = parseInt(data.works[currentIndex].priority);
+    const assignedPriorities = data.works
+      .filter(work => work.priority)
+      .map(work => parseInt(work.priority));
+    const maxAssignedPriority = Math.max(...assignedPriorities);
+    
+    return currentPriority < maxAssignedPriority && currentPriority < data.works.length;
+  };
+
   const movePriorityDown = () => {
     const currentWork = data.works[currentIndex];
     const currentPriority = parseInt(currentWork.priority);
     
     if (!currentPriority) return;
-    const maxPriority = data.works.length;
-    if (currentPriority >= maxPriority) return;
+    
+    // Find the highest priority number currently assigned
+    const assignedPriorities = data.works
+      .filter(work => work.priority)
+      .map(work => parseInt(work.priority));
+    const maxAssignedPriority = Math.max(...assignedPriorities);
+    
+    // Can't move down if already at the highest priority or if it would exceed total works
+    if (currentPriority >= maxAssignedPriority || currentPriority >= data.works.length) return;
+    
     const targetPriority = currentPriority + 1;
     const targetIndex = data.works.findIndex(
       work => work.priority === targetPriority.toString()
@@ -1675,7 +1704,10 @@ const WorksTab = ({ data, setData, deleteItem, convertToBase64, sanitizeLanguage
     
     const updatedWorks = [...data.works];
     
-    if (targetIndex !== -1) updatedWorks[targetIndex].priority = currentPriority.toString();
+    // If there's a work at the target priority, swap them
+    if (targetIndex !== -1) {
+      updatedWorks[targetIndex].priority = currentPriority.toString();
+    }
     
     updatedWorks[currentIndex].priority = targetPriority.toString();
     const sortedWorks = sortWorksByPriority(updatedWorks);
@@ -1697,6 +1729,80 @@ const WorksTab = ({ data, setData, deleteItem, convertToBase64, sanitizeLanguage
     ];
     
     setData(prev => ({ ...prev, works: updatedWorks }));
+  };
+
+  // Helper function to save priority for individual projects (for move up/down buttons)
+  const saveSingleProjectPriority = async (workIndex) => {
+    const work = data.works[workIndex];
+    
+    if (!work.id) {
+      setError('Project must be saved to database first before updating priority.');
+      return false;
+    }
+    
+    if (!work.priority) {
+      setError('No priority to save for this project.');
+      return false;
+    }
+
+    try {
+      setIsLoading(true);
+      const result = await updateWorkPriority(work.id, work.priority);
+      
+      if (result.success) {
+        setSuccess(`Priority updated for "${work.title || 'Untitled Project'}" - images preserved.`);
+        return true;
+      } else {
+        setError(`Failed to update priority: ${result.error}`);
+        return false;
+      }
+    } catch (error) {
+      console.error('Error saving project priority:', error);
+      setError(`Failed to save priority: ${error.message}`);
+      return false;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Function to save all projects with their updated priorities (optimized to only update priorities)
+  const saveAllProjectPriorities = async () => {
+    try {
+      setIsLoading(true);
+      setError('');
+      setSuccess('Saving project priorities...');
+
+      // Filter projects that have both an ID and a priority (only saved projects with priorities can be updated)
+      const priorityUpdates = data.works
+        .filter(work => work.id && work.priority) // Only update existing projects with priorities
+        .map(work => ({
+          workId: work.id,
+          priority: work.priority
+        }));
+      
+      if (priorityUpdates.length === 0) {
+        setError('No valid projects with priorities to save. Make sure projects are saved to the database first.');
+        return;
+      }
+
+      // Use the new batch priority update function that doesn't touch images
+      const result = await updateMultipleWorkPriorities(priorityUpdates);
+      
+      if (result.success) {
+        setSuccess(`Successfully updated ${result.updatedCount} project priorities! Images were preserved.`);
+      } else {
+        if (result.updatedCount > 0) {
+          setError(`${result.updatedCount} priorities updated successfully, but ${result.failures?.length || 0} failed: ${result.error}`);
+        } else {
+          setError(`Failed to update project priorities: ${result.error}`);
+        }
+      }
+    } catch (error) {
+      console.error('Error saving project priorities:', error);
+      setError(`Failed to save project priorities: ${error.message}`);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   // Function to save only the current project
@@ -1839,9 +1945,14 @@ const WorksTab = ({ data, setData, deleteItem, convertToBase64, sanitizeLanguage
             {data.works[currentIndex] && (
               <>
                 <div className="mb-4 p-2 bg-blue-50 rounded-lg">
-                  <h3 className="font-medium text-sm text-blue-800">Project Priority</h3>
+                  <h3 className="font-medium text-sm text-blue-800">
+                    Project Priority 
+                    <span className="ml-2 text-xs text-blue-600">
+                      ({data.works.filter(w => w.priority).length} of {data.works.length} projects have priority)
+                    </span>
+                  </h3>
                   <div className="flex items-center gap-2 mt-1 overflow-x-auto pb-2">
-                    {Array.from({ length: Math.min(data.works.length, 20) }, (_, i) => i + 1).map(num => {
+                    {Array.from({ length: data.works.length }, (_, i) => i + 1).map(num => {
                       const workWithThisPriority = data.works.find(w => w.priority === num.toString());
                       const isCurrentWork = data.works[currentIndex].priority === num.toString();
                       const workIndex = workWithThisPriority ? 
@@ -1851,8 +1962,8 @@ const WorksTab = ({ data, setData, deleteItem, convertToBase64, sanitizeLanguage
                         <div 
                           key={num}
                           title={workWithThisPriority 
-                            ? `${workWithThisPriority.title} (Priority ${num})` 
-                            : `Priority ${num} - Unassigned (available)`
+                            ? `${workWithThisPriority.title} (Priority ${num}) - Click to view` 
+                            : `Priority ${num} - Available slot`
                           }
                           onClick={() => {
                             if (workIndex !== -1) {
@@ -1862,9 +1973,9 @@ const WorksTab = ({ data, setData, deleteItem, convertToBase64, sanitizeLanguage
                           className={`
                             w-8 h-8 flex items-center justify-center rounded-full text-sm font-medium
                             ${isCurrentWork 
-                              ? 'bg-blue-600 text-white border-2 border-blue-300' 
+                              ? 'bg-blue-600 text-white border-2 border-blue-300 shadow-lg' 
                               : workWithThisPriority 
-                                ? 'bg-gray-200 text-gray-700 hover:bg-gray-300 cursor-pointer' 
+                                ? 'bg-gray-200 text-gray-700 hover:bg-gray-300 cursor-pointer border border-gray-400' 
                                 : 'bg-gray-50 text-gray-400 border border-dashed border-gray-300 hover:bg-gray-100 hover:border-gray-400'
                             }
                             transition-all duration-200 shrink-0
@@ -1879,7 +1990,7 @@ const WorksTab = ({ data, setData, deleteItem, convertToBase64, sanitizeLanguage
                     <div className="flex items-center gap-2">
                       <p className="text-xs text-gray-600">
                         {data.works[currentIndex].priority 
-                          ? `Priority ${data.works[currentIndex].priority}`
+                          ? `Priority ${data.works[currentIndex].priority} of ${data.works.length}`
                           : 'No priority set'
                         }
                       </p>
@@ -1890,7 +2001,7 @@ const WorksTab = ({ data, setData, deleteItem, convertToBase64, sanitizeLanguage
                     <button
                       onClick={fixPriorityNumbering}
                       className="text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-1.5 rounded-md transition-colors flex items-center gap-1"
-                      title="Fix any gaps in priority numbering while maintaining order"
+                      title={`Fix any gaps in priority numbering while maintaining order. Currently ${data.works.filter(w => !w.priority).length} projects without priority.`}
                     >
                       <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12"/>
@@ -1982,7 +2093,7 @@ const WorksTab = ({ data, setData, deleteItem, convertToBase64, sanitizeLanguage
                         className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                       >
                         <option value="">Select Priority</option>
-                        {Array.from({ length: Math.max(10, (data.works?.length || 0) + 3) }, (_, i) => i + 1).map(num => {
+                        {Array.from({ length: Math.max(data.works.length, 10) }, (_, i) => i + 1).map(num => {
                           // Check if this priority is already used by another project
                           const isUsed = data.works?.some((work, idx) => 
                             idx !== currentIndex && work.priority === num.toString()
@@ -2002,9 +2113,9 @@ const WorksTab = ({ data, setData, deleteItem, convertToBase64, sanitizeLanguage
                       <div className="flex space-x-1">
                         <button
                           onClick={movePriorityUp}
-                          disabled={!data.works[currentIndex].priority || data.works[currentIndex].priority === '1'}
+                          disabled={!canMoveUp()}
                           className={`px-2 py-1 rounded flex items-center justify-center ${
-                            !data.works[currentIndex].priority || data.works[currentIndex].priority === '1' 
+                            !canMoveUp()
                               ? '!bg-gray-300 !cursor-not-allowed' 
                               : '!bg-blue-500 hover:!bg-blue-600 !text-white'
                           }`}
@@ -2014,13 +2125,9 @@ const WorksTab = ({ data, setData, deleteItem, convertToBase64, sanitizeLanguage
                         </button>
                         <button
                           onClick={movePriorityDown}
-                          disabled={
-                            !data.works[currentIndex].priority || 
-                            parseInt(data.works[currentIndex].priority) >= data.works.length
-                          }
+                          disabled={!canMoveDown()}
                           className={`px-2 py-1 rounded flex items-center justify-center ${
-                            !data.works[currentIndex].priority || 
-                            parseInt(data.works[currentIndex].priority) >= data.works.length
+                            !canMoveDown()
                               ? '!bg-gray-300 !cursor-not-allowed' 
                               : '!bg-blue-500 hover:!bg-blue-600 !text-white'
                           }`}
@@ -2028,11 +2135,33 @@ const WorksTab = ({ data, setData, deleteItem, convertToBase64, sanitizeLanguage
                         >
                           <span className="text-lg">↓</span>
                         </button>
+                        {data.works[currentIndex].priority && data.works[currentIndex].id && (
+                          <button
+                            onClick={() => saveSingleProjectPriority(currentIndex)}
+                            disabled={isLoading}
+                            className={`px-2 py-1 rounded text-xs font-medium flex items-center justify-center ${
+                              isLoading
+                                ? '!bg-gray-300 !cursor-not-allowed !text-gray-500'
+                                : '!bg-green-500 hover:!bg-green-600 !text-white'
+                            }`}
+                            title="Save priority for this project only (preserves images)"
+                          >
+                            {isLoading ? '⏳' : '💾'}
+                          </button>
+                        )}
                       </div>
                     </div>
                     <p className="text-xs text-gray-500 mt-1">
                       Use the arrows to reorder projects (lower number will appear first)
                     </p>
+                    {data.works[currentIndex].priority && data.works[currentIndex].id && (
+                      <p className="text-xs text-green-600 mt-1 flex items-center gap-1">
+                        <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"/>
+                        </svg>
+                        Priority updates now preserve images - no re-upload needed!
+                      </p>
+                    )}
                   </div>
                   
                   <div>
@@ -2268,6 +2397,169 @@ const WorksTab = ({ data, setData, deleteItem, convertToBase64, sanitizeLanguage
                 </div>
               </>
             )}
+          </div>
+
+          {/* Draggable Project List for Easy Reordering */}
+          <div className="border border-gray-200 rounded-lg p-4 mt-4">
+            <div className="flex justify-between items-center mb-3">
+              <h3 className="font-medium text-sm text-gray-800 flex items-center gap-2">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"/>
+                </svg>
+                Quick Reorder Projects (Drag & Drop)
+                <span className="text-xs text-gray-500 font-normal">
+                  Drag projects to reorder them - positions update priority automatically
+                </span>
+              </h3>
+              <button
+                onClick={saveAllProjectPriorities}
+                disabled={isLoading}
+                className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
+                  isLoading
+                    ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                    : 'bg-blue-600 hover:bg-blue-700 text-white shadow-md hover:shadow-lg'
+                }`}
+                title="Save all project priorities to database (images preserved - priority-only update)"
+              >
+                {isLoading ? 'Saving...' : '💾 Save All Priorities (Fast)'}
+              </button>
+            </div>
+            <div className="space-y-2 max-h-96 overflow-y-auto">
+              {data.works
+                .map((work, index) => ({ ...work, originalIndex: index }))
+                .sort((a, b) => {
+                  if (!a.priority && !b.priority) return 0;
+                  if (!a.priority) return 1;
+                  if (!b.priority) return -1;
+                  return parseInt(a.priority) - parseInt(b.priority);
+                })
+                .map((work, sortedIndex) => (
+                  <div
+                    key={work.originalIndex}
+                    draggable
+                    onDragStart={(e) => {
+                      e.dataTransfer.setData('text/plain', work.originalIndex.toString());
+                      e.currentTarget.style.opacity = '0.5';
+                    }}
+                    onDragEnd={(e) => {
+                      e.currentTarget.style.opacity = '1';
+                    }}
+                    onDragOver={(e) => {
+                      e.preventDefault();
+                      e.currentTarget.style.borderColor = '#3b82f6';
+                      e.currentTarget.style.backgroundColor = '#eff6ff';
+                    }}
+                    onDragLeave={(e) => {
+                      e.currentTarget.style.borderColor = '';
+                      e.currentTarget.style.backgroundColor = '';
+                    }}
+                    onDrop={(e) => {
+                      e.preventDefault();
+                      e.currentTarget.style.borderColor = '';
+                      e.currentTarget.style.backgroundColor = '';
+                      
+                      const draggedIndex = parseInt(e.dataTransfer.getData('text/plain'));
+                      const targetIndex = work.originalIndex;
+                      
+                      if (draggedIndex === targetIndex) return;
+                      
+                      // Reorder the array
+                      const updatedWorks = [...data.works];
+                      const draggedItem = updatedWorks[draggedIndex];
+                      updatedWorks.splice(draggedIndex, 1);
+                      updatedWorks.splice(targetIndex, 0, draggedItem);
+                      
+                      // Reassign priorities based on new order
+                      const worksWithPriority = updatedWorks.filter(w => w.priority);
+                      const worksWithoutPriority = updatedWorks.filter(w => !w.priority);
+                      
+                      // Assign new priorities to maintain the dragged order
+                      const reorderedWorks = updatedWorks.map((w, idx) => ({
+                        ...w,
+                        priority: (idx + 1).toString()
+                      }));
+                      
+                      setData(prev => ({ ...prev, works: sortWorksByPriority(reorderedWorks) }));
+                      
+                      // Update current index if needed
+                      if (draggedIndex === currentIndex) {
+                        setCurrentIndex(targetIndex);
+                      } else if (draggedIndex < currentIndex && targetIndex >= currentIndex) {
+                        setCurrentIndex(currentIndex - 1);
+                      } else if (draggedIndex > currentIndex && targetIndex <= currentIndex) {
+                        setCurrentIndex(currentIndex + 1);
+                      }
+                      
+                      setSuccess('Project order updated! All projects now have priority numbers.');
+                      
+                      // Show save prompt after reordering
+                      setTimeout(() => {
+                        if (confirm('Project order has been updated! Would you like to save these changes to the database now?')) {
+                          saveAllProjectPriorities();
+                        }
+                      }, 500);
+                    }}
+                    onClick={() => setCurrentIndex(work.originalIndex)}
+                    className={`
+                      p-3 border rounded-lg cursor-move transition-all duration-200 hover:shadow-md
+                      ${work.originalIndex === currentIndex 
+                        ? 'border-blue-500 bg-blue-50 shadow-md' 
+                        : 'border-gray-200 hover:border-gray-300'
+                      }
+                    `}
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="flex flex-col items-center">
+                          <svg className="w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M3 15h18v-2H3v2zm0 4h18v-2H3v2zm0-8h18V9H3v2zm0-6v2h18V5H3z"/>
+                          </svg>
+                        </div>
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <span className="font-medium text-gray-900">
+                              {work.title || 'Untitled Project'}
+                            </span>
+                            {work.priority && (
+                              <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
+                                Priority {work.priority}
+                              </span>
+                            )}
+                            {!work.priority && (
+                              <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full">
+                                No Priority
+                              </span>
+                            )}
+                          </div>
+                          <div className="text-xs text-gray-500 mt-1">
+                            {work.category && <span className="mr-3">{work.category}</span>}
+                            {work.year && <span className="mr-3">{work.year}</span>}
+                            {work.languages?.length > 0 && (
+                              <span>{work.languages.length} technologies</span>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        {work.originalIndex === currentIndex && (
+                          <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">
+                            Current
+                          </span>
+                        )}
+                        <div className="text-xs text-gray-400">
+                          #{sortedIndex + 1}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+            </div>
+            <div className="mt-3 text-xs text-gray-500 flex items-center gap-1">
+              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+              Tip: Click on a project to edit it, or drag and drop to reorder. After reordering, use "Save All Priorities" button or you'll be prompted to save changes.
+            </div>
           </div>
         </>
       ) : (

@@ -449,6 +449,74 @@ export const updateWork = async (work) => {
   }
 };
 
+// Priority-only update function that doesn't touch images
+export const updateWorkPriority = async (workId, priority) => {
+  try {
+    if (!workId) {
+      return { success: false, error: 'Work ID is required' };
+    }
+    
+    const docRef = doc(db, 'works', workId);
+    
+    // Update only the priority field
+    await updateDoc(docRef, { 
+      priority: priority?.toString() || null 
+    });
+    
+    return { success: true, id: workId };
+  } catch (error) {
+    console.error(`Error updating priority for work ${workId}:`, error);
+    return { success: false, error: error.message };
+  }
+};
+
+// Batch update priorities for multiple works (efficient for drag-and-drop reordering)
+export const updateMultipleWorkPriorities = async (priorityUpdates) => {
+  try {
+    if (!Array.isArray(priorityUpdates) || priorityUpdates.length === 0) {
+      return { success: false, error: 'Priority updates array is required' };
+    }
+    
+    // Create update promises for all works
+    const updatePromises = priorityUpdates.map(({ workId, priority }) => {
+      if (!workId) {
+        return Promise.resolve({ success: false, error: 'Missing work ID' });
+      }
+      
+      const docRef = doc(db, 'works', workId);
+      return updateDoc(docRef, { 
+        priority: priority?.toString() || null 
+      }).then(() => ({ success: true, workId }))
+        .catch(error => ({ success: false, workId, error: error.message }));
+    });
+    
+    // Execute all updates in parallel
+    const results = await Promise.all(updatePromises);
+    
+    // Check for failures
+    const failures = results.filter(result => !result.success);
+    const successes = results.filter(result => result.success);
+    
+    if (failures.length === 0) {
+      return { 
+        success: true, 
+        updatedCount: successes.length,
+        message: `Successfully updated ${successes.length} project priorities` 
+      };
+    } else {
+      return { 
+        success: false, 
+        error: `${failures.length} out of ${results.length} priority updates failed`,
+        updatedCount: successes.length,
+        failures: failures
+      };
+    }
+  } catch (error) {
+    console.error('Error in batch priority update:', error);
+    return { success: false, error: error.message };
+  }
+};
+
 export const updateTestimonial = async (testimonial) => {
   try {
     const colRef = collection(db, 'testimonials');
