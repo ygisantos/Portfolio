@@ -72,7 +72,7 @@ function Project() {
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [selectedLanguage, setSelectedLanguage] = useState(null);
-  const [selectedSort, setSelectedSort] = useState({ value: 'importance', label: 'Importance (Low to High)' });
+  const [selectedSort, setSelectedSort] = useState({ value: 'importance', label: 'Importance' });
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   
   // Track window width for responsive design
@@ -198,7 +198,7 @@ function Project() {
     const handleClearFilters = useCallback(() => {
     setSelectedCategory(null);
     setSelectedLanguage(null);
-    setSelectedSort({ value: 'importance', label: 'Importance (Low to High)' });
+    setSelectedSort({ value: 'importance', label: 'Importance' });
   }, []);
   return (
     <div className="container mx-auto px-4 py-6">

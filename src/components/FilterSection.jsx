@@ -132,7 +132,7 @@ function FilterSection({
           <Select
             placeholder="Sort projects by..."
             options={[
-              { value: 'priority', label: 'Priority (Low to High)' },
+              { value: 'priority', label: 'Importance' },
               { value: 'year', label: 'Year (Newest first)' },
               { value: 'title', label: 'Title (A-Z)' }
             ]}
@@ -142,7 +142,7 @@ function FilterSection({
             classNamePrefix="react-select"
             styles={customSelectStyles}
             aria-label="Sort projects"
-            defaultValue={{ value: 'priority', label: 'Priority (Low to High)' }}
+            defaultValue={{ value: 'priority', label: 'Importance' }}
           />
         </div>
       </div>
@@ -165,7 +165,7 @@ FilterSection.propTypes = {
 
 FilterSection.defaultProps = {
   filteredWorks: [],
-  selectedSort: { value: 'priority', label: 'Priority (Low to High)' }
+  selectedSort: { value: 'priority', label: 'Importance' }
 };
 
 export default React.memo(FilterSection);
