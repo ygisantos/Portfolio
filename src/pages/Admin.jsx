@@ -2005,8 +2005,8 @@ const WorksTab = ({ data, setData, deleteItem, convertToBase64, sanitizeLanguage
                           disabled={!data.works[currentIndex].priority || data.works[currentIndex].priority === '1'}
                           className={`px-2 py-1 rounded flex items-center justify-center ${
                             !data.works[currentIndex].priority || data.works[currentIndex].priority === '1' 
-                              ? 'bg-gray-300 cursor-not-allowed' 
-                              : 'bg-blue-500 hover:bg-blue-600 text-white'
+                              ? '!bg-gray-300 !cursor-not-allowed' 
+                              : '!bg-blue-500 hover:!bg-blue-600 !text-white'
                           }`}
                           title="Move Up in Priority"
                         >
@@ -2021,8 +2021,8 @@ const WorksTab = ({ data, setData, deleteItem, convertToBase64, sanitizeLanguage
                           className={`px-2 py-1 rounded flex items-center justify-center ${
                             !data.works[currentIndex].priority || 
                             parseInt(data.works[currentIndex].priority) >= data.works.length
-                              ? 'bg-gray-300 cursor-not-allowed' 
-                              : 'bg-blue-500 hover:bg-blue-600 text-white'
+                              ? '!bg-gray-300 !cursor-not-allowed' 
+                              : '!bg-blue-500 hover:!bg-blue-600 !text-white'
                           }`}
                           title="Move Down in Priority"
                         >
